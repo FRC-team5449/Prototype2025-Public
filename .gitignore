@@ -1,0 +1,93 @@
+# WPILib specific
+bin/
+build/
+dist/
+sysid_data/
+simgui*.json
+simgui-ds.json
+simgui-window.json
+networktables.json
+networktables.json.bck
+
+# Gradle specific
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+
+# IDE specific
+*.ipr
+*.iws
+*.iml
+.idea/
+.settings/
+.classpath
+.project
+
+# VS Code specific
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Simulation specific
+FRC_characterization*
+*.csv
+*.wpilog
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# Package files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Virtual Machine crash logs
+hs_err_pid*
+replay_pid*
+
+# CTRE Phoenix Sim
+ctre_sim/
+
+# IDE specific additions
+.factorypath
+.fleet
+out/
+.cache
+
+# Simulation additions
+logs/
+*-window.json
+
+# Development
+compile_commands.json
+
+# Temporary files
+*~
+.fuse_hidden*
+.Trash-*
+.nfs*
+
+# Windows specific
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk

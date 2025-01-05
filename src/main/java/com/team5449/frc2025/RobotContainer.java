@@ -7,15 +7,92 @@
 
 package com.team5449.frc2025;
 
+import com.team5449.frc2025.commands.DriveCommands;
+import com.team5449.frc2025.subsystems.TunerConstants;
+import com.team5449.frc2025.subsystems.drive.Drive;
+import com.team5449.frc2025.subsystems.drive.GyroIO;
+import com.team5449.frc2025.subsystems.drive.GyroIOPigeon2;
+import com.team5449.frc2025.subsystems.drive.ModuleIO;
+import com.team5449.frc2025.subsystems.drive.ModuleIOTalonFX;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 
 public class RobotContainer {
+  private final Drive drive;
+
+  private final CommandPS5Controller driverGamepad = new CommandPS5Controller(0);
+  private final CommandPS5Controller operatorGamepad = new CommandPS5Controller(0);
+
   public RobotContainer() {
+
+    switch (Constants.currentMode) {
+      case REAL:
+        // Real robot, instantiate hardware IO implementations
+        drive =
+            new Drive(
+                new GyroIOPigeon2(),
+                new ModuleIOTalonFX(TunerConstants.FrontLeft),
+                new ModuleIOTalonFX(TunerConstants.FrontRight),
+                new ModuleIOTalonFX(TunerConstants.BackLeft),
+                new ModuleIOTalonFX(TunerConstants.BackRight));
+        break;
+
+        // case SIM:
+        //   // Sim robot, instantiate physics sim IO implementations
+        //   drive =
+        //       new Drive(
+        //           new GyroIO() {},
+        //           new ModuleIOSim(TunerConstants.FrontLeft),
+        //           new ModuleIOSim(TunerConstants.FrontRight),
+        //           new ModuleIOSim(TunerConstants.BackLeft),
+        //           new ModuleIOSim(TunerConstants.BackRight));
+        //   break;
+
+      default:
+        // Replayed robot, disable IO implementations
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {});
+        break;
+    }
     configureBindings();
   }
 
-  private void configureBindings() {}
+  private void configureBindings() {
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            drive,
+            () -> -driverGamepad.getLeftY(),
+            () -> -driverGamepad.getLeftX(),
+            () -> -driverGamepad.getRightX()));
+
+    driverGamepad
+        .circle()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -driverGamepad.getLeftY(),
+                () -> -driverGamepad.getLeftX(),
+                () -> new Rotation2d()));
+
+    // Reset gyro to 0° when B button is pressed
+    driverGamepad
+        .triangle()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        drive.setPose(
+                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                    drive)
+                .ignoringDisable(true));
+  }
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");

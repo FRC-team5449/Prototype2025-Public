@@ -7,11 +7,9 @@
 
 package com.team5449.frc2025;
 
-import edu.wpi.first.wpilibj.RobotBase;
-
 public final class Constants {
   public static final Mode simMode = Mode.REPLAY;
-  public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
+  public static final Mode currentMode = Robot.isReal() ? Mode.REAL : simMode;
   public static final boolean tuningMode = false;
 
   public static enum Mode {

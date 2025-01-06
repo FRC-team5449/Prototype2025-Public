@@ -8,9 +8,9 @@
 package com.team5449.frc2025;
 
 public final class Constants {
-  public static final Mode simMode = Mode.REPLAY;
+  public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = Robot.isReal() ? Mode.REAL : simMode;
-  public static final boolean tuningMode = false;
+  public static final boolean tuningMode = true;
 
   public static enum Mode {
     /** Running on a real robot. */

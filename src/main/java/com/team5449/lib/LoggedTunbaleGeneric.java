@@ -1,5 +1,5 @@
-// Copyright (c) 2025 FRC 6328
-// http://github.com/Mechanical-Advantage
+// Copyright (c) 2025 FRC 5449
+// http://github.com/frc-team5449
 //
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE file at
@@ -7,23 +7,22 @@
 
 package com.team5449.lib;
 
+import com.team5449.frc2025.Constants;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Unit;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
-import com.team5449.frc2025.Constants;
-
-/**
- * Class for a tunable number. Gets value from dashboard in tuning mode, returns default if not or
- * value not in dashboard.
- */
-public class LoggedTunableNumber implements DoubleSupplier {
+public class LoggedTunbaleGeneric<T extends Measure<U>, U extends Unit> implements Supplier<T> {
   private static final String tableKey = "/Tuning";
 
   private final String key;
+  private final U defauleUnit;
+  private T currentMeasure;
   private boolean hasDefault = false;
   private double defaultValue;
   private LoggedNetworkNumber dashboardNumber;
@@ -34,8 +33,11 @@ public class LoggedTunableNumber implements DoubleSupplier {
    *
    * @param dashboardKey Key on dashboard
    */
-  public LoggedTunableNumber(String dashboardKey) {
+  @SuppressWarnings("unchecked")
+  public LoggedTunbaleGeneric(String dashboardKey, U defaultUnit) {
     this.key = tableKey + "/" + dashboardKey;
+    this.defauleUnit = defaultUnit;
+    currentMeasure = (T) defaultUnit.of(defaultValue);
   }
 
   /**
@@ -44,8 +46,8 @@ public class LoggedTunableNumber implements DoubleSupplier {
    * @param dashboardKey Key on dashboard
    * @param defaultValue Default value
    */
-  public LoggedTunableNumber(String dashboardKey, double defaultValue) {
-    this(dashboardKey);
+  public LoggedTunbaleGeneric(String dashboardKey, double defaultValue, U defaultUnit) {
+    this(dashboardKey, defaultUnit);
     initDefault(defaultValue);
   }
 
@@ -69,12 +71,14 @@ public class LoggedTunableNumber implements DoubleSupplier {
    *
    * @return The current value
    */
-  public double get() {
-    if (!hasDefault) {
-      return 0.0;
-    } else {
-      return Constants.tuningMode ? dashboardNumber.get() : defaultValue;
+  @SuppressWarnings("unchecked")
+  public double getDouble() {
+    double value = 0.0;
+    if (hasDefault) {
+      value = Constants.tuningMode ? dashboardNumber.get() : defaultValue;
     }
+    currentMeasure = (T) defauleUnit.of(value);
+    return value;
   }
 
   /**
@@ -86,7 +90,7 @@ public class LoggedTunableNumber implements DoubleSupplier {
    *     otherwise.
    */
   public boolean hasChanged(int id) {
-    double currentValue = get();
+    double currentValue = getDouble();
     Double lastValue = lastHasChangedValues.get(id);
     if (lastValue == null || currentValue != lastValue) {
       lastHasChangedValues.put(id, currentValue);
@@ -118,7 +122,7 @@ public class LoggedTunableNumber implements DoubleSupplier {
   }
 
   @Override
-  public double getAsDouble() {
-    return get();
+  public T get() {
+    return currentMeasure;
   }
 }

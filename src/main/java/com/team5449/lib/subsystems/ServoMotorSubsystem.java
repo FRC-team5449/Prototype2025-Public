@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO>
@@ -106,35 +107,34 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
         .ignoringDisable(true);
   }
 
-  public Command positionSetpointCommand(DoubleSupplier positionRadSupplier) {
+  public Command positionSetpointCommand(Supplier<Angle> positionSupplier) {
     return runEnd(
             () -> {
-              setPositionSetpointImpl(Angle.ofBaseUnits(positionRadSupplier.getAsDouble(), Radian));
+              setPositionSetpointImpl(positionSupplier.get());
             },
             () -> {})
         .withName(getName() + " positionSetpointCommand");
   }
 
-  public Command motionMagicSetpointCommand(DoubleSupplier positionRadSupplier) {
+  public Command motionMagicSetpointCommand(Supplier<Angle> positionSupplier) {
     return runEnd(
             () -> {
-              setMotionMagicSetpointImpl(
-                  Angle.ofBaseUnits(positionRadSupplier.getAsDouble(), Radian));
+              setMotionMagicSetpointImpl(positionSupplier.get());
             },
             () -> {})
         .withName(getName() + " motionMagicSetpointCommand");
   }
 
   public Command positionSetpointUntilOnTargetCommand(
-      DoubleSupplier positionRadSupplier, DoubleSupplier epsilon) {
+      Supplier<Angle> positionSupplier, DoubleSupplier epsilon) {
     return new ParallelDeadlineGroup(
         new WaitUntilCommand(
             () ->
                 MathUtil.isNear(
-                    positionRadSupplier.getAsDouble(),
+                    positionSupplier.get().in(Radian),
                     inputs.position.in(Radian),
                     epsilon.getAsDouble())),
-        positionSetpointCommand(positionRadSupplier));
+        positionSetpointCommand(positionSupplier));
   }
 
   protected void setCurrentPositionAsZero() {

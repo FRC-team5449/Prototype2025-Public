@@ -7,6 +7,7 @@
 
 package com.team5449.frc2025;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.team5449.frc2025.commands.DriveCommands;
 import com.team5449.frc2025.subsystems.TunerConstants;
 import com.team5449.frc2025.subsystems.drive.Drive;
@@ -20,12 +21,15 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
   private final Drive drive;
 
   private final CommandPS5Controller driverGamepad = new CommandPS5Controller(0);
   private final CommandPS5Controller operatorGamepad = new CommandPS5Controller(0);
+
+  private final LoggedDashboardChooser<Command> autoChooser;
 
   public RobotContainer() {
 
@@ -63,6 +67,11 @@ public class RobotContainer {
                 new ModuleIO() {});
         break;
     }
+
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    autoChooser.addOption("None", Commands.none());
+    autoChooser.addDefaultOption("Auto1", AutoBuilder.buildAuto("New Auto"));
+
     configureBindings();
   }
 
@@ -96,6 +105,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return autoChooser.get();
   }
 }

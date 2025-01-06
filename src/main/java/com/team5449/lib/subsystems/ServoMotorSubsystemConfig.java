@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package com.team5449.lib.servo;
+package com.team5449.lib.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 

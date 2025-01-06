@@ -5,13 +5,14 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package com.team5449.lib.servo;
+package com.team5449.lib.subsystems;
 
 import static com.team5449.lib.PhoenixUtil.tryUntilOk;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radian;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -21,9 +22,9 @@ import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team5449.frc2025.Robot;
 import com.team5449.lib.UnitUtil;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -79,21 +80,9 @@ public class TalonFXIO implements MotorIO {
     tryUntilOk(5, () -> talon.optimizeBusUtilization());
   }
 
-  public double clampPosition(double units) {
-    return unitsToRotor(
-        MathUtil.clamp(units, mConfig.kMinPositionUnits, mConfig.kMaxPositionUnits));
-  }
-
-  private double rotorToUnits(double rotor) {
-    return rotor * mConfig.unitToRotorRatio;
-  }
-
-  public double unitsToRotor(double units) {
-    return units / mConfig.unitToRotorRatio;
-  }
-
   @Override
-  public void processInputs(MotorInputs inputs) {
+  public void updateInputs(MotorInputs inputs) {
+    inputs.motorConnected = BaseStatusSignal.refreshAll(signals).equals(StatusCode.OK);
     inputs.appliedVolts = voltageSignal.getValueAsDouble();
     inputs.currentStatorAmps = currentStatorSignal.getValueAsDouble();
     inputs.currentSupplyAmps = currentSupplySignal.getValueAsDouble();
@@ -107,7 +96,41 @@ public class TalonFXIO implements MotorIO {
   }
 
   @Override
-  public void setPositionSetpoint(Angle units) {
-    talon.setControl(positionControl.withPosition(UnitUtil.clamp(units, minPosition, maxPosition)));
+  public void setPositionSetpoint(Angle position) {
+    talon.setControl(
+        positionControl.withPosition(UnitUtil.clamp(position, minPosition, maxPosition)));
+  }
+
+  @Override
+  public void setMotionMagicSetpoint(Angle position) {
+    talon.setControl(
+        motionMagicControl.withPosition(UnitUtil.clamp(position, minPosition, maxPosition)));
+  }
+
+  @Override
+  public void setEnableSoftLimits(boolean forward, boolean reverse) {
+    mConfig.fxConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = forward;
+    mConfig.fxConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = forward;
+    tryUntilOk(5, () -> talon.getConfigurator().apply(mConfig.fxConfig));
+  }
+
+  @Override
+  public void setNeutralMode(NeutralModeValue mode) {
+    talon.setNeutralMode(mode);
+  }
+
+  @Override
+  public void setVelocitySetpoint(AngularVelocity velocity) {
+    talon.setControl(velocityControl.withVelocity(velocity));
+  }
+
+  @Override
+  public void setCurrentPositionAsZero() {
+    setCurrentPosition(Angle.ofBaseUnits(0, Radian));
+  }
+
+  @Override
+  public void setCurrentPosition(Angle position) {
+    talon.setPosition(position);
   }
 }

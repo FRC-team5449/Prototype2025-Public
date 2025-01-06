@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package com.team5449.lib.servo;
+package com.team5449.lib.subsystems;
 
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Rotation;
@@ -26,22 +26,22 @@ public interface MotorIO {
     public double currentSupplyAmps = 0.0;
   }
 
-  default void processInputs(MotorInputs inputs) {}
+  default void updateInputs(MotorInputs inputs) {}
 
   default void setOpenLoopDutyCycle(double dutyCycle) {}
 
   // These are in the "units" of the subsystem (rad, m).
-  default void setPositionSetpoint(Angle units) {}
+  default void setPositionSetpoint(Angle position) {}
 
-  default void setMotionMagicSetpoint(Angle units) {}
+  default void setMotionMagicSetpoint(Angle position) {}
 
   default void setNeutralMode(NeutralModeValue mode) {}
 
-  default void setVelocitySetpoint(AngularVelocity unitsPerSecond) {}
+  default void setVelocitySetpoint(AngularVelocity velocity) {}
 
   default void setCurrentPositionAsZero() {}
 
-  default void setCurrentPosition(double positionUnits) {}
+  default void setCurrentPosition(Angle position) {}
 
   default void setEnableSoftLimits(boolean forward, boolean reverse) {}
 }

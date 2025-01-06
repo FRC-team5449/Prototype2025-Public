@@ -13,6 +13,7 @@ import com.team5449.frc2025.subsystems.drive.Drive;
 import com.team5449.frc2025.subsystems.drive.GyroIO;
 import com.team5449.frc2025.subsystems.drive.GyroIOPigeon2;
 import com.team5449.frc2025.subsystems.drive.ModuleIO;
+import com.team5449.frc2025.subsystems.drive.ModuleIOSim;
 import com.team5449.frc2025.subsystems.drive.ModuleIOTalonFX;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -40,16 +41,16 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackRight));
         break;
 
-        // case SIM:
-        //   // Sim robot, instantiate physics sim IO implementations
-        //   drive =
-        //       new Drive(
-        //           new GyroIO() {},
-        //           new ModuleIOSim(TunerConstants.FrontLeft),
-        //           new ModuleIOSim(TunerConstants.FrontRight),
-        //           new ModuleIOSim(TunerConstants.BackLeft),
-        //           new ModuleIOSim(TunerConstants.BackRight));
-        //   break;
+      case SIM:
+        // Sim robot, instantiate physics sim IO implementations
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIOSim(TunerConstants.FrontLeft),
+                new ModuleIOSim(TunerConstants.FrontRight),
+                new ModuleIOSim(TunerConstants.BackLeft),
+                new ModuleIOSim(TunerConstants.BackRight));
+        break;
 
       default:
         // Replayed robot, disable IO implementations

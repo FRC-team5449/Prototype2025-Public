@@ -27,7 +27,7 @@ public class RobotContainer {
   private final Drive drive;
 
   private final CommandPS5Controller driverGamepad = new CommandPS5Controller(0);
-  private final CommandPS5Controller operatorGamepad = new CommandPS5Controller(0);
+  // private final CommandPS5Controller operatorGamepad = new CommandPS5Controller(0);
 
   private final LoggedDashboardChooser<Command> autoChooser;
 

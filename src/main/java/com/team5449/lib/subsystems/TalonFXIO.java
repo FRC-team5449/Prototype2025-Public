@@ -34,8 +34,7 @@ public class TalonFXIO implements MotorIO {
   protected final TalonFX talon;
   protected final ServoMotorSubsystemConfig mConfig;
   protected final DutyCycleOut dutyCycleControl = new DutyCycleOut(0.0);
-  private final VelocityTorqueCurrentFOC velocityControl =
-      new VelocityTorqueCurrentFOC(RPM.of(0));
+  private final VelocityTorqueCurrentFOC velocityControl = new VelocityTorqueCurrentFOC(RPM.of(0));
   private final PositionTorqueCurrentFOC positionControl =
       new PositionTorqueCurrentFOC(Radian.of(0));
   private final MotionMagicExpoTorqueCurrentFOC motionMagicControl =

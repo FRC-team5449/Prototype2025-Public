@@ -35,11 +35,11 @@ public class TalonFXIO implements MotorIO {
   protected final ServoMotorSubsystemConfig mConfig;
   protected final DutyCycleOut dutyCycleControl = new DutyCycleOut(0.0);
   private final VelocityTorqueCurrentFOC velocityControl =
-      new VelocityTorqueCurrentFOC(AngularVelocity.ofBaseUnits(0, RPM));
+      new VelocityTorqueCurrentFOC(RPM.of(0));
   private final PositionTorqueCurrentFOC positionControl =
-      new PositionTorqueCurrentFOC(Angle.ofBaseUnits(0, Radian));
+      new PositionTorqueCurrentFOC(Radian.of(0));
   private final MotionMagicExpoTorqueCurrentFOC motionMagicControl =
-      new MotionMagicExpoTorqueCurrentFOC(Angle.ofBaseUnits(0, Radian));
+      new MotionMagicExpoTorqueCurrentFOC(Radian.of(0));
   private final StatusSignal<Angle> positionSignal;
   private final StatusSignal<AngularVelocity> velocitySignal;
   private final StatusSignal<Voltage> voltageSignal;
@@ -53,8 +53,8 @@ public class TalonFXIO implements MotorIO {
 
   public TalonFXIO(ServoMotorSubsystemConfig config) {
     mConfig = config;
-    maxPosition = Angle.ofBaseUnits(mConfig.kMaxPositionUnits, Radian);
-    minPosition = Angle.ofBaseUnits(mConfig.kMinPositionUnits, Radian);
+    maxPosition = Radian.of(mConfig.kMaxPositionUnits);
+    minPosition = Radian.of(mConfig.kMinPositionUnits);
 
     talon = new TalonFX(config.canId, config.canBus);
 
@@ -126,7 +126,7 @@ public class TalonFXIO implements MotorIO {
 
   @Override
   public void setCurrentPositionAsZero() {
-    setCurrentPosition(Angle.ofBaseUnits(0, Radian));
+    setCurrentPosition(Radian.of(0));
   }
 
   @Override

@@ -26,7 +26,7 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
     extends SubsystemBase {
   protected U io;
   protected T inputs;
-  private Angle positionSetpoint = Angle.ofBaseUnits(0, Radian);
+  private Angle positionSetpoint = Radian.of(0);
 
   protected ServoMotorSubsystemConfig config;
 

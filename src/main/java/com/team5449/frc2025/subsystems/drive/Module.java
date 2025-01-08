@@ -10,6 +10,7 @@ package com.team5449.frc2025.subsystems.drive;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
+import com.team5449.lib.LoggedTunableNumber;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -19,6 +20,19 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import org.littletonrobotics.junction.Logger;
 
 public class Module {
+  //   private static final LoggedTunableNumber drivekS =
+  //     new LoggedTunableNumber("Drive/Module/DrivekS");
+  // private static final LoggedTunableNumber drivekV =
+  //     new LoggedTunableNumber("Drive/Module/DrivekV");
+  // private static final LoggedTunableNumber drivekT =
+  //     new LoggedTunableNumber("Drive/Module/DrivekT");
+  private static final LoggedTunableNumber drivekP =
+      new LoggedTunableNumber("Drive/Module/DrivekP");
+  private static final LoggedTunableNumber drivekD =
+      new LoggedTunableNumber("Drive/Module/DrivekD");
+  private static final LoggedTunableNumber turnkP = new LoggedTunableNumber("Drive/Module/TurnkP");
+  private static final LoggedTunableNumber turnkD = new LoggedTunableNumber("Drive/Module/TurnkD");
+
   private final ModuleIO io;
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
   private final int index;
@@ -53,6 +67,13 @@ public class Module {
   }
 
   public void periodic() {
+    if (drivekP.hasChanged(hashCode()) || drivekD.hasChanged(hashCode())) {
+      io.setDrivePID(drivekP.get(), 0, drivekD.get());
+    }
+    if (turnkP.hasChanged(hashCode()) || turnkD.hasChanged(hashCode())) {
+      io.setTurnPID(turnkP.get(), 0, turnkD.get());
+    }
+
     io.updateInputs(inputs);
     Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
 

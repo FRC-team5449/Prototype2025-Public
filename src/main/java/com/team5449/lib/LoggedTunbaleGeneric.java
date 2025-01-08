@@ -109,20 +109,25 @@ public class LoggedTunbaleGeneric<T extends Measure<U>, U extends Unit> implemen
    *     numbers in order inputted in method
    * @param tunableNumbers All tunable numbers to check
    */
-  public static void ifChanged(
-      int id, Consumer<double[]> action, LoggedTunableNumber... tunableNumbers) {
+  @SafeVarargs
+  public static <T extends Measure<U>, U extends Unit> void ifChanged(
+      int id, Consumer<double[]> action, LoggedTunbaleGeneric<T, U>... tunableNumbers) {
     if (Arrays.stream(tunableNumbers).anyMatch(tunableNumber -> tunableNumber.hasChanged(id))) {
-      action.accept(Arrays.stream(tunableNumbers).mapToDouble(LoggedTunableNumber::get).toArray());
+      action.accept(
+          Arrays.stream(tunableNumbers).mapToDouble(LoggedTunbaleGeneric::getDouble).toArray());
     }
   }
 
   /** Runs action if any of the tunableNumbers have changed */
-  public static void ifChanged(int id, Runnable action, LoggedTunableNumber... tunableNumbers) {
-    ifChanged(id, values -> action.run(), tunableNumbers);
+  @SafeVarargs
+  public static <T extends Measure<U>, U extends Unit> void ifChanged(
+      int id, Runnable action, LoggedTunbaleGeneric<T, U>... tunableNumbers) {
+    ifChanged(id, (values) -> action.run(), tunableNumbers);
   }
 
   @Override
   public T get() {
+    getDouble();
     return currentMeasure;
   }
 }

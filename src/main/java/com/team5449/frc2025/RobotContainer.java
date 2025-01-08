@@ -26,7 +26,6 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
   private final Drive drive;
-  private final Test test;
 
   private final CommandPS5Controller driverGamepad = new CommandPS5Controller(0);
   // private final CommandPS5Controller operatorGamepad = new CommandPS5Controller(0);
@@ -34,8 +33,6 @@ public class RobotContainer {
   private final LoggedDashboardChooser<Command> autoChooser;
 
   public RobotContainer() {
-
-    test = new Test();
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations

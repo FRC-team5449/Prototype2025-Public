@@ -9,7 +9,6 @@ package com.team5449.frc2025;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.team5449.frc2025.commands.DriveCommands;
-import com.team5449.frc2025.subsystems.Test;
 import com.team5449.frc2025.subsystems.TunerConstants;
 import com.team5449.frc2025.subsystems.drive.Drive;
 import com.team5449.frc2025.subsystems.drive.GyroIO;
@@ -98,9 +97,11 @@ public class RobotContainer {
         .onTrue(
             Commands.runOnce(
                     () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                    drive)
+                        RobotState.getInstance()
+                            .resetPose(
+                                new Pose2d(
+                                    RobotState.getInstance().getEstimatedPose().getTranslation(),
+                                    new Rotation2d())))
                 .ignoringDisable(true));
   }
 

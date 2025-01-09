@@ -16,6 +16,7 @@ import com.ctre.phoenix6.signals.*;
 import com.ctre.phoenix6.swerve.*;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.*;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.*;
@@ -242,6 +243,13 @@ public class TunerConstants {
               kBackRightDriveMotorInverted,
               kBackRightSteerMotorInverted,
               kBackRightEncoderInverted);
+
+  public static final Translation2d[] moduleTranslations = {
+    new Translation2d(TunerConstants.FrontLeft.LocationX, TunerConstants.FrontLeft.LocationY),
+    new Translation2d(TunerConstants.FrontRight.LocationX, TunerConstants.FrontRight.LocationY),
+    new Translation2d(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
+    new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
+  };
 
   /**
    * Creates a CommandSwerveDrivetrain instance. This should only be called once in your robot

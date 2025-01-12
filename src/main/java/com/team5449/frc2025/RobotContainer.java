@@ -26,6 +26,9 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   private final Drive drive;
 
+  @SuppressWarnings("unused")
+  private final RobotState robotState = RobotState.getInstance();
+
   private final CommandPS5Controller driverGamepad = new CommandPS5Controller(0);
   // private final CommandPS5Controller operatorGamepad = new CommandPS5Controller(0);
 

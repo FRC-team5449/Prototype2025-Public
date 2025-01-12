@@ -255,19 +255,19 @@ public class ModuleIOTalonFX implements ModuleIO {
         });
   }
 
-  @Override
-  public void setDrivePID(double kP, double kI, double kD) {
-    driveConfig.Slot0.kP = kP;
-    driveConfig.Slot0.kI = kI;
-    driveConfig.Slot0.kD = kD;
-    tryUntilOk(5, () -> driveTalon.getConfigurator().apply(driveConfig, 0.25));
-  }
+  // @Override
+  // public void setDrivePID(double kP, double kI, double kD) {
+  //   driveConfig.Slot0.kP = kP;
+  //   driveConfig.Slot0.kI = kI;
+  //   driveConfig.Slot0.kD = kD;
+  //   tryUntilOk(5, () -> driveTalon.getConfigurator().apply(driveConfig, 0.25));
+  // }
 
-  @Override
-  public void setTurnPID(double kP, double kI, double kD) {
-    turnConfig.Slot0.kP = kP;
-    turnConfig.Slot0.kI = kI;
-    turnConfig.Slot0.kD = kD;
-    tryUntilOk(5, () -> turnTalon.getConfigurator().apply(turnConfig, 0.25));
-  }
+  // @Override
+  // public void setTurnPID(double kP, double kI, double kD) {
+  //   turnConfig.Slot0.kP = kP;
+  //   turnConfig.Slot0.kI = kI;
+  //   turnConfig.Slot0.kD = kD;
+  //   tryUntilOk(5, () -> turnTalon.getConfigurator().apply(turnConfig, 0.25));
+  // }
 }

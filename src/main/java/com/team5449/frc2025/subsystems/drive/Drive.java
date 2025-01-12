@@ -216,7 +216,6 @@ public class Drive extends SubsystemBase {
     previousSetpoint = setpointGenerator.generateSetpoint(previousSetpoint, speeds, 0.02);
 
     SwerveModuleState[] setpointStates = previousSetpoint.moduleStates();
-    SwerveModuleState[] moduleStates = getModuleStates();
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, TunerConstants.kSpeedAt12Volts);
 
     // Log unoptimized setpoints and setpoint speeds
@@ -225,9 +224,6 @@ public class Drive extends SubsystemBase {
 
     // Send setpoints to modules
     for (int i = 0; i < 4; i++) {
-      Rotation2d wheelAngle = moduleStates[i].angle;
-      setpointStates[i].optimize(wheelAngle);
-      setpointStates[i].cosineScale(wheelAngle);
       modules[i].runSetpoint(setpointStates[i]);
     }
 

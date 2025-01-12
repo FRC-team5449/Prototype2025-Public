@@ -32,7 +32,6 @@ import com.team5449.lib.LocalADStarAK;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -94,16 +93,6 @@ public class Drive extends SubsystemBase {
 
   private final SwerveDriveKinematics kinematics =
       new SwerveDriveKinematics(TunerConstants.moduleTranslations);
-  private Rotation2d rawGyroRotation = new Rotation2d();
-  private SwerveModulePosition[] lastModulePositions = // For delta tracking
-      new SwerveModulePosition[] {
-        new SwerveModulePosition(),
-        new SwerveModulePosition(),
-        new SwerveModulePosition(),
-        new SwerveModulePosition()
-      };
-  private SwerveDrivePoseEstimator poseEstimator =
-      new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
   private final SwerveSetpointGenerator setpointGenerator;
   private SwerveSetpoint previousSetpoint;
@@ -227,6 +216,7 @@ public class Drive extends SubsystemBase {
     previousSetpoint = setpointGenerator.generateSetpoint(previousSetpoint, speeds, 0.02);
 
     SwerveModuleState[] setpointStates = previousSetpoint.moduleStates();
+    SwerveModuleState[] moduleStates = getModuleStates();
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, TunerConstants.kSpeedAt12Volts);
 
     // Log unoptimized setpoints and setpoint speeds
@@ -235,6 +225,9 @@ public class Drive extends SubsystemBase {
 
     // Send setpoints to modules
     for (int i = 0; i < 4; i++) {
+      Rotation2d wheelAngle = moduleStates[i].angle;
+      setpointStates[i].optimize(wheelAngle);
+      setpointStates[i].cosineScale(wheelAngle);
       modules[i].runSetpoint(setpointStates[i]);
     }
 

@@ -39,6 +39,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -183,7 +184,9 @@ public class Drive extends SubsystemBase {
     // Update odometry
     double[] sampleTimestamps =
         modules[0].getOdometryTimestamps(); // All signals are sampled together
+
     int sampleCount = sampleTimestamps.length;
+
     for (int i = 0; i < sampleCount; i++) {
 
       SwerveModulePosition[] wheelPositions = new SwerveModulePosition[4];
@@ -199,6 +202,9 @@ public class Drive extends SubsystemBase {
                       gyroInputs.connected ? gyroInputs.odometryYawPositions[i] : null),
                   sampleTimestamps[i]));
     }
+
+    RobotState.getInstance()
+        .setYawVelocity(Units.radiansToDegrees(gyroInputs.yawVelocityRadPerSec));
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);

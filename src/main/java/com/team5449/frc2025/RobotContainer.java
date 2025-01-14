@@ -10,6 +10,7 @@ package com.team5449.frc2025;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.team5449.frc2025.commands.DriveCommands;
 import com.team5449.frc2025.subsystems.TunerConstants;
+import com.team5449.frc2025.subsystems.apriltagvision.AprilTagVision;
 import com.team5449.frc2025.subsystems.drive.Drive;
 import com.team5449.frc2025.subsystems.drive.GyroIO;
 import com.team5449.frc2025.subsystems.drive.GyroIOPigeon2;
@@ -25,6 +26,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
   private final Drive drive;
+  private final AprilTagVision aprilTagVision;
 
   @SuppressWarnings("unused")
   private final RobotState robotState = RobotState.getInstance();
@@ -45,6 +47,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+        aprilTagVision = new AprilTagVision(null);
         break;
 
       case SIM:
@@ -56,6 +59,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
+        aprilTagVision = null;
         break;
 
       default:
@@ -67,6 +71,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+        aprilTagVision = null;
         break;
     }
 

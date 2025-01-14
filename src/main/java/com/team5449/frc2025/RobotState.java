@@ -23,6 +23,7 @@ import edu.wpi.first.math.numbers.N3;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import lombok.Getter;
+import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class RobotState {
@@ -45,6 +46,8 @@ public class RobotState {
   @Getter
   @AutoLogOutput(key = "RobotState/EstimatedPose")
   private Pose2d estimatedPose = new Pose2d();
+
+  @Getter @Setter private double yawVelocity = 0.0;
 
   private final TimeInterpolatableBuffer<Pose2d> poseBuffer =
       TimeInterpolatableBuffer.createBuffer(poseBufferSizeSec);

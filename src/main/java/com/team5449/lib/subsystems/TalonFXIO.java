@@ -7,7 +7,7 @@
 
 package com.team5449.lib.subsystems;
 
-import static com.team5449.lib.PhoenixUtil.tryUntilOk;
+import static com.team5449.lib.util.PhoenixUtil.tryUntilOk;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radian;
 
@@ -24,7 +24,7 @@ import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team5449.frc2025.Robot;
-import com.team5449.lib.UnitUtil;
+import com.team5449.lib.util.UnitUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;

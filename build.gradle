@@ -153,7 +153,7 @@ spotless {
 // the root directory of this project.
 
 '''
-        targetExclude "**/com/team5449/lib/Alert.java", "**/com/team5449/lib/LoggedTunableNumber.java"
+        targetExclude "**/com/team5449/lib/Alert.java", "**/com/team5449/lib/LoggedTunableNumber.java", "**/com/team5449/lib/thirdpartylibs/"
     }
 
     groovyGradle {

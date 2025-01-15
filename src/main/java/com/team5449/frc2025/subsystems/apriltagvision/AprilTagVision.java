@@ -9,7 +9,8 @@ package com.team5449.frc2025.subsystems.apriltagvision;
 
 import com.team5449.frc2025.RobotState;
 import com.team5449.frc2025.RobotState.VisionObservation;
-import com.team5449.lib.LimelightHelpers;
+import com.team5449.lib.thirdpartylibs.LimelightHelpers;
+import com.team5449.lib.util.AllianceFlipUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -18,14 +19,16 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.littletonrobotics.junction.Logger;
 
 public class AprilTagVision extends SubsystemBase {
-  private static final double FIELD_LENGTH_METERS = 16.54175;
-  private static final double FIELD_WIDTH_METERS = 8.0137;
+  private static final double FIELD_LENGTH_METERS = AllianceFlipUtil.fieldLength;
+  private static final double FIELD_WIDTH_METERS = AllianceFlipUtil.fieldWidth;
   // Tuning constants
   private static final double MIN_TAG_AREA = 0.1;
   private static final double MAX_TAG_DISTANCE = 6.0;
@@ -172,6 +175,7 @@ public class AprilTagVision extends SubsystemBase {
           getMegaTag2Estimate(camera.limelightName(), camera.stdDevCoefficient());
       if (megaTag2Estimate.isPresent()) {
         observations.add(megaTag2Estimate.get());
+        Logger.recordOutput("Vision/Timestamp", megaTag2Estimate.get().timestamp());
         continue;
       }
 
@@ -181,8 +185,8 @@ public class AprilTagVision extends SubsystemBase {
       megaTagEstimate.ifPresent(observations::add);
     }
 
-    for (VisionObservation observation : observations) {
-      RobotState.getInstance().addVisionObservation(observation);
-    }
+    observations.stream()
+        .sorted(Comparator.comparingDouble(VisionObservation::timestamp))
+        .forEach(RobotState.getInstance()::addVisionObservation);
   }
 }

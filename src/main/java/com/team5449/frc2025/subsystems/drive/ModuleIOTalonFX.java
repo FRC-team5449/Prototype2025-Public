@@ -7,7 +7,7 @@
 
 package com.team5449.frc2025.subsystems.drive;
 
-import static com.team5449.lib.PhoenixUtil.tryUntilOk;
+import static com.team5449.lib.util.PhoenixUtil.tryUntilOk;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;

@@ -14,6 +14,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -48,6 +49,8 @@ public class RobotState {
   private Pose2d estimatedPose = new Pose2d();
 
   @Getter @Setter private double yawVelocity = 0.0;
+
+  private Twist2d robotVelocity = new Twist2d();
 
   private final TimeInterpolatableBuffer<Pose2d> poseBuffer =
       TimeInterpolatableBuffer.createBuffer(poseBufferSizeSec);
@@ -154,6 +157,18 @@ public class RobotState {
 
   public Rotation2d getRotation() {
     return estimatedPose.getRotation();
+  }
+
+  public void addVelocityData(Twist2d robotVelocity) {
+    this.robotVelocity = robotVelocity;
+  }
+
+  @AutoLogOutput(key = "RobotState/FieldVelocity")
+  public Twist2d fieldVelocity() {
+    Translation2d linearFieldVelocity =
+        new Translation2d(robotVelocity.dx, robotVelocity.dy).rotateBy(estimatedPose.getRotation());
+    return new Twist2d(
+        linearFieldVelocity.getX(), linearFieldVelocity.getY(), robotVelocity.dtheta);
   }
 
   public record OdometryObservation(

@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package com.team5449.lib;
+package com.team5449.lib.util;
 
 import com.ctre.phoenix6.StatusCode;
 import java.util.function.Supplier;

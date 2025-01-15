@@ -28,7 +28,8 @@ import com.team5449.frc2025.Constants;
 import com.team5449.frc2025.Constants.Mode;
 import com.team5449.frc2025.RobotState;
 import com.team5449.frc2025.subsystems.TunerConstants;
-import com.team5449.lib.LocalADStarAK;
+import com.team5449.lib.thirdpartylibs.LocalADStarAK;
+import com.team5449.lib.util.GeomUtil;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -206,6 +207,13 @@ public class Drive extends SubsystemBase {
     RobotState.getInstance()
         .setYawVelocity(Units.radiansToDegrees(gyroInputs.yawVelocityRadPerSec));
 
+    ChassisSpeeds robotRelativeVelocity = getChassisSpeeds();
+    robotRelativeVelocity.omegaRadiansPerSecond =
+        gyroInputs.connected
+            ? gyroInputs.yawVelocityRadPerSec
+            : robotRelativeVelocity.omegaRadiansPerSecond;
+    RobotState.getInstance().addVelocityData(GeomUtil.toTwist2d(robotRelativeVelocity));
+
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
   }
@@ -322,12 +330,12 @@ public class Drive extends SubsystemBase {
   }
 
   /** Returns the maximum linear speed in meters per sec. */
-  public double getMaxLinearSpeedMetersPerSec() {
+  public static double getMaxLinearSpeedMetersPerSec() {
     return TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
   }
 
   /** Returns the maximum angular speed in radians per sec. */
-  public double getMaxAngularSpeedRadPerSec() {
+  public static double getMaxAngularSpeedRadPerSec() {
     return getMaxLinearSpeedMetersPerSec() / DRIVE_BASE_RADIUS;
   }
 }

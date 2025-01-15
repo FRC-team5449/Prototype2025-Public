@@ -10,7 +10,6 @@ package com.team5449.frc2025;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.team5449.frc2025.commands.DriveCommands;
 import com.team5449.frc2025.subsystems.TunerConstants;
-import com.team5449.frc2025.subsystems.apriltagvision.AprilTagVision;
 import com.team5449.frc2025.subsystems.drive.Drive;
 import com.team5449.frc2025.subsystems.drive.GyroIO;
 import com.team5449.frc2025.subsystems.drive.GyroIOPigeon2;
@@ -26,7 +25,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
   private final Drive drive;
-  private final AprilTagVision aprilTagVision;
+  // private final AprilTagVision aprilTagVision;
   private final RobotState robotState = RobotState.getInstance();
 
   private final CommandPS5Controller driverGamepad = new CommandPS5Controller(0);
@@ -45,7 +44,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
-        aprilTagVision = new AprilTagVision(null);
+        // aprilTagVision = new AprilTagVision(null);
         break;
 
       case SIM:
@@ -57,7 +56,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
-        aprilTagVision = null;
+        // aprilTagVision = null;
         break;
 
       default:
@@ -69,7 +68,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        aprilTagVision = null;
+        // aprilTagVision = null;
         break;
     }
 
@@ -107,7 +106,10 @@ public class RobotContainer {
                             .resetPose(
                                 new Pose2d(
                                     RobotState.getInstance().getEstimatedPose().getTranslation(),
-                                    new Rotation2d())))
+                                    RobotState.getInstance()
+                                        .getEstimatedPose()
+                                        .getRotation()
+                                        .unaryMinus())))
                 .ignoringDisable(true));
   }
 

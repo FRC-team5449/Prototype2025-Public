@@ -64,7 +64,9 @@ public class RobotState {
         new SwerveModulePosition(),
         new SwerveModulePosition()
       };
+
   // Assume gyro starts at zero
+  @AutoLogOutput(key = "RobotState/GyroOffset")
   private Rotation2d gyroOffset = new Rotation2d();
 
   private RobotState() {
@@ -77,7 +79,7 @@ public class RobotState {
   public void resetPose(Pose2d pose) {
     estimatedPose = pose;
     odometryPose = pose;
-    gyroOffset = pose.getRotation().minus(gyroOffset);
+    gyroOffset = pose.getRotation();
     poseBuffer.clear();
   }
 

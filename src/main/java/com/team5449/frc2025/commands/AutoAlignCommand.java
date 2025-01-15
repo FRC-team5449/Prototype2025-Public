@@ -158,7 +158,9 @@ public class AutoAlignCommand extends Command {
         thetaController.getSetpoint().velocity * ffScalar
             + thetaController.calculate(
                 currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians());
+
     if (thetaController.atGoal()) thetaVelocity = 0.0;
+
     if (!linearController.atGoal() || !thetaController.atGoal()) {
       toleranceTimer.reset();
     }

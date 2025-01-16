@@ -24,7 +24,7 @@ public class RobotState {
   }
 
   @AutoLogOutput(key = "RobotState/Robot")
-  public synchronized Pose2d getEstimatedPose() {
+  public synchronized Pose2d getPose() {
     return estimatedPose;
   }
 
@@ -32,7 +32,7 @@ public class RobotState {
     estimatedPose = pose;
   }
 
-  public synchronized void requestPoseReset(Pose2d newPose) {
+  public synchronized void setPose(Pose2d newPose) {
     poseResetRequest = Optional.of(newPose);
   }
 

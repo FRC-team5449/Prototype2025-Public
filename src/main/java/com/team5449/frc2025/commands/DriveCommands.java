@@ -7,7 +7,7 @@
 
 package com.team5449.frc2025.commands;
 
-import com.team5449.frc2025.RobotState;
+import com.team5449.frc2025.subsystems.TunerConstants;
 import com.team5449.frc2025.subsystems.drive.Drive;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -87,10 +87,13 @@ public class DriveCommands {
           boolean isFlipped =
               DriverStation.getAlliance().isPresent()
                   && DriverStation.getAlliance().get() == Alliance.Red;
-          Rotation2d rotation = RobotState.getInstance().getRotation();
-          drive.runVelocity(
+          speeds =
               ChassisSpeeds.fromFieldRelativeSpeeds(
-                  speeds, isFlipped ? rotation.plus(new Rotation2d(Math.PI)) : rotation));
+                  speeds,
+                  isFlipped
+                      ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                      : drive.getRotation());
+          drive.runVelocity(speeds);
         },
         drive);
   }
@@ -122,12 +125,10 @@ public class DriveCommands {
               Translation2d linearVelocity =
                   getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
-              Rotation2d rotation = RobotState.getInstance().getRotation();
-
               // Calculate angular speed
               double omega =
                   angleController.calculate(
-                      rotation.getRadians(), rotationSupplier.get().getRadians());
+                      drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
 
               // Convert to field relative speeds & send command
               ChassisSpeeds speeds =
@@ -138,15 +139,17 @@ public class DriveCommands {
               boolean isFlipped =
                   DriverStation.getAlliance().isPresent()
                       && DriverStation.getAlliance().get() == Alliance.Red;
-              drive.runVelocity(
-                  ChassisSpeeds.fromFieldRelativeSpeeds(
-                      speeds, isFlipped ? rotation.plus(new Rotation2d(Math.PI)) : rotation));
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  speeds,
+                  isFlipped
+                      ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                      : drive.getRotation());
+              drive.runVelocity(speeds);
             },
             drive)
 
         // Reset PID controller when command starts
-        .beforeStarting(
-            () -> angleController.reset(RobotState.getInstance().getRotation().getRadians()));
+        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
 
   /**
@@ -243,14 +246,14 @@ public class DriveCommands {
             Commands.runOnce(
                 () -> {
                   state.positions = drive.getWheelRadiusCharacterizationPositions();
-                  state.lastAngle = drive.getGyroRotation();
+                  state.lastAngle = drive.getRotation();
                   state.gyroDelta = 0.0;
                 }),
 
             // Update gyro delta
             Commands.run(
                     () -> {
-                      var rotation = drive.getGyroRotation();
+                      var rotation = drive.getRotation();
                       state.gyroDelta += Math.abs(rotation.minus(state.lastAngle).getRadians());
                       state.lastAngle = rotation;
                     })
@@ -263,7 +266,8 @@ public class DriveCommands {
                       for (int i = 0; i < 4; i++) {
                         wheelDelta += Math.abs(positions[i] - state.positions[i]) / 4.0;
                       }
-                      double wheelRadius = (state.gyroDelta * Drive.DRIVE_BASE_RADIUS) / wheelDelta;
+                      double wheelRadius =
+                          (state.gyroDelta * TunerConstants.DRIVE_BASE_RADIUS) / wheelDelta;
 
                       NumberFormat formatter = new DecimalFormat("#0.000");
                       System.out.println(

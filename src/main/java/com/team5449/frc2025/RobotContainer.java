@@ -25,8 +25,11 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
   private final Drive drive;
-  // private final AprilTagVision aprilTagVision;
+
+  @SuppressWarnings("unused")
   private final RobotState robotState = RobotState.getInstance();
+
+  // private final AprilTagVision aprilTagVision;
 
   private final CommandPS5Controller driverGamepad = new CommandPS5Controller(0);
   // private final CommandPS5Controller operatorGamepad = new CommandPS5Controller(0);
@@ -36,7 +39,6 @@ public class RobotContainer {
   public RobotContainer() {
     switch (Constants.currentMode) {
       case REAL:
-        // Real robot, instantiate hardware IO implementations
         drive =
             new Drive(
                 new GyroIOPigeon2(),
@@ -44,11 +46,9 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
-        // aprilTagVision = new AprilTagVision(null);
         break;
 
       case SIM:
-        // Sim robot, instantiate physics sim IO implementations
         drive =
             new Drive(
                 new GyroIO() {},
@@ -56,11 +56,9 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
-        // aprilTagVision = null;
         break;
 
       default:
-        // Replayed robot, disable IO implementations
         drive =
             new Drive(
                 new GyroIO() {},
@@ -68,6 +66,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+        ;
         // aprilTagVision = null;
         break;
     }
@@ -102,14 +101,9 @@ public class RobotContainer {
         .onTrue(
             Commands.runOnce(
                     () ->
-                        RobotState.getInstance()
-                            .resetPose(
-                                new Pose2d(
-                                    RobotState.getInstance().getEstimatedPose().getTranslation(),
-                                    RobotState.getInstance()
-                                        .getEstimatedPose()
-                                        .getRotation()
-                                        .unaryMinus())))
+                        drive.setPose(
+                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                    drive)
                 .ignoringDisable(true));
   }
 

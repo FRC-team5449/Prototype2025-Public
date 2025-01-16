@@ -199,24 +199,14 @@ public class Drive extends SubsystemBase {
       SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
       SwerveModulePosition[] moduleDeltas = new SwerveModulePosition[4];
 
-      try {
-        for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
-          modulePositions[moduleIndex] = modules[moduleIndex].getOdometryPositions()[i];
-          moduleDeltas[moduleIndex] =
-              new SwerveModulePosition(
-                  modulePositions[moduleIndex].distanceMeters
-                      - lastModulePositions[moduleIndex].distanceMeters,
-                  modulePositions[moduleIndex].angle);
-          lastModulePositions[moduleIndex] = modulePositions[moduleIndex];
-        }
-      } catch (ArrayIndexOutOfBoundsException e) {
-        Logger.recordOutput("Drive/ModuleLength", modules.length);
-        Logger.recordOutput("Drive/ModulePosition", modulePositions.length);
-        Logger.recordOutput("Drive/OdometryPosition", modules[0].getOdometryPositions().length);
-
-        System.out.println("Drive/ModuleLength" + modules.length);
-        System.out.println("Drive/ModulePosition" + modulePositions.length);
-        System.out.println("Drive/OdometryPosition" + modules[0].getOdometryPositions().length);
+      for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
+        modulePositions[moduleIndex] = modules[moduleIndex].getOdometryPositions()[i];
+        moduleDeltas[moduleIndex] =
+            new SwerveModulePosition(
+                modulePositions[moduleIndex].distanceMeters
+                    - lastModulePositions[moduleIndex].distanceMeters,
+                modulePositions[moduleIndex].angle);
+        lastModulePositions[moduleIndex] = modulePositions[moduleIndex];
       }
 
       // Update gyro angle
@@ -236,7 +226,18 @@ public class Drive extends SubsystemBase {
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
 
-    RobotState.getInstance().updatePose(getPose());
+    // Consume vision measurements
+    RobotState.getInstance()
+        .consumeVisionObservation()
+        .ifPresent(
+            observation -> {
+              poseEstimator.addVisionMeasurement(
+                  observation.visionPose(), observation.timestamp(), observation.stdDevs());
+            });
+
+    // Update robot state with current pose
+    RobotState.getInstance().updatePose(poseEstimator.getEstimatedPosition());
+    RobotState.getInstance().updateSpeeds(getChassisSpeeds());
   }
 
   /**

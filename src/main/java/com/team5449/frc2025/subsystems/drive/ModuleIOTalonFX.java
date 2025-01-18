@@ -119,6 +119,13 @@ public class ModuleIOTalonFX implements ModuleIO {
           case RemoteCANcoder -> FeedbackSensorSourceValue.RemoteCANcoder;
           case FusedCANcoder -> FeedbackSensorSourceValue.FusedCANcoder;
           case SyncCANcoder -> FeedbackSensorSourceValue.SyncCANcoder;
+          case FusedCANdiPWM1 -> FeedbackSensorSourceValue.FusedCANdiPWM1;
+          case FusedCANdiPWM2 -> FeedbackSensorSourceValue.FusedCANdiPWM2;
+          case SyncCANdiPWM1 -> FeedbackSensorSourceValue.SyncCANdiPWM1;
+          case SyncCANdiPWM2 -> FeedbackSensorSourceValue.SyncCANdiPWM2;
+          case RemoteCANdiPWM1 -> FeedbackSensorSourceValue.RemoteCANdiPWM1;
+          case RemoteCANdiPWM2 -> FeedbackSensorSourceValue.RemoteCANdiPWM2;
+          case TalonFXS_PulseWidth -> FeedbackSensorSourceValue.RotorSensor;
         };
     turnConfig.Feedback.RotorToSensorRatio = constants.SteerMotorGearRatio;
     turnConfig.MotionMagic.MotionMagicCruiseVelocity = 100.0 / constants.SteerMotorGearRatio;

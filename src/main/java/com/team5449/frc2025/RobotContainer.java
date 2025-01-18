@@ -16,6 +16,7 @@ import com.team5449.frc2025.subsystems.drive.GyroIOPigeon2;
 import com.team5449.frc2025.subsystems.drive.ModuleIO;
 import com.team5449.frc2025.subsystems.drive.ModuleIOSim;
 import com.team5449.frc2025.subsystems.drive.ModuleIOTalonFX;
+import com.team5449.frc2025.subsystems.elevator.Elevator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,6 +26,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
   private final Drive drive;
+  private final Elevator elevator;
 
   @SuppressWarnings("unused")
   private final RobotState robotState = RobotState.getInstance();
@@ -46,6 +48,8 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+
+        elevator = new Elevator();
         break;
 
       case SIM:
@@ -56,6 +60,8 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
+
+        elevator = null;
         break;
 
       default:
@@ -66,6 +72,8 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+
+        elevator = null;
         ;
         // aprilTagVision = null;
         break;
@@ -105,6 +113,9 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
+
+    driverGamepad.povUp().onTrue(elevator.positionCommand(17));
+    driverGamepad.povDown().onTrue(elevator.positionCommand(0));
   }
 
   public Command getAutonomousCommand() {

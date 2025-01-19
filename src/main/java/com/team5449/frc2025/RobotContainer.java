@@ -80,9 +80,8 @@ public class RobotContainer {
     }
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-    autoChooser.addOption("None", Commands.none());
-    autoChooser.addDefaultOption("Auto1", AutoBuilder.buildAuto("New Auto"));
-
+    autoChooser.addDefaultOption("None", Commands.none());
+    autoChooser.addOption("Auto1", AutoBuilder.buildAuto("New Auto"));
     configureBindings();
   }
 

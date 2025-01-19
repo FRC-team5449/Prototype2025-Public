@@ -7,6 +7,7 @@
 
 package com.team5449.frc2025;
 
+import com.ctre.phoenix6.CANBus;
 import com.team5449.lib.thirdpartylibs.Elastic;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -52,6 +53,11 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotPeriodic() {
+    Logger.recordOutput("CANBus/Name", new CANBus("canivore").getName());
+    Logger.recordOutput("CANBus/FD", new CANBus("canivore").isNetworkFD());
+    Logger.recordOutput("CANBus/Status", new CANBus("canivore").getStatus().Status);
+    Logger.recordOutput("CANBus/Utilization", new CANBus("canivore").getStatus().BusUtilization);
+
     Threads.setCurrentThreadPriority(true, 99);
 
     CommandScheduler.getInstance().run();

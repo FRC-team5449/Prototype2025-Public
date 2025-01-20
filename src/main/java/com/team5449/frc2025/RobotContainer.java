@@ -102,7 +102,7 @@ public class RobotContainer {
                 () -> -driverGamepad.getLeftX(),
                 () -> new Rotation2d()));
 
-    // Reset gyro to 0° when B button is pressed
+    // Reset gyro to 0 when triangle is pressed
     driverGamepad
         .triangle()
         .onTrue(

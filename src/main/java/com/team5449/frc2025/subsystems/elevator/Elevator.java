@@ -7,11 +7,14 @@
 
 package com.team5449.frc2025.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.Rotation;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,7 +23,7 @@ public class Elevator extends SubsystemBase {
   private final TalonFX elevatorMaster = new TalonFX(1, "canivore");
   private final TalonFX elevatorSlave = new TalonFX(2, "canivore");
   private final PositionDutyCycle positionControl = new PositionDutyCycle(-0.03);
-  private double positionRotation = 0;
+  private Angle positionRotation = Rotation.of(0);
 
   public Elevator() {
     TalonFXConfiguration configuration = new TalonFXConfiguration();
@@ -33,7 +36,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command positionCommand(double newPositionRotation) {
-    return Commands.runOnce(() -> positionRotation = newPositionRotation, this);
+    return Commands.runOnce(() -> positionRotation = Rotation.of(newPositionRotation), this);
   }
 
   @Override

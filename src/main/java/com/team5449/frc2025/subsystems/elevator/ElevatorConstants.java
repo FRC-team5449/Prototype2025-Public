@@ -7,8 +7,9 @@
 
 package com.team5449.frc2025.subsystems.elevator;
 
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -23,10 +24,8 @@ public class ElevatorConstants {
     kElevatorConfig.canId = 0;
     kElevatorConfig.fxConfig =
         new TalonFXConfiguration()
-            .withMotionMagic(
-                new MotionMagicConfigs()
-                    .withMotionMagicAcceleration(100)
-                    .withMotionMagicCruiseVelocity(33))
+            .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(90))
+            .withSlot0(new Slot0Configs().withKP(0))
             .withMotorOutput(
                 new MotorOutputConfigs()
                     .withInverted(InvertedValue.Clockwise_Positive)

@@ -151,9 +151,7 @@ public class DriveCommands {
             },
             drive)
         .until(new Trigger(angleController::atGoal).debounce(0.2))
-        .
-        // Reset PID controller when command starts
-        beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
 
   /**

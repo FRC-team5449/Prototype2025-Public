@@ -10,6 +10,7 @@ package com.team5449.lib.subsystems;
 import static com.team5449.lib.util.PhoenixUtil.tryUntilOk;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radian;
+import static edu.wpi.first.units.Units.Rotation;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
@@ -34,11 +35,13 @@ public class TalonFXIO implements MotorIO {
   protected final TalonFX talon;
   protected final ServoMotorSubsystemConfig mConfig;
   protected final DutyCycleOut dutyCycleControl = new DutyCycleOut(0.0);
+
   private final VelocityTorqueCurrentFOC velocityControl = new VelocityTorqueCurrentFOC(RPM.of(0));
   private final PositionTorqueCurrentFOC positionControl =
       new PositionTorqueCurrentFOC(Radian.of(0));
   private final MotionMagicExpoTorqueCurrentFOC motionMagicControl =
       new MotionMagicExpoTorqueCurrentFOC(Radian.of(0));
+
   private final StatusSignal<Angle> positionSignal;
   private final StatusSignal<AngularVelocity> velocitySignal;
   private final StatusSignal<Voltage> voltageSignal;
@@ -52,8 +55,8 @@ public class TalonFXIO implements MotorIO {
 
   public TalonFXIO(ServoMotorSubsystemConfig config) {
     mConfig = config;
-    maxPosition = Radian.of(mConfig.kMaxPositionUnits);
-    minPosition = Radian.of(mConfig.kMinPositionUnits);
+    maxPosition = Rotation.of(mConfig.kMaxPositionUnits);
+    minPosition = Rotation.of(mConfig.kMinPositionUnits);
 
     talon = new TalonFX(config.canId, config.canBus);
 

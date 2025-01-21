@@ -9,6 +9,7 @@ package com.team5449.frc2025;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.team5449.frc2025.commands.DriveCommands;
+import com.team5449.frc2025.commands.StaticCharacterizationCommand;
 import com.team5449.frc2025.subsystems.TunerConstants;
 import com.team5449.frc2025.subsystems.drive.Drive;
 import com.team5449.frc2025.subsystems.drive.GyroIO;
@@ -81,7 +82,11 @@ public class RobotContainer {
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
     autoChooser.addDefaultOption("None", Commands.none());
-    autoChooser.addOption("Auto1", AutoBuilder.buildAuto("New Auto"));
+    autoChooser.addOption(
+        "Elevator Characterization",
+        new StaticCharacterizationCommand(
+                elevator, (current) -> elevator.runCharacterization(current), elevator::getVelocity)
+            .finallyDo(elevator::endCharacterization));
     configureBindings();
   }
 

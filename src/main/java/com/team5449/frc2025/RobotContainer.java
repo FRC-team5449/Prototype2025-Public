@@ -41,6 +41,7 @@ public class RobotContainer {
   private final LoggedDashboardChooser<Command> autoChooser;
 
   public RobotContainer() {
+
     switch (Constants.currentMode) {
       case REAL:
         drive =
@@ -122,12 +123,7 @@ public class RobotContainer {
 
     driverGamepad
         .square()
-        .whileTrue(
-            new AutoAlignCommand(
-                () -> new Pose2d(15, 4, Rotation2d.kZero),
-                () -> new Translation2d(),
-                () -> false,
-                drive));
+        .whileTrue(new AutoAlignCommand(() -> new Translation2d(), () -> false, drive));
 
     // driverGamepad.povUp().onTrue(elevator.positionCommand(17));
     // driverGamepad.povDown().onTrue(elevator.positionCommand(0));

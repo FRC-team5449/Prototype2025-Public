@@ -76,11 +76,8 @@ public class AutoAlignCommand extends Command {
   private final Drive drive;
 
   public AutoAlignCommand(
-      Supplier<Pose2d> poseSupplier,
-      Supplier<Translation2d> feedforwardSupplier,
-      BooleanSupplier slowMode,
-      Drive drive) {
-    this.poseSupplier = poseSupplier;
+      Supplier<Translation2d> feedforwardSupplier, BooleanSupplier slowMode, Drive drive) {
+    this.poseSupplier = drive::getTargetPose;
     this.feedforwardSupplier = feedforwardSupplier;
     this.slowMode = slowMode;
     this.drive = drive;

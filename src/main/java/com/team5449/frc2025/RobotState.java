@@ -24,6 +24,7 @@ public class RobotState {
   private static RobotState mIntance = null;
   private Pose2d estimatedPose = new Pose2d();
   private Optional<Pose2d> poseResetRequest = Optional.empty();
+  private Optional<Pose2d> targetResetRequest = Optional.empty();
   private Optional<VisionObservation> latestVisionObservation = Optional.empty();
   private VisionObservation lastProcessedObservation = null;
 
@@ -68,9 +69,19 @@ public class RobotState {
     poseResetRequest = Optional.of(newPose);
   }
 
+  public synchronized void setTargetPose(Pose2d newPose) {
+    targetResetRequest = Optional.of(newPose);
+  }
+
   public synchronized Optional<Pose2d> consumePoseResetRequest() {
     Optional<Pose2d> request = poseResetRequest;
     poseResetRequest = Optional.empty();
+    return request;
+  }
+
+  public synchronized Optional<Pose2d> consumeTargetResetRequest() {
+    Optional<Pose2d> request = targetResetRequest;
+    targetResetRequest = Optional.empty();
     return request;
   }
 

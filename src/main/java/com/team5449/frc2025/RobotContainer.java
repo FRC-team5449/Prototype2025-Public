@@ -8,8 +8,8 @@
 package com.team5449.frc2025;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.team5449.frc2025.commands.AutoAlignCommand;
 import com.team5449.frc2025.commands.DriveCommands;
-import com.team5449.frc2025.commands.StaticCharacterizationCommand;
 import com.team5449.frc2025.subsystems.TunerConstants;
 import com.team5449.frc2025.subsystems.drive.Drive;
 import com.team5449.frc2025.subsystems.drive.GyroIO;
@@ -20,6 +20,7 @@ import com.team5449.frc2025.subsystems.drive.ModuleIOTalonFX;
 import com.team5449.frc2025.subsystems.elevator.Elevator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -82,11 +83,12 @@ public class RobotContainer {
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
     autoChooser.addDefaultOption("None", Commands.none());
-    autoChooser.addOption(
-        "Elevator Characterization",
-        new StaticCharacterizationCommand(
-                elevator, (current) -> elevator.runCharacterization(current), elevator::getVelocity)
-            .finallyDo(elevator::endCharacterization));
+    // autoChooser.addOption(
+    //     "Elevator Characterization",
+    //     new StaticCharacterizationCommand(
+    //             elevator, (current) -> elevator.runCharacterization(current),
+    // elevator::getVelocity)
+    //         .finallyDo(elevator::endCharacterization));
     configureBindings();
   }
 
@@ -118,8 +120,17 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    driverGamepad.povUp().onTrue(elevator.positionCommand(17));
-    driverGamepad.povDown().onTrue(elevator.positionCommand(0));
+    driverGamepad
+        .square()
+        .whileTrue(
+            new AutoAlignCommand(
+                () -> new Pose2d(15, 4, Rotation2d.kZero),
+                () -> new Translation2d(),
+                () -> false,
+                drive));
+
+    // driverGamepad.povUp().onTrue(elevator.positionCommand(17));
+    // driverGamepad.povDown().onTrue(elevator.positionCommand(0));
   }
 
   public Command getAutonomousCommand() {

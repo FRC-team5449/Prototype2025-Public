@@ -125,8 +125,8 @@ public class RobotContainer {
         .square()
         .whileTrue(new AutoAlignCommand(() -> new Translation2d(), () -> false, drive));
 
-    // driverGamepad.povUp().onTrue(elevator.positionCommand(17));
-    // driverGamepad.povDown().onTrue(elevator.positionCommand(0));
+    driverGamepad.povUp().onTrue(elevator.positionCommand(17));
+    driverGamepad.povDown().onTrue(elevator.positionCommand(0));
   }
 
   public Command getAutonomousCommand() {

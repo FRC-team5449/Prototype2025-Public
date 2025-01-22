@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
@@ -36,7 +37,7 @@ public class Elevator extends SubsystemBase {
   private final StatusSignal<AngularVelocity> elevatorVelocity;
 
   private Angle positionRotation = Rotation.of(0);
-  private boolean characterizing = true;
+  private boolean characterizing = false;
 
   public Elevator() {
     elevatorMaster = new TalonFX(1, "canivore");
@@ -84,12 +85,12 @@ public class Elevator extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // BaseStatusSignal.refreshAll(elevatorAcceleration, elevatorVelocity);
+    BaseStatusSignal.refreshAll(elevatorAcceleration, elevatorVelocity);
 
-    // if (!characterizing) {
-    //   elevatorMaster.setControl(
-    //       positionControl.withEnableFOC(true).withSlot(0).withPosition(positionRotation));
-    //   elevatorSlave.setControl(new Follower(0, false));
-    // }
+    if (!characterizing) {
+      elevatorMaster.setControl(
+          positionControl.withEnableFOC(true).withSlot(0).withPosition(positionRotation));
+      elevatorSlave.setControl(new Follower(0, false));
+    }
   }
 }

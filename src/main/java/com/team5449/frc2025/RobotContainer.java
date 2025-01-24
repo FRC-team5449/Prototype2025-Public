@@ -7,10 +7,13 @@
 
 package com.team5449.frc2025;
 
+import static edu.wpi.first.units.Units.Rotation;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.team5449.frc2025.commands.AutoAlignCommand;
 import com.team5449.frc2025.commands.DriveCommands;
 import com.team5449.frc2025.subsystems.TunerConstants;
+import com.team5449.frc2025.subsystems.arm.Arm;
 import com.team5449.frc2025.subsystems.drive.Drive;
 import com.team5449.frc2025.subsystems.drive.GyroIO;
 import com.team5449.frc2025.subsystems.drive.GyroIOPigeon2;
@@ -18,6 +21,8 @@ import com.team5449.frc2025.subsystems.drive.ModuleIO;
 import com.team5449.frc2025.subsystems.drive.ModuleIOSim;
 import com.team5449.frc2025.subsystems.drive.ModuleIOTalonFX;
 import com.team5449.frc2025.subsystems.elevator.Elevator;
+import com.team5449.frc2025.subsystems.elevator.Elevator.Goal;
+import com.team5449.frc2025.subsystems.endeffector.EndEffector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -29,6 +34,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   private final Drive drive;
   private final Elevator elevator;
+  private final EndEffector endEffector;
+  private final Arm arm;
 
   @SuppressWarnings("unused")
   private final RobotState robotState = RobotState.getInstance();
@@ -53,6 +60,10 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
         elevator = new Elevator();
+
+        endEffector = new EndEffector();
+
+        arm = new Arm();
         break;
 
       case SIM:
@@ -65,6 +76,8 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackRight));
 
         elevator = null;
+        endEffector = null;
+        arm = null;
         break;
 
       default:
@@ -77,8 +90,8 @@ public class RobotContainer {
                 new ModuleIO() {});
 
         elevator = null;
-        ;
-        // aprilTagVision = null;
+        endEffector = null;
+        arm = null;
         break;
     }
 
@@ -125,8 +138,27 @@ public class RobotContainer {
         .square()
         .whileTrue(new AutoAlignCommand(() -> new Translation2d(), () -> false, drive));
 
-    driverGamepad.povUp().onTrue(elevator.positionCommand(17));
-    driverGamepad.povDown().onTrue(elevator.positionCommand(0));
+    driverGamepad.povUp().onTrue(elevator.positionCommand(Goal.LEVEL_4.targetRotation.get()));
+    driverGamepad.povDown().onTrue(elevator.positionCommand(Goal.LEVEL_1.targetRotation.get()));
+
+    driverGamepad
+        .R1()
+        .whileTrue(
+            Commands.runEnd(
+                () -> endEffector.setOpenLoop(-0.5),
+                () -> endEffector.setOpenLoop(0),
+                endEffector));
+
+    driverGamepad
+        .R2()
+        .whileTrue(
+            Commands.runEnd(
+                () -> endEffector.setOpenLoop(0.5), () -> endEffector.setOpenLoop(0), endEffector));
+    // driverGamepad.R1().whileTrue(endEffector.outtake());
+
+    driverGamepad.L1().onTrue(arm.positionCommand(Rotation.of(5.3)));
+    driverGamepad.L2().onTrue(arm.positionCommand(Rotation.of(3)));
+    // driverGamepad.R2().whileTrue(endEffector.intake());
   }
 
   public Command getAutonomousCommand() {

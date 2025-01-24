@@ -11,6 +11,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team5449.lib.subsystems.ServoMotorSubsystemConfig;
@@ -21,17 +22,27 @@ public class ElevatorConstants {
   static {
     kElevatorConfig.name = "Elevator";
     kElevatorConfig.canBus = "canivore";
-    kElevatorConfig.canId = 0;
+    kElevatorConfig.canMasterId = 1;
+
+    kElevatorConfig.enableSlave = true;
+    kElevatorConfig.canSlaveId = 2;
+    kElevatorConfig.isSlaveOpposite = false;
+
     kElevatorConfig.fxConfig =
         new TalonFXConfiguration()
             .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(90))
-            .withSlot0(new Slot0Configs().withKP(0))
+            .withSlot0(
+                new Slot0Configs()
+                    .withKP(0.1)
+                    .withKI(0.005)
+                    .withKG(0.025)
+                    .withGravityType(GravityTypeValue.Elevator_Static))
             .withMotorOutput(
                 new MotorOutputConfigs()
                     .withInverted(InvertedValue.Clockwise_Positive)
                     .withNeutralMode(NeutralModeValue.Brake));
-    kElevatorConfig.kMaxPositionUnits = 300;
-    kElevatorConfig.kMinPositionUnits = -300;
+    kElevatorConfig.kMaxPositionUnits = 16.5;
+    kElevatorConfig.kMinPositionUnits = 0;
     kElevatorConfig.unitToRotorRatio = 1;
   }
 }

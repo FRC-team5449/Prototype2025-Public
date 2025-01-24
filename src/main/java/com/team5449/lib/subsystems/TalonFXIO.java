@@ -19,9 +19,17 @@ import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicExpoDutyCycle;
 import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team5449.frc2025.Robot;
@@ -33,14 +41,27 @@ import edu.wpi.first.units.measure.Voltage;
 
 public class TalonFXIO implements MotorIO {
   protected final TalonFX talon;
+  protected TalonFX talonSlave;
   protected final ServoMotorSubsystemConfig mConfig;
-  protected final DutyCycleOut dutyCycleControl = new DutyCycleOut(0.0);
 
-  private final VelocityTorqueCurrentFOC velocityControl = new VelocityTorqueCurrentFOC(RPM.of(0));
-  private final PositionTorqueCurrentFOC positionControl =
+  private final VelocityTorqueCurrentFOC velocityCurrentControl =
+      new VelocityTorqueCurrentFOC(RPM.of(0));
+  private final PositionTorqueCurrentFOC positionCurrentControl =
       new PositionTorqueCurrentFOC(Radian.of(0));
-  private final MotionMagicExpoTorqueCurrentFOC motionMagicControl =
+  private final MotionMagicExpoTorqueCurrentFOC motionMagicCurrentControl =
       new MotionMagicExpoTorqueCurrentFOC(Radian.of(0));
+
+  private final VelocityVoltage velocityVoltageControl = new VelocityVoltage(RPM.of(0));
+  private final PositionVoltage positionVoltageControl = new PositionVoltage(Radian.of(0));
+  private final MotionMagicExpoVoltage motionMagicVoltageControl =
+      new MotionMagicExpoVoltage(Radian.of(0));
+
+  private final VelocityDutyCycle velocityDutyCycleControl = new VelocityDutyCycle(RPM.of(0));
+  private final PositionDutyCycle positionDutyCycleControl = new PositionDutyCycle(Radian.of(0));
+  private final MotionMagicExpoDutyCycle motionMagicDutyCycleControl =
+      new MotionMagicExpoDutyCycle(Radian.of(0));
+
+  private ControlType controlType = ControlType.DUTY_CYCLE;
 
   private final StatusSignal<Angle> positionSignal;
   private final StatusSignal<AngularVelocity> velocitySignal;
@@ -58,7 +79,11 @@ public class TalonFXIO implements MotorIO {
     maxPosition = Rotation.of(mConfig.kMaxPositionUnits);
     minPosition = Rotation.of(mConfig.kMinPositionUnits);
 
-    talon = new TalonFX(config.canId, config.canBus);
+    talon = new TalonFX(config.canMasterId, config.canBus);
+
+    if (config.enableSlave) {
+      talonSlave = new TalonFX(config.canSlaveId, config.canBus);
+    }
 
     if (Robot.isSimulation()) {
       mConfig.fxConfig.CurrentLimits = new CurrentLimitsConfigs();
@@ -94,19 +119,45 @@ public class TalonFXIO implements MotorIO {
 
   @Override
   public void setOpenLoopDutyCycle(double dutyCycle) {
-    talon.setControl(dutyCycleControl.withOutput(dutyCycle));
+    talon.setControl(new DutyCycleOut(dutyCycle));
   }
 
   @Override
   public void setPositionSetpoint(Angle position) {
-    talon.setControl(
-        positionControl.withPosition(UnitUtil.clamp(position, minPosition, maxPosition)));
+    Angle setPosition = UnitUtil.clamp(position, minPosition, maxPosition);
+    switch (controlType) {
+      case DUTY_CYCLE:
+        talon.setControl(positionDutyCycleControl.withPosition(setPosition));
+        break;
+
+      case VOLTAGE:
+        talon.setControl(positionVoltageControl.withPosition(setPosition));
+        break;
+
+      case CURRENT_FOC:
+        talon.setControl(positionCurrentControl.withPosition(setPosition));
+        break;
+    }
+    setSlaveMotorFollowing();
   }
 
   @Override
   public void setMotionMagicSetpoint(Angle position) {
-    talon.setControl(
-        motionMagicControl.withPosition(UnitUtil.clamp(position, minPosition, maxPosition)));
+    Angle setPosition = UnitUtil.clamp(position, minPosition, maxPosition);
+    switch (controlType) {
+      case DUTY_CYCLE:
+        talon.setControl(motionMagicDutyCycleControl.withPosition(setPosition));
+        break;
+
+      case VOLTAGE:
+        talon.setControl(motionMagicVoltageControl.withPosition(setPosition));
+        break;
+
+      case CURRENT_FOC:
+        talon.setControl(motionMagicCurrentControl.withPosition(setPosition));
+        break;
+    }
+    setSlaveMotorFollowing();
   }
 
   @Override
@@ -123,7 +174,20 @@ public class TalonFXIO implements MotorIO {
 
   @Override
   public void setVelocitySetpoint(AngularVelocity velocity) {
-    talon.setControl(velocityControl.withVelocity(velocity));
+    switch (controlType) {
+      case DUTY_CYCLE:
+        talon.setControl(velocityDutyCycleControl.withVelocity(velocity));
+        break;
+
+      case VOLTAGE:
+        talon.setControl(velocityVoltageControl.withVelocity(velocity));
+        break;
+
+      case CURRENT_FOC:
+        talon.setControl(velocityCurrentControl.withVelocity(velocity));
+        break;
+    }
+    setSlaveMotorFollowing();
   }
 
   @Override
@@ -134,5 +198,32 @@ public class TalonFXIO implements MotorIO {
   @Override
   public void setCurrentPosition(Angle position) {
     talon.setPosition(position);
+  }
+
+  public void setSlaveMotorFollowing() {
+    if (talonSlave != null && mConfig.enableSlave) {
+      talonSlave.setControl(new Follower(mConfig.canMasterId, mConfig.isSlaveOpposite));
+    }
+  }
+
+  @Override
+  public void setEnableSlaveMotor(boolean enableSlave) {
+    mConfig.enableSlave = enableSlave;
+  }
+
+  @Override
+  public void setControlType(ControlType controlType) {
+    this.controlType = controlType;
+  }
+
+  @Override
+  public void runCharacterization(double currentAmps) {
+    talon.setControl(new TorqueCurrentFOC(currentAmps));
+  }
+
+  public enum ControlType {
+    DUTY_CYCLE,
+    VOLTAGE,
+    CURRENT_FOC
   }
 }

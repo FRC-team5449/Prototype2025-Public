@@ -11,7 +11,10 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 public class ServoMotorSubsystemConfig {
   public String name = "UNNAMED";
-  public int canId;
+  public int canMasterId;
+  public boolean enableSlave;
+  public boolean isSlaveOpposite;
+  public int canSlaveId;
   public String canBus;
   public TalonFXConfiguration fxConfig = new TalonFXConfiguration();
 

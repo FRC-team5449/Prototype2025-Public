@@ -65,7 +65,6 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
     io.setOpenLoopDutyCycle(dutyCycle);
   }
 
-  // TODO: How will Measure<U> be displayed in advantagescope?
   protected void setPositionSetpointImpl(Angle position) {
     positionSetpoint = position;
     Logger.recordOutput(getName() + "/API/setPositionSetpointImp/Units", position);

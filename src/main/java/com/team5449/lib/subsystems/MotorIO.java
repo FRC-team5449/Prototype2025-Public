@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Rotation;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.team5449.lib.subsystems.TalonFXIO.ControlType;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import org.littletonrobotics.junction.AutoLog;
@@ -26,22 +27,28 @@ public interface MotorIO {
     public double currentSupplyAmps = 0.0;
   }
 
-  default void updateInputs(MotorInputs inputs) {}
+  public default void updateInputs(MotorInputs inputs) {}
 
-  default void setOpenLoopDutyCycle(double dutyCycle) {}
+  public default void setOpenLoopDutyCycle(double dutyCycle) {}
 
   // These are in the "units" of the subsystem (rad, m).
-  default void setPositionSetpoint(Angle position) {}
+  public default void setPositionSetpoint(Angle position) {}
 
-  default void setMotionMagicSetpoint(Angle position) {}
+  public default void setMotionMagicSetpoint(Angle position) {}
 
-  default void setNeutralMode(NeutralModeValue mode) {}
+  public default void setNeutralMode(NeutralModeValue mode) {}
 
-  default void setVelocitySetpoint(AngularVelocity velocity) {}
+  public default void setVelocitySetpoint(AngularVelocity velocity) {}
 
-  default void setCurrentPositionAsZero() {}
+  public default void setCurrentPositionAsZero() {}
 
-  default void setCurrentPosition(Angle position) {}
+  public default void setCurrentPosition(Angle position) {}
 
-  default void setEnableSoftLimits(boolean forward, boolean reverse) {}
+  public default void setEnableSoftLimits(boolean forward, boolean reverse) {}
+
+  public default void setEnableSlaveMotor(boolean enableSlaveMotor) {}
+
+  public default void setControlType(ControlType controlType) {}
+
+  public default void runCharacterization(double currentAmps) {}
 }

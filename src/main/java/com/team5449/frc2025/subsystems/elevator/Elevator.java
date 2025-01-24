@@ -16,12 +16,17 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.PositionDutyCycle;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.team5449.lib.LoggedTunableGeneric;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
@@ -37,18 +42,26 @@ import org.littletonrobotics.junction.AutoLogOutput;
 public class Elevator extends SubsystemBase {
   private final TalonFX elevatorMaster;
   private final TalonFX elevatorSlave;
-  private final PositionDutyCycle positionControl = new PositionDutyCycle(0);
+  private final MotionMagicVoltage motionMagicControl = new MotionMagicVoltage(0);
   private final TorqueCurrentFOC currentOpenLoop = new TorqueCurrentFOC(0);
   private static final LoggedTunableGeneric<Angle, AngleUnit> rotationTarget =
       new LoggedTunableGeneric<>("Elevator/Level1_Rotation", Rotation);
+  private final double positionTolerance = 0.3;
 
-  @Setter private Goal goal = Goal.LEVEL_1;
+  @Setter private Goal goal = Goal.IDLE;
 
   private final StatusSignal<AngularAcceleration> elevatorAcceleration;
   private final StatusSignal<AngularVelocity> elevatorVelocity;
+  private final StatusSignal<Angle> elevatorPosition;
 
-  private Angle positionRotation = Rotation.of(0);
+  private Angle setpointPosition = Rotation.of(0);
   private boolean characterizing = false;
+  private boolean openLoopControl = false;
+
+  @AutoLogOutput(key = "Elevator/Homing")
+  private boolean isHoming = false;
+
+  private final Debouncer homingDelay = new Debouncer(0.2);
 
   public Elevator() {
     elevatorMaster = new TalonFX(1, "canivore");
@@ -56,60 +69,88 @@ public class Elevator extends SubsystemBase {
 
     elevatorAcceleration = elevatorMaster.getAcceleration();
     elevatorVelocity = elevatorMaster.getVelocity();
+    elevatorPosition = elevatorMaster.getPosition();
 
     TalonFXConfiguration configuration = new TalonFXConfiguration();
     configuration.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     configuration.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 17;
     configuration.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
     configuration.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
+
     configuration.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     configuration.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    configuration.CurrentLimits.StatorCurrentLimit = 90;
+
+    configuration.CurrentLimits.StatorCurrentLimit = 70;
+
     configuration.Slot0.kG = 0.025;
-    configuration.Slot0.kP = 0.1;
-    configuration.Slot0.kI = 0.005;
+    configuration.Slot0.kP = 1.7;
+    configuration.Slot0.kI = 0;
+    configuration.Slot0.kD = 0.04;
+    configuration.Slot0.kS = 0.12;
+    configuration.Slot0.kG = 0.33;
+    configuration.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+    configuration.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
+
+    configuration.MotionMagic.MotionMagicCruiseVelocity = 35;
+    configuration.MotionMagic.MotionMagicAcceleration = 300;
+    configuration.MotionMagic.MotionMagicJerk = 0;
+    configuration.MotionMagic.MotionMagicExpo_kV = 0.19;
+    configuration.MotionMagic.MotionMagicExpo_kA = 0.3;
     tryUntilOk(5, () -> elevatorMaster.getConfigurator().apply(configuration));
 
     elevatorMaster.setPosition(0);
     elevatorSlave.setNeutralMode(NeutralModeValue.Brake);
   }
 
+  public void setCurrentPosition(Angle setPosition) {
+    elevatorMaster.setPosition(setPosition);
+  }
+
+  public void setCurrentAsZero() {
+    setCurrentPosition(Rotation.of(0));
+  }
+
+  public void startHoming() {
+    isHoming = true;
+  }
+
+  public void stopHoming() {
+    isHoming = false;
+    setCurrentAsZero();
+    runSetpoint(Goal.IDLE.targetRotation.get());
+  }
+
+  private boolean atHomingLocation() {
+    return MathUtil.isNear(0, elevatorPosition.getValue().in(Rotation), positionTolerance);
+  }
+
+  private void updateHoming() {
+    // Auto-start homing when at home position
+    if (goal == Goal.IDLE && atHomingLocation() && !isHoming) {
+      startHoming();
+    }
+
+    if (isHoming) {
+      runOpenLoop(-6); // Apply homing voltage
+      if (homingDelay.calculate(elevatorVelocity.getValueAsDouble() < 0.05)) {
+        stopHoming();
+      }
+    }
+  }
+
+  public void runOpenLoop(double volts) {
+    openLoopControl = true;
+    elevatorMaster.setControl(new VoltageOut(volts));
+    elevatorSlave.setControl(new Follower(1, true));
+  }
+
+  public void runSetpoint(Angle setpointPosition) {
+    openLoopControl = false;
+    this.setpointPosition = setpointPosition;
+  }
+
   public Command positionCommand(Angle newPosition) {
-    return Commands.runOnce(() -> positionRotation = newPosition, this);
-  }
-
-  public void liftUpElevator() {
-    switch (goal) {
-      case LEVEL_1:
-        goal = Goal.LEVEL_2;
-        break;
-      case LEVEL_2:
-        goal = Goal.LEVEL_3;
-        break;
-      case LEVEL_3:
-        goal = Goal.LEVEL_4;
-        break;
-      case LEVEL_4:
-        goal = Goal.LEVEL_4;
-        break;
-    }
-  }
-
-  public void lowerDownElevator() {
-    switch (goal) {
-      case LEVEL_1:
-        goal = Goal.LEVEL_1;
-        break;
-      case LEVEL_2:
-        goal = Goal.LEVEL_1;
-        break;
-      case LEVEL_3:
-        goal = Goal.LEVEL_2;
-        break;
-      case LEVEL_4:
-        goal = Goal.LEVEL_3;
-        break;
-    }
+    return Commands.runOnce(() -> runSetpoint(newPosition), this);
   }
 
   public void runCharacterization(double currentAmps) {
@@ -135,17 +176,19 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putString("Current Goal", goal.toString());
-    BaseStatusSignal.refreshAll(elevatorAcceleration, elevatorVelocity);
+    BaseStatusSignal.refreshAll(elevatorPosition, elevatorAcceleration, elevatorVelocity);
 
-    // positionRotation = goal.targetRotation.get();
-    if (!characterizing) {
+    updateHoming();
+
+    if (!characterizing && !isHoming && !openLoopControl) {
       elevatorMaster.setControl(
-          positionControl.withEnableFOC(true).withSlot(0).withPosition(positionRotation));
+          motionMagicControl.withEnableFOC(true).withSlot(0).withPosition(setpointPosition));
       elevatorSlave.setControl(new Follower(1, true));
     }
   }
 
   public enum Goal {
+    IDLE(() -> Rotation.of(0)),
     LEVEL_1(() -> Rotation.of(2)),
     LEVEL_2(() -> Rotation.of(5)),
     LEVEL_3(() -> Rotation.of(10)),

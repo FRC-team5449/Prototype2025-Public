@@ -23,19 +23,19 @@ public class EndEffector extends SubsystemBase {
     endEffectorSpark = new SparkMax(8, MotorType.kBrushless);
   }
 
-  public void setOpenLoop(double speed) {
+  public void runOpenLoop(double speed) {
     endEffectorSpark.set(speed);
   }
 
   public Command intake() {
-    return runEnd(() -> setOpenLoop(1), () -> setOpenLoop(0))
+    return runEnd(() -> runOpenLoop(1), () -> runOpenLoop(0))
         .until(
             new Trigger(() -> endEffectorSpark.getOutputCurrent() > currentThreshold)
                 .debounce(intakeLatency));
   }
 
   public Command outtake() {
-    return runEnd(() -> setOpenLoop(1), () -> setOpenLoop(0));
+    return runEnd(() -> runOpenLoop(1), () -> runOpenLoop(0));
   }
 
   @Override

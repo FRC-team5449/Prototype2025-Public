@@ -7,8 +7,6 @@
 
 package com.team5449.frc2025;
 
-import static edu.wpi.first.units.Units.Rotation;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.team5449.frc2025.commands.AutoAlignCommand;
 import com.team5449.frc2025.commands.DriveCommands;
@@ -145,19 +143,17 @@ public class RobotContainer {
         .R1()
         .whileTrue(
             Commands.runEnd(
-                () -> endEffector.setOpenLoop(-0.5),
-                () -> endEffector.setOpenLoop(0),
+                () -> endEffector.runOpenLoop(-0.5),
+                () -> endEffector.runOpenLoop(0),
                 endEffector));
 
     driverGamepad
         .R2()
         .whileTrue(
             Commands.runEnd(
-                () -> endEffector.setOpenLoop(0.5), () -> endEffector.setOpenLoop(0), endEffector));
+                () -> endEffector.runOpenLoop(0.5), () -> endEffector.runOpenLoop(0), endEffector));
     // driverGamepad.R1().whileTrue(endEffector.outtake());
 
-    driverGamepad.L1().onTrue(arm.positionCommand(Rotation.of(5.3)));
-    driverGamepad.L2().onTrue(arm.positionCommand(Rotation.of(3)));
     // driverGamepad.R2().whileTrue(endEffector.intake());
   }
 

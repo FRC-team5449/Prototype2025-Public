@@ -8,7 +8,6 @@
 package com.team5449.frc2025;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.team5449.frc2025.commands.AutoAlignCommand;
 import com.team5449.frc2025.commands.DriveCommands;
 import com.team5449.frc2025.subsystems.TunerConstants;
 import com.team5449.frc2025.subsystems.arm.Arm;
@@ -19,11 +18,9 @@ import com.team5449.frc2025.subsystems.drive.ModuleIO;
 import com.team5449.frc2025.subsystems.drive.ModuleIOSim;
 import com.team5449.frc2025.subsystems.drive.ModuleIOTalonFX;
 import com.team5449.frc2025.subsystems.elevator.Elevator;
-import com.team5449.frc2025.subsystems.elevator.Elevator.Goal;
 import com.team5449.frc2025.subsystems.endeffector.EndEffector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -133,28 +130,47 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
     driverGamepad
-        .square()
-        .whileTrue(new AutoAlignCommand(() -> new Translation2d(), () -> false, drive));
+        .pov(0)
+        .and(arm::notStowed)
+        .onTrue(elevator.positionCommand(Elevator.Goal.LEVEL_1.targetRotation.get()));
 
-    driverGamepad.povUp().onTrue(elevator.positionCommand(Goal.LEVEL_4.targetRotation.get()));
-    driverGamepad.povDown().onTrue(elevator.positionCommand(Goal.LEVEL_1.targetRotation.get()));
+    driverGamepad
+        .pov(90)
+        .and(arm::notStowed)
+        .onTrue(elevator.positionCommand(Elevator.Goal.LEVEL_2.targetRotation.get()));
+
+    driverGamepad
+        .pov(180)
+        .and(arm::notStowed)
+        .onTrue(elevator.positionCommand(Elevator.Goal.LEVEL_3.targetRotation.get()));
+
+    driverGamepad
+        .pov(270)
+        .and(arm::notStowed)
+        .onTrue(elevator.positionCommand(Elevator.Goal.LEVEL_4.targetRotation.get()));
 
     driverGamepad
         .R1()
+        .onTrue(
+            elevator
+                .positionCommand(Elevator.Goal.IDLE.targetRotation.get())
+                .andThen(
+                    Commands.waitUntil(elevator::isStowed)
+                        .andThen(arm.positionCommand(Arm.Goal.STOW))))
+        .and(arm::isStowed)
+        .whileTrue(
+            Commands.runEnd(
+                () -> endEffector.runOpenLoop(-0.5), () -> endEffector.runOpenLoop(0), endEffector))
+        .onFalse(arm.positionCommand(Arm.Goal.IDLE));
+
+    driverGamepad
+        .L1()
+        .and(elevator::atGoal)
         .whileTrue(
             Commands.runEnd(
                 () -> endEffector.runOpenLoop(-0.5),
                 () -> endEffector.runOpenLoop(0),
                 endEffector));
-
-    driverGamepad
-        .R2()
-        .whileTrue(
-            Commands.runEnd(
-                () -> endEffector.runOpenLoop(0.5), () -> endEffector.runOpenLoop(0), endEffector));
-    // driverGamepad.R1().whileTrue(endEffector.outtake());
-
-    // driverGamepad.R2().whileTrue(endEffector.intake());
   }
 
   public Command getAutonomousCommand() {

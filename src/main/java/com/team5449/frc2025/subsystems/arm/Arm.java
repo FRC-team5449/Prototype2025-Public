@@ -33,15 +33,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Arm extends SubsystemBase {
   private final TalonFX armTalon;
   private final CANcoder armCanCoder;
 
-  private final MotionMagicVoltage positionControl = new MotionMagicVoltage(0);
+  private final MotionMagicVoltage positionControl =
+      new MotionMagicVoltage(Goal.IDLE.targetPosition.get());
   private final StatusSignal<Angle> armPosition;
 
-  private Goal goal = Goal.STOW;
+  private Goal goal = Goal.IDLE;
 
   /** Creates a new Arm. */
   public Arm() {
@@ -93,14 +95,21 @@ public class Arm extends SubsystemBase {
     return Commands.runOnce(() -> goal = goalPosition, this);
   }
 
+  @AutoLogOutput(key = "Arm/NotStowed")
   public boolean notStowed() {
     return !MathUtil.isNear(
-        Goal.STOW.targetPosition.get().in(Rotation), armPosition.getValue().in(Rotation), 0.1);
+        Goal.STOW.targetPosition.get().in(Rotation), armPosition.getValue().in(Rotation), 0.02);
+  }
+
+  public boolean isStowed() {
+    return MathUtil.isNear(
+        Goal.STOW.targetPosition.get().in(Rotation), armPosition.getValue().in(Rotation), 0.02);
   }
 
   public enum Goal {
-    STOW(() -> Rotation.of(0.24)),
-    SCORE(() -> Rotation.of(0.1)),
+    STOW(() -> Rotation.of(0.22)),
+    IDLE(() -> Rotation.of(0.15)),
+    SCORE(() -> Rotation.of(0.13)),
     ;
     private final Supplier<Angle> targetPosition;
 

@@ -36,8 +36,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.Supplier;
-import lombok.Setter;
+import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
   private final TalonFX elevatorMaster;
@@ -48,7 +49,7 @@ public class Elevator extends SubsystemBase {
       new LoggedTunableGeneric<>("Elevator/Level1_Rotation", Rotation);
   private final double positionTolerance = 0.3;
 
-  @Setter private Goal goal = Goal.IDLE;
+  @Getter private Goal goal = Goal.IDLE;
 
   private final StatusSignal<AngularAcceleration> elevatorAcceleration;
   private final StatusSignal<AngularVelocity> elevatorVelocity;
@@ -73,7 +74,7 @@ public class Elevator extends SubsystemBase {
 
     TalonFXConfiguration configuration = new TalonFXConfiguration();
     configuration.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    configuration.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 17;
+    configuration.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 17.8;
     configuration.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
     configuration.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
 
@@ -82,7 +83,6 @@ public class Elevator extends SubsystemBase {
 
     configuration.CurrentLimits.StatorCurrentLimit = 70;
 
-    configuration.Slot0.kG = 0.025;
     configuration.Slot0.kP = 1.7;
     configuration.Slot0.kI = 0;
     configuration.Slot0.kD = 0.04;
@@ -110,16 +110,6 @@ public class Elevator extends SubsystemBase {
     setCurrentPosition(Rotation.of(0));
   }
 
-  public void startHoming() {
-    isHoming = true;
-  }
-
-  public void stopHoming() {
-    isHoming = false;
-    setCurrentAsZero();
-    runSetpoint(Goal.IDLE.targetRotation.get());
-  }
-
   private boolean atHomingLocation() {
     return MathUtil.isNear(0, elevatorPosition.getValue().in(Rotation), positionTolerance);
   }
@@ -127,13 +117,18 @@ public class Elevator extends SubsystemBase {
   private void updateHoming() {
     // Auto-start homing when at home position
     if (goal == Goal.IDLE && atHomingLocation() && !isHoming) {
-      startHoming();
+      // Start Homing
+      isHoming = true;
     }
 
     if (isHoming) {
-      runOpenLoop(-6); // Apply homing voltage
-      if (homingDelay.calculate(elevatorVelocity.getValueAsDouble() < 0.05)) {
-        stopHoming();
+      runOpenLoop(-0.4); // Apply homing voltage
+      if (homingDelay.calculate(
+          MathUtil.isNear(0, elevatorVelocity.getValue().in(RotationsPerSecond), 0.05))) {
+        // Stop Homing
+        isHoming = false;
+        setCurrentAsZero();
+        runSetpoint(Goal.IDLE.targetRotation.get());
       }
     }
   }
@@ -173,12 +168,28 @@ public class Elevator extends SubsystemBase {
     return elevatorVelocity.getValue().in(RotationsPerSecond);
   }
 
+  public boolean isStowed() {
+    return MathUtil.isNear(0, elevatorPosition.getValue().in(Rotation), 0.3);
+  }
+
+  @AutoLogOutput(key = "Elevator/AtGoal")
+  public boolean atGoal() {
+    return !isStowed()
+        && MathUtil.isNear(
+            setpointPosition.in(Rotation),
+            elevatorPosition.getValue().in(Rotation),
+            positionTolerance);
+  }
+
   @Override
   public void periodic() {
     SmartDashboard.putString("Current Goal", goal.toString());
     BaseStatusSignal.refreshAll(elevatorPosition, elevatorAcceleration, elevatorVelocity);
 
-    updateHoming();
+    // updateHoming();
+
+    Logger.recordOutput("Elevator/SetpointPosition", setpointPosition.in(Rotation));
+    Logger.recordOutput("Elevator/CurrentPosition", elevatorPosition.getValue().in(Rotation));
 
     if (!characterizing && !isHoming && !openLoopControl) {
       elevatorMaster.setControl(
@@ -192,7 +203,7 @@ public class Elevator extends SubsystemBase {
     LEVEL_1(() -> Rotation.of(2)),
     LEVEL_2(() -> Rotation.of(5)),
     LEVEL_3(() -> Rotation.of(10)),
-    LEVEL_4(() -> Rotation.of(17));
+    LEVEL_4(() -> Rotation.of(17.5));
 
     public final Supplier<Angle> targetRotation;
 

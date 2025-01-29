@@ -5,10 +5,11 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package com.team5449.frc2025.subsystems.elevator;
+package com.team5449.frc2025.subsystems.arm;
 
 import static edu.wpi.first.units.Units.Rotation;
 
+import com.team5449.frc2025.subsystems.elevator.ElevatorConstants;
 import com.team5449.lib.subsystems.MotorIO;
 import com.team5449.lib.subsystems.MotorInputsAutoLogged;
 import com.team5449.lib.subsystems.ServoMotorSubsystem;
@@ -19,42 +20,39 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.Supplier;
 import lombok.Setter;
 
-public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, MotorIO> {
-  @Setter private ElevatorState desiredState = ElevatorState.IDLE;
+public class ArmSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, MotorIO> {
+  @Setter private ArmState desiredState = ArmState.IDLE;
 
-  public ElevatorSubsystem(final MotorIO io) {
-    super(ElevatorConstants.kElevatorConfig, new MotorInputsAutoLogged(), io);
-    setCurrentPositionAsZero();
+  public ArmSubsystem(final MotorIO io) {
+    super(ArmConstants.kArmConfig, new MotorInputsAutoLogged(), io);
     setDefaultCommand(motionMagicSetpointCommand(desiredState.goalSetpoint));
   }
 
-  public Command setStateCommand(ElevatorState state) {
+  public Command setStateCommand(ArmState state) {
     return Commands.runOnce(() -> this.setDesiredState(state), this);
   }
 
   public boolean isStowed() {
-    return atGoal(ElevatorState.IDLE);
+    return atGoal(ArmState.STOW);
   }
 
   public boolean atGoal() {
     return atGoal(desiredState);
   }
 
-  public boolean atGoal(ElevatorState setState) {
+  public boolean atGoal(ArmState setState) {
     return UnitUtil.isNear(
         inputs.position, setState.goalSetpoint.get(), ElevatorConstants.positionTolerance);
   }
 
-  public enum ElevatorState {
-    IDLE(() -> Rotation.of(0)),
-    LEVEL_1(() -> Rotation.of(2)),
-    LEVEL_2(() -> Rotation.of(5)),
-    LEVEL_3(() -> Rotation.of(10)),
-    LEVEL_4(() -> Rotation.of(17.5));
+  public enum ArmState {
+    IDLE(() -> Rotation.of(0.15)),
+    STOW(() -> Rotation.of(0.22)),
+    SCORE(() -> Rotation.of(0.13));
 
     public final Supplier<Angle> goalSetpoint;
 
-    ElevatorState(Supplier<Angle> goalSetpoint) {
+    ArmState(Supplier<Angle> goalSetpoint) {
       this.goalSetpoint = goalSetpoint;
     }
   }

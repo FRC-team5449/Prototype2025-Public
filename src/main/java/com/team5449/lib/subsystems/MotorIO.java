@@ -11,7 +11,6 @@ import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Rotation;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.team5449.lib.subsystems.TalonFXIO.ControlType;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import org.littletonrobotics.junction.AutoLog;
@@ -20,8 +19,8 @@ public interface MotorIO {
   @AutoLog
   public static class MotorInputs {
     public boolean motorConnected = false;
-    public AngularVelocity velocity = AngularVelocity.ofBaseUnits(0, RPM);
-    public Angle position = Angle.ofBaseUnits(0, Rotation);
+    public AngularVelocity velocity = RPM.of(0);
+    public Angle position = Rotation.of(0);
     public double appliedVolts = 0.0;
     public double currentStatorAmps = 0.0;
     public double currentSupplyAmps = 0.0;
@@ -47,8 +46,6 @@ public interface MotorIO {
   public default void setEnableSoftLimits(boolean forward, boolean reverse) {}
 
   public default void setEnableSlaveMotor(boolean enableSlaveMotor) {}
-
-  public default void setControlType(ControlType controlType) {}
 
   public default void runCharacterization(double currentAmps) {}
 }

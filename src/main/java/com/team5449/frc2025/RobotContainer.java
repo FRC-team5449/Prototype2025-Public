@@ -10,15 +10,23 @@ package com.team5449.frc2025;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.team5449.frc2025.commands.DriveCommands;
 import com.team5449.frc2025.subsystems.TunerConstants;
-import com.team5449.frc2025.subsystems.arm.Arm;
+import com.team5449.frc2025.subsystems.arm.ArmSimTalonIO;
+import com.team5449.frc2025.subsystems.arm.ArmSubsystem;
+import com.team5449.frc2025.subsystems.arm.ArmSubsystem.ArmState;
+import com.team5449.frc2025.subsystems.arm.ArmTalonIO;
 import com.team5449.frc2025.subsystems.drive.Drive;
 import com.team5449.frc2025.subsystems.drive.GyroIO;
 import com.team5449.frc2025.subsystems.drive.GyroIOPigeon2;
 import com.team5449.frc2025.subsystems.drive.ModuleIO;
 import com.team5449.frc2025.subsystems.drive.ModuleIOSim;
 import com.team5449.frc2025.subsystems.drive.ModuleIOTalonFX;
-import com.team5449.frc2025.subsystems.elevator.Elevator;
+import com.team5449.frc2025.subsystems.elevator.ElevatorConstants;
+import com.team5449.frc2025.subsystems.elevator.ElevatorSubsystem;
+import com.team5449.frc2025.subsystems.elevator.ElevatorSubsystem.ElevatorState;
 import com.team5449.frc2025.subsystems.endeffector.EndEffector;
+import com.team5449.lib.subsystems.MotorIO;
+import com.team5449.lib.subsystems.SimTalonFXIO;
+import com.team5449.lib.subsystems.TalonFXIO;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,9 +36,9 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
   private final Drive drive;
-  private final Elevator elevator;
+  private final ElevatorSubsystem elevator;
   private final EndEffector endEffector;
-  private final Arm arm;
+  private final ArmSubsystem arm;
 
   @SuppressWarnings("unused")
   private final RobotState robotState = RobotState.getInstance();
@@ -54,11 +62,11 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
-        elevator = new Elevator();
+        elevator = new ElevatorSubsystem(new TalonFXIO(ElevatorConstants.kElevatorConfig));
 
         endEffector = new EndEffector();
 
-        arm = new Arm();
+        arm = new ArmSubsystem(new ArmTalonIO());
         break;
 
       case SIM:
@@ -70,9 +78,11 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
 
-        elevator = null;
+        elevator = new ElevatorSubsystem(new SimTalonFXIO(ElevatorConstants.kElevatorConfig));
+
         endEffector = null;
-        arm = null;
+
+        arm = new ArmSubsystem(new ArmSimTalonIO());
         break;
 
       default:
@@ -84,9 +94,11 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
 
-        elevator = null;
+        elevator = new ElevatorSubsystem(new MotorIO() {});
+
         endEffector = null;
-        arm = null;
+
+        arm = new ArmSubsystem(new MotorIO() {});
         break;
     }
 
@@ -131,37 +143,39 @@ public class RobotContainer {
 
     driverGamepad
         .pov(0)
-        .and(arm::notStowed)
-        .onTrue(elevator.positionCommand(Elevator.Goal.LEVEL_1.targetRotation.get()));
+        .and(() -> !arm.isStowed())
+        .onTrue(elevator.setStateCommand(ElevatorState.LEVEL_1));
 
     driverGamepad
         .pov(90)
-        .and(arm::notStowed)
-        .onTrue(elevator.positionCommand(Elevator.Goal.LEVEL_2.targetRotation.get()));
+        .and(() -> !arm.isStowed())
+        .onTrue(elevator.setStateCommand(ElevatorState.LEVEL_2));
 
     driverGamepad
         .pov(180)
-        .and(arm::notStowed)
-        .onTrue(elevator.positionCommand(Elevator.Goal.LEVEL_3.targetRotation.get()));
+        .and(() -> !arm.isStowed())
+        .onTrue(elevator.setStateCommand(ElevatorState.LEVEL_3));
 
     driverGamepad
         .pov(270)
-        .and(arm::notStowed)
-        .onTrue(elevator.positionCommand(Elevator.Goal.LEVEL_4.targetRotation.get()));
+        .and(() -> !arm.isStowed())
+        .onTrue(elevator.setStateCommand(ElevatorState.LEVEL_4));
 
     driverGamepad
         .R1()
         .onTrue(
             elevator
-                .positionCommand(Elevator.Goal.IDLE.targetRotation.get())
+                .setStateCommand(ElevatorState.IDLE)
                 .andThen(
                     Commands.waitUntil(elevator::isStowed)
-                        .andThen(arm.positionCommand(Arm.Goal.STOW))))
+                        .andThen(arm.setStateCommand(ArmState.STOW))))
+        .onFalse(arm.setStateCommand(ArmState.IDLE))
         .and(arm::isStowed)
         .whileTrue(
             Commands.runEnd(
-                () -> endEffector.runOpenLoop(-0.5), () -> endEffector.runOpenLoop(0), endEffector))
-        .onFalse(arm.positionCommand(Arm.Goal.IDLE));
+                () -> endEffector.runOpenLoop(-0.5),
+                () -> endEffector.runOpenLoop(0),
+                endEffector));
 
     driverGamepad
         .L1()

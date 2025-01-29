@@ -5,41 +5,34 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package com.team5449.lib.subsystems;
+package com.team5449.frc2025.subsystems.arm;
 
 import static com.team5449.lib.util.PhoenixUtil.tryUntilOk;
-import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radian;
 import static edu.wpi.first.units.Units.Rotation;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
-import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.team5449.frc2025.Robot;
+import com.team5449.lib.subsystems.MotorIO;
+import com.team5449.lib.subsystems.ServoMotorSubsystemConfig;
 import com.team5449.lib.util.UnitUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 
-public class TalonFXIO implements MotorIO {
+public class ArmTalonIO implements MotorIO {
+  protected final CANcoder armCancoder;
   protected final TalonFX talon;
-  protected TalonFX talonSlave;
-  protected final ServoMotorSubsystemConfig mConfig;
+  protected final ServoMotorSubsystemConfig mConfig = ArmConstants.kArmConfig;
 
-  private final VelocityVoltage velocityVoltageControl = new VelocityVoltage(RPM.of(0));
-  private final PositionVoltage positionVoltageControl = new PositionVoltage(Radian.of(0));
   private final MotionMagicExpoVoltage motionMagicVoltageControl =
       new MotionMagicExpoVoltage(Radian.of(0));
 
@@ -54,20 +47,16 @@ public class TalonFXIO implements MotorIO {
 
   private BaseStatusSignal[] signals;
 
-  public TalonFXIO(ServoMotorSubsystemConfig config) {
-    mConfig = config;
+  public ArmTalonIO() {
     maxPosition = Rotation.of(mConfig.kMaxPositionUnits);
     minPosition = Rotation.of(mConfig.kMinPositionUnits);
 
     talon = new TalonFX(mConfig.canMasterId, mConfig.canBus);
 
-    if (Robot.isSimulation()) {
-      mConfig.fxConfig.CurrentLimits = new CurrentLimitsConfigs();
-      mConfig.fxConfig.ClosedLoopRamps = new ClosedLoopRampsConfigs();
-      mConfig.fxConfig.OpenLoopRamps = new OpenLoopRampsConfigs();
-    }
+    armCancoder = new CANcoder(ArmConstants.armCanCoderId, ArmConstants.armCanCoderBus);
 
     tryUntilOk(5, () -> talon.getConfigurator().apply(mConfig.fxConfig, 0.25));
+    tryUntilOk(5, () -> armCancoder.getConfigurator().apply(ArmConstants.armCanCoderConfig, 0.25));
 
     positionSignal = talon.getPosition();
     velocitySignal = talon.getVelocity();
@@ -81,12 +70,6 @@ public class TalonFXIO implements MotorIO {
         };
     tryUntilOk(5, () -> BaseStatusSignal.setUpdateFrequencyForAll(50.0, signals));
     tryUntilOk(5, () -> talon.optimizeBusUtilization());
-
-    if (config.enableSlave) {
-      talonSlave = new TalonFX(config.canSlaveId, config.canBus);
-      tryUntilOk(5, () -> talonSlave.getConfigurator().apply(config.fxSlaveConfig));
-      tryUntilOk(5, () -> talonSlave.optimizeBusUtilization());
-    }
   }
 
   @Override
@@ -105,18 +88,9 @@ public class TalonFXIO implements MotorIO {
   }
 
   @Override
-  public void setPositionSetpoint(Angle position) {
-    Angle setPosition = UnitUtil.clamp(position, minPosition, maxPosition);
-
-    talon.setControl(positionVoltageControl.withPosition(setPosition));
-    setSlaveMotorFollowing();
-  }
-
-  @Override
   public void setMotionMagicSetpoint(Angle position) {
     Angle setPosition = UnitUtil.clamp(position, minPosition, maxPosition);
     talon.setControl(motionMagicVoltageControl.withPosition(setPosition));
-    setSlaveMotorFollowing();
   }
 
   @Override
@@ -132,12 +106,6 @@ public class TalonFXIO implements MotorIO {
   }
 
   @Override
-  public void setVelocitySetpoint(AngularVelocity velocity) {
-    talon.setControl(velocityVoltageControl.withVelocity(velocity));
-    setSlaveMotorFollowing();
-  }
-
-  @Override
   public void setCurrentPositionAsZero() {
     setCurrentPosition(Radian.of(0));
   }
@@ -145,17 +113,6 @@ public class TalonFXIO implements MotorIO {
   @Override
   public void setCurrentPosition(Angle position) {
     talon.setPosition(position);
-  }
-
-  public void setSlaveMotorFollowing() {
-    if (talonSlave != null && mConfig.enableSlave) {
-      talonSlave.setControl(new Follower(mConfig.canMasterId, mConfig.isSlaveOpposite));
-    }
-  }
-
-  @Override
-  public void setEnableSlaveMotor(boolean enableSlave) {
-    mConfig.enableSlave = enableSlave;
   }
 
   @Override

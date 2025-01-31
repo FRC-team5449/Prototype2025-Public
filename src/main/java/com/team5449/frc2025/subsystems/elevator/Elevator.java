@@ -45,8 +45,11 @@ public class Elevator extends SubsystemBase {
   private final TalonFX elevatorSlave;
   private final MotionMagicVoltage motionMagicControl = new MotionMagicVoltage(0);
   private final TorqueCurrentFOC currentOpenLoop = new TorqueCurrentFOC(0);
+
+  @SuppressWarnings("unused")
   private static final LoggedTunableGeneric<Angle, AngleUnit> rotationTarget =
       new LoggedTunableGeneric<>("Elevator/Level1_Rotation", Rotation);
+
   private final double positionTolerance = 0.3;
 
   @Getter private Goal goal = Goal.IDLE;
@@ -114,6 +117,7 @@ public class Elevator extends SubsystemBase {
     return MathUtil.isNear(0, elevatorPosition.getValue().in(Rotation), positionTolerance);
   }
 
+  @SuppressWarnings("unused")
   private void updateHoming() {
     // Auto-start homing when at home position
     if (goal == Goal.IDLE && atHomingLocation() && !isHoming) {

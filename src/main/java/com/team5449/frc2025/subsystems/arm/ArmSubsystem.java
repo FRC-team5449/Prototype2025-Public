@@ -30,9 +30,6 @@ public class ArmSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, Mot
     setDefaultCommand(motionMagicSetpointCommand(this::getStateAngle));
   }
 
-  // public Command motionMagicSetpointCommand(Supplier<ArmState> stateSupplier) {
-  //   return motionMagicSetpointCommand(stateSupplier);
-  // }
   public Angle getStateAngle() {
     return desiredState.goalSetpoint.get();
   }

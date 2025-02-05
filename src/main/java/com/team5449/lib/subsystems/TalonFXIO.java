@@ -49,6 +49,8 @@ public class TalonFXIO implements MotorIO {
   private final StatusSignal<Current> currentStatorSignal;
   private final StatusSignal<Current> currentSupplySignal;
 
+  private final StatusSignal<Voltage> slaveVoltageSignal;
+
   private final Angle maxPosition;
   private final Angle minPosition;
 
@@ -69,24 +71,31 @@ public class TalonFXIO implements MotorIO {
 
     tryUntilOk(5, () -> talon.getConfigurator().apply(mConfig.fxConfig, 0.25));
 
+    if (config.enableSlave) {
+      talonSlave = new TalonFX(config.canSlaveId, config.canBus);
+      tryUntilOk(5, () -> talonSlave.getConfigurator().apply(config.fxSlaveConfig));
+      tryUntilOk(5, () -> talonSlave.optimizeBusUtilization());
+    }
+
     positionSignal = talon.getPosition();
     velocitySignal = talon.getVelocity();
     voltageSignal = talon.getMotorVoltage();
     currentStatorSignal = talon.getStatorCurrent();
     currentSupplySignal = talon.getSupplyCurrent();
 
+    slaveVoltageSignal = talonSlave.getMotorVoltage();
+
     signals =
         new BaseStatusSignal[] {
-          positionSignal, velocitySignal, voltageSignal, currentStatorSignal, currentSupplySignal
+          positionSignal,
+          velocitySignal,
+          voltageSignal,
+          currentStatorSignal,
+          currentSupplySignal,
+          slaveVoltageSignal
         };
     tryUntilOk(5, () -> BaseStatusSignal.setUpdateFrequencyForAll(50.0, signals));
     tryUntilOk(5, () -> talon.optimizeBusUtilization());
-
-    if (config.enableSlave) {
-      talonSlave = new TalonFX(config.canSlaveId, config.canBus);
-      tryUntilOk(5, () -> talonSlave.getConfigurator().apply(config.fxSlaveConfig));
-      tryUntilOk(5, () -> talonSlave.optimizeBusUtilization());
-    }
   }
 
   @Override
@@ -97,6 +106,7 @@ public class TalonFXIO implements MotorIO {
     inputs.currentSupplyAmps = currentSupplySignal.getValueAsDouble();
     inputs.position = positionSignal.getValue();
     inputs.velocity = velocitySignal.getValue();
+    inputs.slaveAppliedVolts = slaveVoltageSignal.getValueAsDouble();
   }
 
   @Override

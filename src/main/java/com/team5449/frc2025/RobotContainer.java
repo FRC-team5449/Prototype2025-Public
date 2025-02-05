@@ -24,7 +24,9 @@ import com.team5449.frc2025.subsystems.drive.ModuleIOTalonFX;
 import com.team5449.frc2025.subsystems.elevator.ElevatorConstants;
 import com.team5449.frc2025.subsystems.elevator.ElevatorSubsystem;
 import com.team5449.frc2025.subsystems.elevator.ElevatorSubsystem.ElevatorState;
-import com.team5449.frc2025.subsystems.endeffector.EndEffector;
+import com.team5449.frc2025.subsystems.endeffector.EndEffectorIONEO;
+import com.team5449.frc2025.subsystems.endeffector.EndEffectorIOSim;
+import com.team5449.frc2025.subsystems.endeffector.EndEffectorSubsystem;
 import com.team5449.lib.subsystems.MotorIO;
 import com.team5449.lib.subsystems.SimTalonFXIO;
 import com.team5449.lib.subsystems.TalonFXIO;
@@ -39,7 +41,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   private final Drive drive;
   private final ElevatorSubsystem elevator;
-  private final EndEffector endEffector;
+  private final EndEffectorSubsystem endEffector;
   private final ArmSubsystem arm;
 
   @SuppressWarnings("unused")
@@ -66,7 +68,7 @@ public class RobotContainer {
 
         elevator = new ElevatorSubsystem(new TalonFXIO(ElevatorConstants.kElevatorConfig));
 
-        endEffector = new EndEffector();
+        endEffector = new EndEffectorSubsystem(new EndEffectorIONEO());
 
         arm = new ArmSubsystem(new ArmTalonIO());
         break;
@@ -82,7 +84,7 @@ public class RobotContainer {
 
         elevator = new ElevatorSubsystem(new SimTalonFXIO(ElevatorConstants.kElevatorConfig));
 
-        endEffector = new EndEffector();
+        endEffector = new EndEffectorSubsystem(new EndEffectorIOSim());
 
         arm = new ArmSubsystem(new ArmSimTalonIO());
         break;
@@ -174,25 +176,14 @@ public class RobotContainer {
         .onTrue(
             elevator
                 .setStateCommand(ElevatorState.IDLE)
-                .andThen(
+                .alongWith(
                     Commands.waitUntil(elevator::isStowed)
                         .andThen(arm.setStateCommand(ArmState.STOW))))
         .onFalse(arm.setStateCommand(ArmState.IDLE))
         .and(arm::isStowed)
-        .whileTrue(
-            Commands.runEnd(
-                () -> endEffector.runOpenLoop(-0.5),
-                () -> endEffector.runOpenLoop(0),
-                endEffector));
+        .whileTrue(endEffector.outtake());
 
-    driverGamepad
-        .L1()
-        .and(elevator::atGoal)
-        .whileTrue(
-            Commands.runEnd(
-                () -> endEffector.runOpenLoop(-0.5),
-                () -> endEffector.runOpenLoop(0),
-                endEffector));
+    driverGamepad.L1().and(elevator::atGoal).whileTrue(endEffector.outtake());
   }
 
   public Command getAutonomousCommand() {

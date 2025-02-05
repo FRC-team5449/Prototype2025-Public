@@ -16,9 +16,8 @@ import com.team5449.lib.util.UnitUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import lombok.Setter;
-
 import java.util.function.Supplier;
+import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, MotorIO> {
@@ -38,10 +37,12 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
     return Commands.runOnce(() -> this.setDesiredState(state), this);
   }
 
+  @AutoLogOutput
   public boolean isStowed() {
     return atGoal(ElevatorState.IDLE);
   }
 
+  @AutoLogOutput
   public boolean atGoal() {
     return atGoal(desiredState);
   }

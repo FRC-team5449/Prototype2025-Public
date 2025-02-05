@@ -17,7 +17,7 @@ public class EndEffectorIONEO implements EndEffectorIO {
   private final SparkMax endEffector;
 
   public EndEffectorIONEO() {
-    endEffector = new SparkMax(0, MotorType.kBrushless);
+    endEffector = new SparkMax(8, MotorType.kBrushless);
     endEffector.configure(
         new SparkMaxConfig().inverted(true),
         ResetMode.kNoResetSafeParameters,

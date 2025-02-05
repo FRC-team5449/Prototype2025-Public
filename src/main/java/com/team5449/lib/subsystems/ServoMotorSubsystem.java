@@ -71,10 +71,10 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
     io.setPositionSetpoint(position);
   }
 
-  protected void setMotionMagicSetpointImpl(Angle position) {
-    positionSetpoint = position;
-    Logger.recordOutput(getName() + "/API/setMotionMagicSetpointImp/Units", position);
-    io.setMotionMagicSetpoint(position);
+  protected void setMotionMagicSetpointImpl(Supplier<Angle> positionSupplier) {
+    positionSetpoint = positionSupplier.get();
+    Logger.recordOutput(getName() + "/API/setMotionMagicSetpointImp/Units", positionSetpoint);
+    io.setMotionMagicSetpoint(positionSetpoint);
   }
 
   protected void setVelocitySetpointImpl(AngularVelocity velocity) {
@@ -118,7 +118,7 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
   public Command motionMagicSetpointCommand(Supplier<Angle> positionSupplier) {
     return runEnd(
             () -> {
-              setMotionMagicSetpointImpl(positionSupplier.get());
+              setMotionMagicSetpointImpl(positionSupplier);
             },
             () -> {})
         .withName(getName() + " motionMagicSetpointCommand");

@@ -26,9 +26,10 @@ public class ArmSimTalonIO extends ArmTalonIO {
   private final DCMotor armPlant = DCMotor.getFalcon500(1);
   private final DCMotorSim mechanismSim =
       new DCMotorSim(
-          LinearSystemId.createDCMotorSystem(armPlant, 0, 1.0 / ArmConstants.kArmGearRatio),
+          LinearSystemId.createDCMotorSystem(armPlant, 0.1, 1.0 / ArmConstants.kArmGearRatio),
           armPlant,
-          0.2981858);
+          0.2981858,
+          .2981858);
 
   private double lastUpdateTimestamp;
   private Notifier simNotifier = null;

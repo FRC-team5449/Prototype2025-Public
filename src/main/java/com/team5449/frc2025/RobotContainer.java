@@ -8,6 +8,7 @@
 package com.team5449.frc2025;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.team5449.frc2025.commands.AutoAlignCommand;
 import com.team5449.frc2025.commands.DriveCommands;
 import com.team5449.frc2025.subsystems.TunerConstants;
 import com.team5449.frc2025.subsystems.arm.ArmSimTalonIO;
@@ -29,6 +30,7 @@ import com.team5449.lib.subsystems.SimTalonFXIO;
 import com.team5449.lib.subsystems.TalonFXIO;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -80,7 +82,7 @@ public class RobotContainer {
 
         elevator = new ElevatorSubsystem(new SimTalonFXIO(ElevatorConstants.kElevatorConfig));
 
-        endEffector = null;
+        endEffector = new EndEffector();
 
         arm = new ArmSubsystem(new ArmSimTalonIO());
         break;
@@ -132,6 +134,9 @@ public class RobotContainer {
 
     // Reset gyro to 0 when triangle is pressed
     driverGamepad
+        .square()
+        .whileTrue(new AutoAlignCommand(() -> new Translation2d(), () -> false, drive));
+    driverGamepad
         .triangle()
         .onTrue(
             Commands.runOnce(
@@ -144,7 +149,10 @@ public class RobotContainer {
     driverGamepad
         .pov(0)
         .and(() -> !arm.isStowed())
-        .onTrue(elevator.setStateCommand(ElevatorState.LEVEL_1));
+        .onTrue(
+            elevator
+                .setStateCommand(ElevatorState.LEVEL_1)
+                .beforeStarting(Commands.print("Command running L1")));
 
     driverGamepad
         .pov(90)

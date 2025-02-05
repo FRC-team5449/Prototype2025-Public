@@ -17,15 +17,23 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.Supplier;
-import lombok.Setter;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, MotorIO> {
-  @Setter private ElevatorState desiredState = ElevatorState.IDLE;
+  @AutoLogOutput private ElevatorState desiredState = ElevatorState.IDLE;
 
   public ElevatorSubsystem(final MotorIO io) {
     super(ElevatorConstants.kElevatorConfig, new MotorInputsAutoLogged(), io);
     setCurrentPositionAsZero();
-    setDefaultCommand(motionMagicSetpointCommand(desiredState.goalSetpoint));
+    setDefaultCommand(motionMagicSetpointCommand(this::getStateAngle));
+  }
+
+  public Angle getStateAngle() {
+    return desiredState.goalSetpoint.get();
+  }
+
+  public void setDesiredState(ElevatorState state) {
+    desiredState = state;
   }
 
   public Command setStateCommand(ElevatorState state) {

@@ -7,7 +7,7 @@
 
 package com.team5449.frc2025;
 
-import com.pathplanner.lib.auto.AutoBuilder;
+import com.team5449.frc2025.auto.AutoBuilder;
 import com.team5449.frc2025.commands.AutoAlignCommand;
 import com.team5449.frc2025.commands.DriveCommands;
 import com.team5449.frc2025.subsystems.TunerConstants;
@@ -33,6 +33,7 @@ import com.team5449.lib.subsystems.TalonFXIO;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -46,6 +47,7 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private final RobotState robotState = RobotState.getInstance();
+  private final AutoBuilder autoBuilder;
 
   // private final AprilTagVision aprilTagVision;
 
@@ -106,8 +108,12 @@ public class RobotContainer {
         break;
     }
 
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    autoBuilder = new AutoBuilder(drive, elevator, arm);
+
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", new SendableChooser<Command>());
     autoChooser.addDefaultOption("None", Commands.none());
+    autoChooser.addOption("Dummy 4 Level3", autoBuilder.dummyFourLV3());
+
     // autoChooser.addOption(
     //     "Elevator Characterization",
     //     new StaticCharacterizationCommand(

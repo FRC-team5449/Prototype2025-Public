@@ -17,6 +17,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.Supplier;
+
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
 
@@ -53,15 +55,12 @@ public class ArmSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, Mot
         inputs.position, setState.goalSetpoint.get(), ArmConstants.positionTolerance);
   }
 
+  @RequiredArgsConstructor
   public enum ArmState {
     IDLE(() -> Rotation.of(0.15)),
     STOW(() -> Rotation.of(0.22)),
     SCORE(() -> Rotation.of(0.13));
 
     public final Supplier<Angle> goalSetpoint;
-
-    ArmState(Supplier<Angle> goalSetpoint) {
-      this.goalSetpoint = goalSetpoint;
-    }
   }
 }

@@ -11,9 +11,13 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 public class ServoMotorSubsystemConfig {
   public String name = "UNNAMED";
-  public int canId;
+  public int canMasterId;
+  public boolean enableSlave = false;
+  public boolean isSlaveOpposite = false;
+  public int canSlaveId = -1;
   public String canBus;
   public TalonFXConfiguration fxConfig = new TalonFXConfiguration();
+  public TalonFXConfiguration fxSlaveConfig = new TalonFXConfiguration();
 
   // Ratio of rotor to units for this talon. rotor * by this ratio should
   // be the units.

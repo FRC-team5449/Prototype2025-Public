@@ -30,6 +30,9 @@ public class Robot extends LoggedRobot {
   private final LoggedTunableNumber poseY = new LoggedTunableNumber("RobotState/Pose_Y", 0.0);
   private final LoggedTunableNumber poseRotation =
       new LoggedTunableNumber("RobotState/Pose_Rotation_Degree", 0.0);
+  private final LoggedTunableNumber targetX = new LoggedTunableNumber("targetPose/X", 0);
+  private final LoggedTunableNumber targetY = new LoggedTunableNumber("targetPose/Y", 0);
+  private final LoggedTunableNumber targetT = new LoggedTunableNumber("targetPose/T", 0);
 
   public Robot() {
     switch (Constants.currentMode) {
@@ -70,6 +73,16 @@ public class Robot extends LoggedRobot {
         poseX,
         poseY,
         poseRotation);
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () ->
+            RobotState.getInstance()
+                .setTargetPose(
+                    new Pose2d(
+                        targetX.get(), targetY.get(), Rotation2d.fromDegrees(targetT.get()))),
+        targetX,
+        targetY,
+        targetT);
     Threads.setCurrentThreadPriority(true, 99);
 
     CommandScheduler.getInstance().run();

@@ -14,7 +14,10 @@ import edu.wpi.first.units.measure.Angle;
 
 public class UnitUtil {
   public static Angle clamp(Angle value, Angle low, Angle high) {
-    return Angle.ofBaseUnits(
-        MathUtil.clamp(value.in(Radian), low.in(Radian), high.in(Radian)), Radian);
+    return Radian.of(MathUtil.clamp(value.in(Radian), low.in(Radian), high.in(Radian)));
+  }
+
+  public static boolean isNear(Angle expected, Angle actual, Angle tolerence) {
+    return MathUtil.isNear(expected.in(Radian), actual.in(Radian), tolerence.in(Radian));
   }
 }

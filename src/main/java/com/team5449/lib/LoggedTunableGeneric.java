@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
-public class LoggedTunbaleGeneric<T extends Measure<U>, U extends Unit> implements Supplier<T> {
+public class LoggedTunableGeneric<T extends Measure<U>, U extends Unit> implements Supplier<T> {
   private static final String tableKey = "/Tuning";
 
   private final String key;
@@ -34,7 +34,7 @@ public class LoggedTunbaleGeneric<T extends Measure<U>, U extends Unit> implemen
    * @param dashboardKey Key on dashboard
    */
   @SuppressWarnings("unchecked")
-  public LoggedTunbaleGeneric(String dashboardKey, U defaultUnit) {
+  public LoggedTunableGeneric(String dashboardKey, U defaultUnit) {
     this.key = tableKey + "/" + dashboardKey;
     this.defauleUnit = defaultUnit;
     currentMeasure = (T) defaultUnit.of(defaultValue);
@@ -46,7 +46,7 @@ public class LoggedTunbaleGeneric<T extends Measure<U>, U extends Unit> implemen
    * @param dashboardKey Key on dashboard
    * @param defaultValue Default value
    */
-  public LoggedTunbaleGeneric(String dashboardKey, double defaultValue, U defaultUnit) {
+  public LoggedTunableGeneric(String dashboardKey, double defaultValue, U defaultUnit) {
     this(dashboardKey, defaultUnit);
     initDefault(defaultValue);
   }
@@ -111,17 +111,17 @@ public class LoggedTunbaleGeneric<T extends Measure<U>, U extends Unit> implemen
    */
   @SafeVarargs
   public static <T extends Measure<U>, U extends Unit> void ifChanged(
-      int id, Consumer<double[]> action, LoggedTunbaleGeneric<T, U>... tunableNumbers) {
+      int id, Consumer<double[]> action, LoggedTunableGeneric<T, U>... tunableNumbers) {
     if (Arrays.stream(tunableNumbers).anyMatch(tunableNumber -> tunableNumber.hasChanged(id))) {
       action.accept(
-          Arrays.stream(tunableNumbers).mapToDouble(LoggedTunbaleGeneric::getDouble).toArray());
+          Arrays.stream(tunableNumbers).mapToDouble(LoggedTunableGeneric::getDouble).toArray());
     }
   }
 
   /** Runs action if any of the tunableNumbers have changed */
   @SafeVarargs
   public static <T extends Measure<U>, U extends Unit> void ifChanged(
-      int id, Runnable action, LoggedTunbaleGeneric<T, U>... tunableNumbers) {
+      int id, Runnable action, LoggedTunableGeneric<T, U>... tunableNumbers) {
     ifChanged(id, (values) -> action.run(), tunableNumbers);
   }
 

@@ -101,6 +101,7 @@ public class Drive extends SubsystemBase {
 
   private final SwerveSetpointGenerator setpointGenerator;
   private SwerveSetpoint previousSetpoint;
+  private Pose2d targetPose = new Pose2d();
 
   /** Creates a new Drive. */
   public Drive(
@@ -164,7 +165,7 @@ public class Drive extends SubsystemBase {
   @Override
   public void periodic() {
     RobotState.getInstance().consumePoseResetRequest().ifPresent(this::setPose);
-
+    RobotState.getInstance().consumeTargetResetRequest().ifPresent(this::setTargetPose);
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -356,9 +357,18 @@ public class Drive extends SubsystemBase {
     return getPose().getRotation();
   }
 
+  @AutoLogOutput(key = "Odometry/Target")
+  public Pose2d getTargetPose() {
+    return targetPose;
+  }
+
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+  }
+
+  public void setTargetPose(Pose2d pose) {
+    targetPose = pose;
   }
 
   /** Adds a new timestamped vision measurement. */

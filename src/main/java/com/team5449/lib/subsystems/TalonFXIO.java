@@ -20,7 +20,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -40,8 +40,7 @@ public class TalonFXIO implements MotorIO {
 
   private final VelocityVoltage velocityVoltageControl = new VelocityVoltage(RPM.of(0));
   private final PositionVoltage positionVoltageControl = new PositionVoltage(Radian.of(0));
-  private final MotionMagicExpoVoltage motionMagicVoltageControl =
-      new MotionMagicExpoVoltage(Radian.of(0));
+  private final MotionMagicVoltage motionMagicVoltageControl = new MotionMagicVoltage(Radian.of(0));
 
   private final StatusSignal<Angle> positionSignal;
   private final StatusSignal<AngularVelocity> velocitySignal;

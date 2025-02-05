@@ -9,7 +9,6 @@ package com.team5449.frc2025.subsystems.arm;
 
 import static edu.wpi.first.units.Units.Rotation;
 
-import com.team5449.frc2025.subsystems.elevator.ElevatorConstants;
 import com.team5449.lib.subsystems.MotorIO;
 import com.team5449.lib.subsystems.MotorInputsAutoLogged;
 import com.team5449.lib.subsystems.ServoMotorSubsystem;
@@ -37,7 +36,7 @@ public class ArmSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, Mot
   }
 
   public Command setStateCommand(ArmState state) {
-    return Commands.runOnce(() -> this.setDesiredState(state), this);
+    return Commands.runOnce(() -> this.setDesiredState(state));
   }
 
   @AutoLogOutput(key = "Arm/isStowed")
@@ -51,7 +50,7 @@ public class ArmSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, Mot
 
   public boolean atGoal(ArmState setState) {
     return UnitUtil.isNear(
-        inputs.position, setState.goalSetpoint.get(), ElevatorConstants.positionTolerance);
+        inputs.position, setState.goalSetpoint.get(), ArmConstants.positionTolerance);
   }
 
   public enum ArmState {

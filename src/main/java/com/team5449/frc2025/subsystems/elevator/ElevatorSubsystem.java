@@ -34,7 +34,7 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
   }
 
   public Command setStateCommand(ElevatorState state) {
-    return Commands.runOnce(() -> this.setDesiredState(state), this);
+    return Commands.runOnce(() -> this.setDesiredState(state));
   }
 
   @AutoLogOutput

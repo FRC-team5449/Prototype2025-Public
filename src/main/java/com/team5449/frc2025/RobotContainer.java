@@ -151,10 +151,7 @@ public class RobotContainer {
     driverGamepad
         .pov(0)
         .and(() -> !arm.isStowed())
-        .onTrue(
-            elevator
-                .setStateCommand(ElevatorState.LEVEL_1)
-                .beforeStarting(Commands.print("Command running L1")));
+        .onTrue(elevator.setStateCommand(ElevatorState.LEVEL_1));
 
     driverGamepad
         .pov(90)

@@ -23,7 +23,7 @@ import edu.wpi.first.units.measure.Angle;
 
 public class ElevatorConstants {
   public static final ServoMotorSubsystemConfig kElevatorConfig = new ServoMotorSubsystemConfig();
-  public static final Angle positionTolerance = Rotation.of(0.03);
+  public static final Angle positionTolerance = Rotation.of(0.3);
 
   static {
     kElevatorConfig.name = "Elevator";

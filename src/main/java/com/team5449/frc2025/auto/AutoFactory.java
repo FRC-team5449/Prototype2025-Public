@@ -8,6 +8,7 @@
 package com.team5449.frc2025.auto;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.team5449.frc2025.subsystems.arm.ArmSubsystem;
 import com.team5449.frc2025.subsystems.drive.Drive;
@@ -28,6 +29,10 @@ public class AutoFactory {
     return Commands.sequence(
         Commands.runOnce(() -> drive.setPose(startToA.getStartingHolonomicPose().get())),
         AutoBuilder.followPath(startToA));
+  }
+
+  public Command autoPathTry() {
+    return new PathPlannerAuto("autoTry");
   }
 
   public PathPlannerPath getAutoPath(String fileName) {

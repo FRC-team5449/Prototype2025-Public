@@ -113,7 +113,7 @@ public class RobotContainer {
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", new SendableChooser<Command>());
     autoChooser.addDefaultOption("None", Commands.none());
-    autoChooser.addOption("Dummy 4 Level3", autoFactory.dummyFourLV3());
+    autoChooser.addOption("Dummy 4 Level3", autoFactory.autoPathTry());
 
     // autoChooser.addOption(
     //     "Elevator Characterization",

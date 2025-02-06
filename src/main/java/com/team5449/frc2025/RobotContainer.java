@@ -7,7 +7,7 @@
 
 package com.team5449.frc2025;
 
-import com.team5449.frc2025.auto.AutoBuilder;
+import com.team5449.frc2025.auto.AutoFactory;
 import com.team5449.frc2025.commands.AutoAlignCommand;
 import com.team5449.frc2025.commands.DriveCommands;
 import com.team5449.frc2025.subsystems.TunerConstants;
@@ -47,7 +47,8 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private final RobotState robotState = RobotState.getInstance();
-  private final AutoBuilder autoBuilder;
+
+  private final AutoFactory autoFactory;
 
   // private final AprilTagVision aprilTagVision;
 
@@ -108,11 +109,11 @@ public class RobotContainer {
         break;
     }
 
-    autoBuilder = new AutoBuilder(drive, elevator, arm);
+    autoFactory = new AutoFactory(drive, elevator, arm);
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", new SendableChooser<Command>());
     autoChooser.addDefaultOption("None", Commands.none());
-    autoChooser.addOption("Dummy 4 Level3", autoBuilder.dummyFourLV3());
+    autoChooser.addOption("Dummy 4 Level3", autoFactory.dummyFourLV3());
 
     // autoChooser.addOption(
     //     "Elevator Characterization",

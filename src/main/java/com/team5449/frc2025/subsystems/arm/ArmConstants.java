@@ -32,6 +32,10 @@ public class ArmConstants {
 
   public static final double kArmGearRatio = 41.66667;
 
+  public static final CANcoderConfiguration armCanCoderConfig = new CANcoderConfiguration();
+  public static final int armCanCoderId = 8;
+  public static final String armCanCoderBus = "rio";
+
   static {
     kArmConfig.name = "Arm";
     kArmConfig.canMasterId = 7;
@@ -40,7 +44,7 @@ public class ArmConstants {
     kArmConfig.enableSlave = false;
 
     kArmConfig.kMaxPositionUnits = 0.254;
-    kArmConfig.kMinPositionUnits = -0.05;
+    kArmConfig.kMinPositionUnits = 0.05;
 
     TalonFXConfiguration talonConfiguration = new TalonFXConfiguration();
     talonConfiguration.MotorOutput =
@@ -70,7 +74,7 @@ public class ArmConstants {
             .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     talonConfiguration.Feedback =
         new FeedbackConfigs()
-            .withFeedbackRemoteSensorID(12)
+            .withFeedbackRemoteSensorID(armCanCoderId)
             .withFeedbackRotorOffset(0)
             .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
             .withRotorToSensorRatio(kArmGearRatio)
@@ -81,12 +85,8 @@ public class ArmConstants {
     kArmConfig.fxConfig = talonConfiguration;
   }
 
-  public static final CANcoderConfiguration armCanCoderConfig = new CANcoderConfiguration();
-  public static final int armCanCoderId = 7;
-  public static final String armCanCoderBus = "rio";
-
   static {
-    armCanCoderConfig.MagnetSensor.MagnetOffset = -0.84497;
+    armCanCoderConfig.MagnetSensor.MagnetOffset = 0.211914;
     armCanCoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
     armCanCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
   }

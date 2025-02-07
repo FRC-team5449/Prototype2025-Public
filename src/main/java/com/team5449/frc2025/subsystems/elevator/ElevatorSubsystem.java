@@ -58,7 +58,7 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
     IDLE(() -> Rotation.of(0)),
     LEVEL_1(() -> Rotation.of(2)),
     LEVEL_2(() -> Rotation.of(5)),
-    LEVEL_3(() -> Rotation.of(10)),
+    LEVEL_3(() -> Rotation.of(11.5)),
     LEVEL_4(() -> Rotation.of(17.5));
 
     public final Supplier<Angle> goalSetpoint;

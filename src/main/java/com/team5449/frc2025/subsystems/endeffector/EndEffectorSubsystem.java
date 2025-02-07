@@ -29,7 +29,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
   }
 
   public Command outtake() {
-    return runEnd(() -> io.setOpenLoop(1), () -> io.setOpenLoop(0));
+    return runEnd(() -> io.setOpenLoop(0.3), () -> io.setOpenLoop(0));
   }
 
   @Override

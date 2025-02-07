@@ -7,6 +7,7 @@
 
 package com.team5449.frc2025;
 
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.team5449.frc2025.auto.AutoFactory;
 import com.team5449.frc2025.commands.AutoAlignCommand;
 import com.team5449.frc2025.commands.DriveCommands;
@@ -114,6 +115,7 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", new SendableChooser<Command>());
     autoChooser.addDefaultOption("None", Commands.none());
     autoChooser.addOption("Dummy 4 Level3", autoFactory.autoPathTry());
+    autoChooser.addOption("test", new PathPlannerAuto("New Auto"));
     // File autoDir = new File("/deploy/pathplanner/autos");
     // for (File file : autoDir.listFiles()) {
     //   autoChooser.addOption(file.getName(), new PathPlannerAuto(file.getName()));
@@ -125,8 +127,8 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -driverGamepad.getLeftY(),
-            () -> -driverGamepad.getLeftX(),
+            () -> driverGamepad.getLeftY(),
+            () -> driverGamepad.getLeftX(),
             () -> -driverGamepad.getRightX()));
 
     driverGamepad

@@ -43,7 +43,7 @@ public class ArmConstants {
 
     kArmConfig.enableSlave = false;
 
-    kArmConfig.kMaxPositionUnits = 0.254;
+    kArmConfig.kMaxPositionUnits = 0.278;
     kArmConfig.kMinPositionUnits = 0.05;
 
     TalonFXConfiguration talonConfiguration = new TalonFXConfiguration();

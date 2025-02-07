@@ -114,13 +114,10 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", new SendableChooser<Command>());
     autoChooser.addDefaultOption("None", Commands.none());
     autoChooser.addOption("Dummy 4 Level3", autoFactory.autoPathTry());
-
-    // autoChooser.addOption(
-    //     "Elevator Characterization",
-    //     new StaticCharacterizationCommand(
-    //             elevator, (current) -> elevator.runCharacterization(current),
-    // elevator::getVelocity)
-    //         .finallyDo(elevator::endCharacterization));
+    // File autoDir = new File("/deploy/pathplanner/autos");
+    // for (File file : autoDir.listFiles()) {
+    //   autoChooser.addOption(file.getName(), new PathPlannerAuto(file.getName()));
+    // }
     configureBindings();
   }
 
@@ -157,22 +154,22 @@ public class RobotContainer {
 
     driverGamepad
         .pov(0)
-        .and(() -> !arm.isStowed())
+        .and(() -> !arm.intaking())
         .onTrue(elevator.setStateCommand(ElevatorState.LEVEL_1));
 
     driverGamepad
         .pov(90)
-        .and(() -> !arm.isStowed())
+        .and(() -> !arm.intaking())
         .onTrue(elevator.setStateCommand(ElevatorState.LEVEL_2));
 
     driverGamepad
         .pov(180)
-        .and(() -> !arm.isStowed())
+        .and(() -> !arm.intaking())
         .onTrue(elevator.setStateCommand(ElevatorState.LEVEL_3));
 
     driverGamepad
         .pov(270)
-        .and(() -> !arm.isStowed())
+        .and(() -> !arm.intaking())
         .onTrue(elevator.setStateCommand(ElevatorState.LEVEL_4));
 
     driverGamepad
@@ -182,9 +179,9 @@ public class RobotContainer {
                 .setStateCommand(ElevatorState.IDLE)
                 .alongWith(
                     Commands.waitUntil(elevator::isStowed)
-                        .andThen(arm.setStateCommand(ArmState.STOW))))
+                        .andThen(arm.setStateCommand(ArmState.INTAKE).onlyIf(driverGamepad.R1()))))
         .onFalse(arm.setStateCommand(ArmState.IDLE))
-        .and(arm::isStowed)
+        .and(arm::intaking)
         .whileTrue(endEffector.outtake());
 
     driverGamepad.L1().and(elevator::atGoal).whileTrue(endEffector.outtake());

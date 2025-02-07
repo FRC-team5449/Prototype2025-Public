@@ -29,7 +29,7 @@ public class ArmSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, Mot
     setDefaultCommand(motionMagicSetpointCommand(this::getStateAngle));
   }
 
-  public Angle getStateAngle() {
+  private Angle getStateAngle() {
     return desiredState.goalSetpoint.get();
   }
 
@@ -37,9 +37,13 @@ public class ArmSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, Mot
     return Commands.runOnce(() -> this.setDesiredState(state));
   }
 
-  @AutoLogOutput(key = "Arm/isStowed")
-  public boolean isStowed() {
-    return atGoal(ArmState.STOW);
+  @AutoLogOutput(key = "Arm/isIdle")
+  public boolean idle() {
+    return atGoal(ArmState.IDLE);
+  }
+
+  public boolean intaking() {
+    return atGoal(ArmState.INTAKE);
   }
 
   public boolean atGoal() {
@@ -53,8 +57,8 @@ public class ArmSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, Mot
 
   @RequiredArgsConstructor
   public enum ArmState {
-    IDLE(() -> Rotation.of(0.15)),
-    STOW(() -> Rotation.of(0.22)),
+    IDLE(() -> Rotation.of(0.22)),
+    INTAKE(() -> Rotation.of(0.273)),
     SCORE(() -> Rotation.of(0.13));
 
     public final Supplier<Angle> goalSetpoint;

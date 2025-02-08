@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "startToReef1"
+            "pathName": "upperStartToReefI"
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "reef1ToSource"
+            "pathName": "reefIToSource"
           }
         },
         {
@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "sourceToReef2"
+            "pathName": "sourceToReefJ"
           }
         },
         {
@@ -43,7 +43,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "reef2ToSource"
+            "pathName": "reefJToSource"
           }
         },
         {
@@ -55,7 +55,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "sourceToReef3"
+            "pathName": "sourceToReefK"
           }
         },
         {
@@ -67,7 +67,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "reef3ToSource"
+            "pathName": "reefKToSource"
           }
         }
       ]

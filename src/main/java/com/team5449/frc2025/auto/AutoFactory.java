@@ -36,14 +36,21 @@ public class AutoFactory {
     return Commands.sequence(
         Commands.runOnce(() -> drive.setPose(startToReef1.getStartingHolonomicPose().get())),
         AutoBuilder.followPath(startToReef1),
-        elevator.setStateCommand(ElevatorState.LEVEL_3),
-        Commands.waitSeconds(0.5),
+        elevator.autoSetStateCommand(ElevatorState.LEVEL_3),
         endEffector.outtake().withTimeout(1.5),
-        Commands.waitSeconds(0.5),
-        elevator.setStateCommand(ElevatorState.IDLE) // ,
-        // AutoBuilder.followPath(reef1ToSource),
-
-        );
+        elevator.autoSetStateCommand(ElevatorState.IDLE),
+        AutoBuilder.followPath(reef1ToSource),
+        Commands.waitSeconds(1),
+        AutoBuilder.followPath(sourceToReef2),
+        elevator.autoSetStateCommand(ElevatorState.LEVEL_3),
+        endEffector.outtake().withTimeout(1.5),
+        elevator.autoSetStateCommand(ElevatorState.IDLE),
+        AutoBuilder.followPath(reef2ToSource),
+        Commands.waitSeconds(1),
+        AutoBuilder.followPath(sourceToReef3),
+        elevator.autoSetStateCommand(ElevatorState.LEVEL_3),
+        endEffector.outtake().withTimeout(1.5),
+        elevator.autoSetStateCommand(ElevatorState.IDLE));
   }
 
   public Command autoPathTry() {

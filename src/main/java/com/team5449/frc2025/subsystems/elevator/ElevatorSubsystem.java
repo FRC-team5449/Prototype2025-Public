@@ -16,6 +16,7 @@ import com.team5449.lib.util.UnitUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -51,6 +52,10 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
   public boolean atGoal(ElevatorState setState) {
     return UnitUtil.isNear(
         inputs.position, setState.goalSetpoint.get(), ElevatorConstants.positionTolerance);
+  }
+
+  public Command autoSetStateCommand(ElevatorState state) {
+    return Commands.sequence(setStateCommand(state), new WaitUntilCommand(() -> atGoal()));
   }
 
   @RequiredArgsConstructor

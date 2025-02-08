@@ -110,11 +110,12 @@ public class RobotContainer {
         break;
     }
 
-    autoFactory = new AutoFactory(drive, elevator, arm);
+    autoFactory = new AutoFactory(drive, elevator, arm, endEffector);
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", new SendableChooser<Command>());
     autoChooser.addDefaultOption("None", Commands.none());
-    autoChooser.addOption("Dummy 4 Level3", autoFactory.autoPathTry());
+    autoChooser.addOption("Dummy 4 Level3", autoFactory.dummyFourLV3());
+    autoChooser.addOption("Auto Try", autoFactory.autoPathTry());
     autoChooser.addOption("test", new PathPlannerAuto("New Auto"));
     // File autoDir = new File("/deploy/pathplanner/autos");
     // for (File file : autoDir.listFiles()) {

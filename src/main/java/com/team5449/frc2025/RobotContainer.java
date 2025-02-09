@@ -117,6 +117,7 @@ public class RobotContainer {
     autoChooser.addOption("Dummy 4 Level3", autoFactory.dummyFourLV3());
     autoChooser.addOption("Auto Try", autoFactory.autoPathTry());
     autoChooser.addOption("test", new PathPlannerAuto("New Auto"));
+    autoChooser.addOption("mid", autoFactory.poor());
     // File autoDir = new File("/deploy/pathplanner/autos");
     // for (File file : autoDir.listFiles()) {
     //   autoChooser.addOption(file.getName(), new PathPlannerAuto(file.getName()));
@@ -139,7 +140,7 @@ public class RobotContainer {
                 drive,
                 () -> -driverGamepad.getLeftY(),
                 () -> -driverGamepad.getLeftX(),
-                () -> new Rotation2d()));
+                Rotation2d::new));
 
     // Reset gyro to 0 when triangle is pressed
     driverGamepad
@@ -155,31 +156,19 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    driverGamepad
-        .pov(0)
-        .and(() -> !arm.intaking())
-        .onTrue(elevator.setStateCommand(ElevatorState.LEVEL_1));
+    driverGamepad.pov(0).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L1));
 
-    driverGamepad
-        .pov(90)
-        .and(() -> !arm.intaking())
-        .onTrue(elevator.setStateCommand(ElevatorState.LEVEL_2));
+    driverGamepad.pov(90).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L2));
 
-    driverGamepad
-        .pov(180)
-        .and(() -> !arm.intaking())
-        .onTrue(elevator.setStateCommand(ElevatorState.LEVEL_3));
+    driverGamepad.pov(180).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L3));
 
-    driverGamepad
-        .pov(270)
-        .and(() -> !arm.intaking())
-        .onTrue(elevator.setStateCommand(ElevatorState.LEVEL_4));
+    driverGamepad.pov(270).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L4));
 
     driverGamepad
         .R1()
         .onTrue(
             elevator
-                .setStateCommand(ElevatorState.IDLE)
+                .setState(ElevatorState.IDLE)
                 .alongWith(
                     Commands.waitUntil(elevator::isStowed)
                         .andThen(arm.setStateCommand(ArmState.INTAKE).onlyIf(driverGamepad.R1()))))

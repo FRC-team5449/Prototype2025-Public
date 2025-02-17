@@ -155,7 +155,11 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
-
+    driverGamepad
+        .cross()
+        .onTrue(
+            Commands.runOnce(
+                () -> drive.setPose(new Pose2d(new Translation2d(), drive.getRotation())), drive));
     driverGamepad.pov(0).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L1));
 
     driverGamepad.pov(90).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L2));

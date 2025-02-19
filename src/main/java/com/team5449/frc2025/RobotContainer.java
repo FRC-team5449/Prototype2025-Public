@@ -12,6 +12,8 @@ import com.team5449.frc2025.auto.AutoFactory;
 import com.team5449.frc2025.commands.AutoAlignCommand;
 import com.team5449.frc2025.commands.DriveCommands;
 import com.team5449.frc2025.subsystems.TunerConstants;
+import com.team5449.frc2025.subsystems.apriltagvision.AprilTagVision;
+import com.team5449.frc2025.subsystems.apriltagvision.AprilTagVision.CameraConfig;
 import com.team5449.frc2025.subsystems.arm.ArmSimTalonIO;
 import com.team5449.frc2025.subsystems.arm.ArmSubsystem;
 import com.team5449.frc2025.subsystems.arm.ArmSubsystem.ArmState;
@@ -33,11 +35,16 @@ import com.team5449.lib.subsystems.SimTalonFXIO;
 import com.team5449.lib.subsystems.TalonFXIO;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+
+import java.lang.reflect.Array;
+import java.util.List;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
@@ -45,6 +52,9 @@ public class RobotContainer {
   private final ElevatorSubsystem elevator;
   private final EndEffectorSubsystem endEffector;
   private final ArmSubsystem arm;
+  private final AprilTagVision vision;
+  private final CameraConfig cameraConfig1;
+  private final CameraConfig[] cameraConfigs;
 
   @SuppressWarnings("unused")
   private final RobotState robotState = RobotState.getInstance();
@@ -75,6 +85,11 @@ public class RobotContainer {
         endEffector = new EndEffectorSubsystem(new EndEffectorIONEO());
 
         arm = new ArmSubsystem(new ArmTalonIO());
+
+        cameraConfig1=new CameraConfig("NAME", new Transform3d(), 5);
+        //TODO finish this
+        cameraConfigs=new CameraConfig[]{cameraConfig1};
+        vision=new AprilTagVision(cameraConfigs);
         break;
 
       case SIM:
@@ -91,6 +106,10 @@ public class RobotContainer {
         endEffector = new EndEffectorSubsystem(new EndEffectorIOSim());
 
         arm = new ArmSubsystem(new ArmSimTalonIO());
+
+        cameraConfig1=null;
+        cameraConfigs=null;
+        vision=null;
         break;
 
       default:
@@ -107,6 +126,10 @@ public class RobotContainer {
         endEffector = null;
 
         arm = new ArmSubsystem(new MotorIO() {});
+
+        cameraConfig1=null;
+        cameraConfigs=null;
+        vision=null;
         break;
     }
 

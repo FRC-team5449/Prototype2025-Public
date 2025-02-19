@@ -7,9 +7,11 @@
 
 package com.team5449.frc2025.subsystems.apriltagvision;
 
+import com.team5449.frc2025.Constants;
 import com.team5449.frc2025.RobotState;
 import com.team5449.frc2025.RobotState.VisionObservation;
 import com.team5449.lib.thirdpartylibs.LimelightHelpers;
+import com.team5449.lib.thirdpartylibs.LimelightHelpers.PoseEstimate;
 import com.team5449.lib.util.AllianceFlipUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -19,6 +21,9 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import static edu.wpi.first.units.Units.Meters;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -30,6 +35,7 @@ import org.littletonrobotics.junction.Logger;
 public class AprilTagVision extends SubsystemBase {
   private static final double FIELD_LENGTH_METERS = AllianceFlipUtil.fieldLength;
   private static final double FIELD_WIDTH_METERS = AllianceFlipUtil.fieldWidth;
+  private static final double BOT_RADIUS = Math.hypot(Constants.botLength.in(Meters), Constants.botWidth.in(Meters))/2;
   // Tuning constants
   private static final double MIN_TAG_AREA = 0.1;
   private static final double MAX_TAG_DISTANCE = 6.0;
@@ -70,7 +76,7 @@ public class AprilTagVision extends SubsystemBase {
 
   private Optional<VisionObservation> getMegaTag2Estimate(
       String cameraName, double stdDevCoefficient) {
-    LimelightHelpers.PoseEstimate poseEstimate =
+    PoseEstimate poseEstimate =
         LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName);
 
     if (poseEstimate == null
@@ -85,7 +91,7 @@ public class AprilTagVision extends SubsystemBase {
 
   private Optional<VisionObservation> getMegaTagEstimate(
       String cameraName, double stdDevCoefficient) {
-    LimelightHelpers.PoseEstimate poseEstimate =
+    PoseEstimate poseEstimate =
         LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraName);
 
     if (poseEstimate == null || poseEstimate.tagCount == 0) {
@@ -104,18 +110,18 @@ public class AprilTagVision extends SubsystemBase {
   }
 
   private Optional<VisionObservation> processEstimate(
-      LimelightHelpers.PoseEstimate estimate, double stdDevCoefficient) {
+      PoseEstimate estimate, double stdDevCoefficient) {
 
     // Validate pose is within field bounds
     if (!isOnField(estimate.pose)) {
       return Optional.empty();
     }
-
+    Pose2d projectedPose=projectOnField(estimate.pose);
     // Calculate standard deviations
     Matrix<N3, N1> stdDevs = calculateStdDevs(estimate, stdDevCoefficient);
 
     // TODO Which timestamp second is right
-    return Optional.of(new VisionObservation(estimate.pose, estimate.timestampSeconds, stdDevs));
+    return Optional.of(new VisionObservation(projectedPose, estimate.timestampSeconds, stdDevs));
 
     // return Optional.of(
     //         new VisionObservation(
@@ -148,13 +154,32 @@ public class AprilTagVision extends SubsystemBase {
 
     return VecBuilder.fill(xyStdDev, xyStdDev, thetaStdDev);
   }
-
+  /**
+   * 
+   * @param pose
+   * @return Whether the pose is on field, allowing an error of {@code margin}. 
+   */
   private boolean isOnField(Pose2d pose) {
-    double margin = 1.0;
+    double margin = .5;
     return pose.getX() >= -margin
         && pose.getX() <= FIELD_LENGTH_METERS + margin
         && pose.getY() >= -margin
         && pose.getY() <= FIELD_WIDTH_METERS + margin;
+  }
+  /**
+   * Projects a robot pose on the field if it is outside the field.
+   * Apply this method if {@link #isOnField()} gives {@code true}, discard this measurement otherwise.
+   * @param pose
+   * @return projected pose
+   */
+  private Pose2d projectOnField(Pose2d pose){
+    double x=pose.getX();
+    double y=pose.getY();
+    if(x>FIELD_LENGTH_METERS-BOT_RADIUS) x=FIELD_LENGTH_METERS-BOT_RADIUS;
+    else if(x<BOT_RADIUS) x=BOT_RADIUS;
+    if(y>FIELD_WIDTH_METERS-BOT_RADIUS) x=FIELD_WIDTH_METERS-BOT_RADIUS;
+    else if(x<BOT_RADIUS) x=BOT_RADIUS;
+    return new Pose2d(x,y,pose.getRotation());
   }
 
   @Override

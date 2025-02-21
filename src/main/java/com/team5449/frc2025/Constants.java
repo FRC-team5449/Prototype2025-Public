@@ -15,9 +15,9 @@ public final class Constants {
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = Robot.isReal() ? Mode.REAL : simMode;
   public static final boolean tuningMode = true;
-  //TODO fill in these
-  public static final Distance botLength=Inches.of(40);
-  public static final Distance botWidth=Inches.of(40);
+  // TODO fill in these
+  public static final Distance botLength = Inches.of(40);
+  public static final Distance botWidth = Inches.of(40);
 
   public static enum Mode {
     /** Running on a real robot. */

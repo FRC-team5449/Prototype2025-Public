@@ -35,16 +35,14 @@ import com.team5449.lib.subsystems.SimTalonFXIO;
 import com.team5449.lib.subsystems.TalonFXIO;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-
-import java.lang.reflect.Array;
-import java.util.List;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
@@ -52,16 +50,18 @@ public class RobotContainer {
   private final ElevatorSubsystem elevator;
   private final EndEffectorSubsystem endEffector;
   private final ArmSubsystem arm;
+
+  @SuppressWarnings("unused")
   private final AprilTagVision vision;
+
   private final CameraConfig cameraConfig1;
+
   private final CameraConfig[] cameraConfigs;
 
   @SuppressWarnings("unused")
   private final RobotState robotState = RobotState.getInstance();
 
   private final AutoFactory autoFactory;
-
-  // private final AprilTagVision aprilTagVision;
 
   private final CommandPS5Controller driverGamepad = new CommandPS5Controller(0);
   // private final CommandPS5Controller operatorGamepad = new CommandPS5Controller(0);
@@ -86,10 +86,15 @@ public class RobotContainer {
 
         arm = new ArmSubsystem(new ArmTalonIO());
 
-        cameraConfig1=new CameraConfig("NAME", new Transform3d(), 5);
-        //TODO finish this
-        cameraConfigs=new CameraConfig[]{cameraConfig1};
-        vision=new AprilTagVision(cameraConfigs);
+        cameraConfig1 =
+            new CameraConfig(
+                "limelight-front",
+                new Transform3d(new Translation3d(), new Rotation3d()),
+                // new Rotation3d(Degree.of(90), Degree.of(0), Degree.of(180))),
+                5);
+        // TODO finish this
+        cameraConfigs = new CameraConfig[] {cameraConfig1};
+        vision = new AprilTagVision(cameraConfigs);
         break;
 
       case SIM:
@@ -107,9 +112,9 @@ public class RobotContainer {
 
         arm = new ArmSubsystem(new ArmSimTalonIO());
 
-        cameraConfig1=null;
-        cameraConfigs=null;
-        vision=null;
+        cameraConfig1 = null;
+        cameraConfigs = null;
+        vision = null;
         break;
 
       default:
@@ -127,9 +132,9 @@ public class RobotContainer {
 
         arm = new ArmSubsystem(new MotorIO() {});
 
-        cameraConfig1=null;
-        cameraConfigs=null;
-        vision=null;
+        cameraConfig1 = null;
+        cameraConfigs = null;
+        vision = null;
         break;
     }
 

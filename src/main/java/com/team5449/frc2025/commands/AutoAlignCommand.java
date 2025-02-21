@@ -28,7 +28,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class AutoAlignCommand extends Command {
   private static final LoggedTunableNumber linearkP =
-      new LoggedTunableNumber("AutoAlign/drivekP", 3.5);
+      new LoggedTunableNumber("AutoAlign/drivekP", 6);
   private static final LoggedTunableNumber linearkD =
       new LoggedTunableNumber("AutoAlign/drivekD", 0.0);
   private static final LoggedTunableNumber thetakP =
@@ -51,9 +51,9 @@ public class AutoAlignCommand extends Command {
   private static final LoggedTunableNumber maxAngularAcceleration =
       new LoggedTunableNumber("AutoAlign/maxAngularAcceleration", 12 * 0.8);
   private static final LoggedTunableNumber slowLinearVelocity =
-      new LoggedTunableNumber("AutoAlign/slowLinearVelocity", 2.25);
+      new LoggedTunableNumber("AutoAlign/slowLinearVelocity", 4);
   private static final LoggedTunableNumber slowLinearAcceleration =
-      new LoggedTunableNumber("AutoAlign/slowLinearAcceleration", 3.0);
+      new LoggedTunableNumber("AutoAlign/slowLinearAcceleration", 4.0);
   private static final LoggedTunableNumber slowAngularVelocity =
       new LoggedTunableNumber("AutoAlign/slowAngularVelocity", Math.PI / 2.0);
   private static final LoggedTunableNumber slowAngularAcceleration =
@@ -84,11 +84,19 @@ public class AutoAlignCommand extends Command {
     // Set up both controllers
     linearController =
         new ProfiledPIDController(
-            linearkP.get(), 0, linearkD.get(), new TrapezoidProfile.Constraints(0, 0));
+            linearkP.get(),
+            0,
+            linearkD.get(),
+            new TrapezoidProfile.Constraints(
+                slowLinearVelocity.get(), slowLinearAcceleration.get()));
     linearController.setTolerance(linearTolerance.get());
     thetaController =
         new ProfiledPIDController(
-            thetakP.get(), 0, thetakD.get(), new TrapezoidProfile.Constraints(0, 0));
+            thetakP.get(),
+            0,
+            thetakD.get(),
+            new TrapezoidProfile.Constraints(
+                slowAngularVelocity.get(), slowAngularAcceleration.get()));
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
     thetaController.setTolerance(thetaTolerance.get());
   }

@@ -7,6 +7,8 @@
 
 package com.team5449.frc2025.subsystems.apriltagvision;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import com.team5449.frc2025.Constants;
 import com.team5449.frc2025.RobotState;
 import com.team5449.frc2025.RobotState.VisionObservation;
@@ -21,9 +23,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import static edu.wpi.first.units.Units.Meters;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -35,7 +34,8 @@ import org.littletonrobotics.junction.Logger;
 public class AprilTagVision extends SubsystemBase {
   private static final double FIELD_LENGTH_METERS = AllianceFlipUtil.fieldLength;
   private static final double FIELD_WIDTH_METERS = AllianceFlipUtil.fieldWidth;
-  private static final double BOT_RADIUS = Math.hypot(Constants.botLength.in(Meters), Constants.botWidth.in(Meters))/2;
+  private static final double BOT_RADIUS =
+      Math.hypot(Constants.botLength.in(Meters), Constants.botWidth.in(Meters)) / 2;
   // Tuning constants
   private static final double MIN_TAG_AREA = 0.1;
   private static final double MAX_TAG_DISTANCE = 6.0;
@@ -76,9 +76,7 @@ public class AprilTagVision extends SubsystemBase {
 
   private Optional<VisionObservation> getMegaTag2Estimate(
       String cameraName, double stdDevCoefficient) {
-    PoseEstimate poseEstimate =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName);
-
+    PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName);
     if (poseEstimate == null
         || poseEstimate.tagCount == 0
         || Units.radiansToDegrees(RobotState.getInstance().getRobotSpeeds().omegaRadiansPerSecond)
@@ -91,8 +89,7 @@ public class AprilTagVision extends SubsystemBase {
 
   private Optional<VisionObservation> getMegaTagEstimate(
       String cameraName, double stdDevCoefficient) {
-    PoseEstimate poseEstimate =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraName);
+    PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraName);
 
     if (poseEstimate == null || poseEstimate.tagCount == 0) {
       return Optional.empty();
@@ -116,7 +113,7 @@ public class AprilTagVision extends SubsystemBase {
     if (!isOnField(estimate.pose)) {
       return Optional.empty();
     }
-    Pose2d projectedPose=projectOnField(estimate.pose);
+    Pose2d projectedPose = projectOnField(estimate.pose);
     // Calculate standard deviations
     Matrix<N3, N1> stdDevs = calculateStdDevs(estimate, stdDevCoefficient);
 
@@ -154,10 +151,10 @@ public class AprilTagVision extends SubsystemBase {
 
     return VecBuilder.fill(xyStdDev, xyStdDev, thetaStdDev);
   }
+
   /**
-   * 
    * @param pose
-   * @return Whether the pose is on field, allowing an error of {@code margin}. 
+   * @return Whether the pose is on field, allowing an error of {@code margin}.
    */
   private boolean isOnField(Pose2d pose) {
     double margin = .5;
@@ -166,20 +163,22 @@ public class AprilTagVision extends SubsystemBase {
         && pose.getY() >= -margin
         && pose.getY() <= FIELD_WIDTH_METERS + margin;
   }
+
   /**
-   * Projects a robot pose on the field if it is outside the field.
-   * Apply this method if {@link #isOnField()} gives {@code true}, discard this measurement otherwise.
+   * Projects a robot pose on the field if it is outside the field. Apply this method if {@link
+   * #isOnField()} gives {@code true}, discard this measurement otherwise.
+   *
    * @param pose
    * @return projected pose
    */
-  private Pose2d projectOnField(Pose2d pose){
-    double x=pose.getX();
-    double y=pose.getY();
-    if(x>FIELD_LENGTH_METERS-BOT_RADIUS) x=FIELD_LENGTH_METERS-BOT_RADIUS;
-    else if(x<BOT_RADIUS) x=BOT_RADIUS;
-    if(y>FIELD_WIDTH_METERS-BOT_RADIUS) x=FIELD_WIDTH_METERS-BOT_RADIUS;
-    else if(x<BOT_RADIUS) x=BOT_RADIUS;
-    return new Pose2d(x,y,pose.getRotation());
+  private Pose2d projectOnField(Pose2d pose) {
+    double x = pose.getX();
+    double y = pose.getY();
+    if (x > FIELD_LENGTH_METERS - BOT_RADIUS) x = FIELD_LENGTH_METERS - BOT_RADIUS;
+    else if (x < BOT_RADIUS) x = BOT_RADIUS;
+    if (y > FIELD_WIDTH_METERS - BOT_RADIUS) x = FIELD_WIDTH_METERS - BOT_RADIUS;
+    else if (x < BOT_RADIUS) x = BOT_RADIUS;
+    return new Pose2d(x, y, pose.getRotation());
   }
 
   @Override

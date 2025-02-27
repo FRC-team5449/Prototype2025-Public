@@ -7,4 +7,16 @@
 
 package com.team5449.frc2025.auto;
 
-public class AutoCommand {}
+import com.team5449.frc2025.subsystems.arm.ArmSubsystem;
+import com.team5449.frc2025.subsystems.drive.Drive;
+import com.team5449.frc2025.subsystems.elevator.ElevatorSubsystem;
+import com.team5449.frc2025.subsystems.endeffector.EndEffectorSubsystem;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+public class AutoCommand {
+  private final Drive drive;
+  private final ElevatorSubsystem elevator;
+  private final ArmSubsystem arm;
+  private final EndEffectorSubsystem endEffector;
+}

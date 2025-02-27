@@ -34,8 +34,8 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
     return desiredState.goalSetpoint.get();
   }
 
-  public Command setStateCommand(ElevatorState state) {
-    return Commands.runOnce(() -> this.setDesiredState(state));
+  public Command setState(ElevatorState state) {
+    return Commands.runOnce(() -> setDesiredState(state));
   }
 
   @AutoLogOutput
@@ -53,13 +53,17 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
         inputs.position, setState.goalSetpoint.get(), ElevatorConstants.positionTolerance);
   }
 
+  public Command setStateOk(ElevatorState state) {
+    return setState(state).andThen(Commands.waitUntil(this::atGoal));
+  }
+
   @RequiredArgsConstructor
   public enum ElevatorState {
     IDLE(() -> Rotation.of(0)),
-    LEVEL_1(() -> Rotation.of(2)),
-    LEVEL_2(() -> Rotation.of(5)),
-    LEVEL_3(() -> Rotation.of(11.2)),
-    LEVEL_4(() -> Rotation.of(17.5));
+    L1(() -> Rotation.of(2)),
+    L2(() -> Rotation.of(5)),
+    L3(() -> Rotation.of(11.2)),
+    L4(() -> Rotation.of(17.5));
 
     public final Supplier<Angle> goalSetpoint;
   }

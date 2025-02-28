@@ -14,11 +14,13 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class EndEffectorIONEO implements EndEffectorIO {
-  private final SparkMax endEffector;
+  private final SparkMax rollerLeft;
+  private final SparkMax rollerRight;
 
   public EndEffectorIONEO() {
-    endEffector = new SparkMax(8, MotorType.kBrushless);
-    endEffector.configure(
+    rollerLeft = new SparkMax(8, MotorType.kBrushless);
+    rollerRight = new SparkMax(0, MotorType.kBrushless);
+    rollerLeft.configure(
         new SparkMaxConfig().inverted(true),
         ResetMode.kNoResetSafeParameters,
         PersistMode.kPersistParameters);
@@ -26,12 +28,12 @@ public class EndEffectorIONEO implements EndEffectorIO {
 
   @Override
   public void updateInputs(EndEffectorIOInputs inputs) {
-    inputs.appliedVolts = endEffector.getBusVoltage();
-    inputs.currentAmps = endEffector.getOutputCurrent();
+    inputs.appliedVolts = rollerLeft.getBusVoltage();
+    inputs.currentAmps = rollerLeft.getOutputCurrent();
   }
 
   @Override
   public void setOpenLoop(double outputVolts) {
-    endEffector.set(outputVolts);
+    rollerLeft.set(outputVolts);
   }
 }

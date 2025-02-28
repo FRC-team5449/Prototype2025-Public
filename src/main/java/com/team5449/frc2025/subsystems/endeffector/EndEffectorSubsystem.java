@@ -7,12 +7,14 @@
 
 package com.team5449.frc2025.subsystems.endeffector;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.littletonrobotics.junction.Logger;
 
 public class EndEffectorSubsystem extends SubsystemBase {
+  private final DigitalInput coralSwitch;
   private static final double currentThreshold = 10;
   private static final double intakeLatency = 0.5;
 
@@ -20,12 +22,13 @@ public class EndEffectorSubsystem extends SubsystemBase {
   private final EndEffectorIOInputsAutoLogged inputs = new EndEffectorIOInputsAutoLogged();
 
   public EndEffectorSubsystem(EndEffectorIO io) {
+    coralSwitch = new DigitalInput(0);
     this.io = io;
   }
 
   public Command intake() {
     return runEnd(() -> io.setOpenLoop(1), () -> io.setOpenLoop(0))
-        .until(new Trigger(() -> inputs.currentAmps > currentThreshold).debounce(intakeLatency));
+        .until(new Trigger(coralSwitch::get).debounce(intakeLatency));
   }
 
   public Command outtake() {

@@ -84,10 +84,6 @@ public class TunerConstants {
   // All swerve devices must share the same CAN bus
   public static final CANBus kCANBus = new CANBus("canivore", "./logs/example.hoot");
 
-  // Theoretical free speed (m/s) at 12 V applied output;
-  // This needs to be tuned to your individual robot
-  public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond.of(4.93);
-
   // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
   // This may need to be tuned to your individual robot
   private static final double kCoupleRatio = 3.5714285714285716;
@@ -112,6 +108,10 @@ public class TunerConstants {
           .withPigeon2Id(kPigeonId)
           .withPigeon2Configs(pigeonConfigs);
 
+  // Theoretical free speed (m/s) at 12 V applied output;
+  // This needs to be tuned to your individual robot
+  public static final LinearVelocity kLinearSpeedAt12Volts = MetersPerSecond.of(4.93);
+
   private static final SwerveModuleConstantsFactory<
           TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
       ConstantCreator =
@@ -126,7 +126,7 @@ public class TunerConstants {
               .withSteerMotorClosedLoopOutput(kSteerClosedLoopOutput)
               .withDriveMotorClosedLoopOutput(kDriveClosedLoopOutput)
               .withSlipCurrent(kSlipCurrent)
-              .withSpeedAt12Volts(kSpeedAt12Volts)
+              .withSpeedAt12Volts(kLinearSpeedAt12Volts)
               .withDriveMotorType(kDriveMotorType)
               .withSteerMotorType(kSteerMotorType)
               .withFeedbackSource(kSteerFeedbackType)
@@ -238,20 +238,23 @@ public class TunerConstants {
               kBackRightEncoderInverted);
 
   public static final Translation2d[] moduleTranslations = {
-    new Translation2d(TunerConstants.FrontLeft.LocationX, TunerConstants.FrontLeft.LocationY),
-    new Translation2d(TunerConstants.FrontRight.LocationX, TunerConstants.FrontRight.LocationY),
-    new Translation2d(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
-    new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
+    new Translation2d(FrontLeft.LocationX, FrontLeft.LocationY),
+    new Translation2d(FrontRight.LocationX, FrontRight.LocationY),
+    new Translation2d(BackLeft.LocationX, BackLeft.LocationY),
+    new Translation2d(BackRight.LocationX, BackRight.LocationY)
   };
 
   public static final double DRIVE_BASE_RADIUS =
       Math.max(
           Math.max(
-              Math.hypot(TunerConstants.FrontLeft.LocationX, TunerConstants.FrontLeft.LocationY),
-              Math.hypot(TunerConstants.FrontRight.LocationX, TunerConstants.FrontRight.LocationY)),
+              Math.hypot(FrontLeft.LocationX, FrontLeft.LocationY),
+              Math.hypot(FrontRight.LocationX, FrontRight.LocationY)),
           Math.max(
-              Math.hypot(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
-              Math.hypot(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)));
+              Math.hypot(BackLeft.LocationX, BackLeft.LocationY),
+              Math.hypot(BackRight.LocationX, BackRight.LocationY)));
+
+  public static final AngularVelocity kAngularSpeedAt12Volts =
+      RadiansPerSecond.of(4.93 / DRIVE_BASE_RADIUS);
 
   /** Swerve Drive class utilizing CTR Electronics' Phoenix 6 API with the selected device types. */
   public static class TunerSwerveDrivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> {

@@ -9,8 +9,8 @@ package com.team5449.frc2025;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.team5449.frc2025.auto.AutoFactory;
-import com.team5449.frc2025.commands.AutoAlignCommand;
 import com.team5449.frc2025.commands.DriveCommands;
+import com.team5449.frc2025.commands.IDrive;
 import com.team5449.frc2025.subsystems.TunerConstants;
 import com.team5449.frc2025.subsystems.apriltagvision.AprilTagVision;
 import com.team5449.frc2025.subsystems.apriltagvision.AprilTagVision.CameraConfig;
@@ -171,9 +171,7 @@ public class RobotContainer {
                 Rotation2d::new));
 
     // Reset gyro to 0 when triangle is pressed
-    driverGamepad
-        .square()
-        .whileTrue(new AutoAlignCommand(() -> new Translation2d(), () -> false, drive));
+    driverGamepad.square().whileTrue(new IDrive(drive));
     driverGamepad
         .triangle()
         .onTrue(

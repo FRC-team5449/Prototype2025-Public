@@ -173,6 +173,7 @@ out/
 *-window.json
 simgui*.json
 networktables.json
+*.dat
 
 
 # Shot map temporary file

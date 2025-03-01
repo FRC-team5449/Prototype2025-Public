@@ -63,7 +63,7 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
     L1(() -> Rotation.of(2)),
     L2(() -> Rotation.of(5)),
     L3(() -> Rotation.of(11.2)),
-    L4(() -> Rotation.of(17.5));
+    L4(() -> Rotation.of(20));
 
     public final Supplier<Angle> goalSetpoint;
   }

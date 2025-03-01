@@ -15,8 +15,8 @@ import org.littletonrobotics.junction.Logger;
 
 public class EndEffectorSubsystem extends SubsystemBase {
   private final DigitalInput coralSwitch;
-  private static final double currentThreshold = 10;
-  private static final double intakeLatency = 0.5;
+  private static final double intakeLatency = 0;
+  private static final double currentThreshold = 0.3;
 
   private final EndEffectorIO io;
   private final EndEffectorIOInputsAutoLogged inputs = new EndEffectorIOInputsAutoLogged();
@@ -27,12 +27,12 @@ public class EndEffectorSubsystem extends SubsystemBase {
   }
 
   public Command intake() {
-    return runEnd(() -> io.setOpenLoop(1), () -> io.setOpenLoop(0))
-        .until(new Trigger(coralSwitch::get).debounce(intakeLatency));
+    return runEnd(() -> io.setOpenLoop(0.8), () -> io.setOpenLoop(0))
+        .until(new Trigger(() -> inputs.accelerationRPM < -500).debounce(intakeLatency));
   }
 
   public Command outtake() {
-    return runEnd(() -> io.setOpenLoop(0.5), () -> io.setOpenLoop(0));
+    return runEnd(() -> io.setOpenLoop(0.8), () -> io.setOpenLoop(0));
   }
 
   @Override

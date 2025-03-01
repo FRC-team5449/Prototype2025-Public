@@ -34,7 +34,7 @@ public class ElevatorConstants {
     kElevatorConfig.canSlaveId = 2;
     kElevatorConfig.isSlaveOpposite = true;
 
-    kElevatorConfig.kMaxPositionUnits = 17.8;
+    kElevatorConfig.kMaxPositionUnits = 21;
     kElevatorConfig.kMinPositionUnits = -0.05;
 
     TalonFXConfiguration talonConfiguration = new TalonFXConfiguration();

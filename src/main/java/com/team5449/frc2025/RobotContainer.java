@@ -9,6 +9,7 @@ package com.team5449.frc2025;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.team5449.frc2025.auto.AutoFactory;
+import com.team5449.frc2025.commands.DriveCommands;
 import com.team5449.frc2025.commands.IDrive;
 import com.team5449.frc2025.subsystems.TunerConstants;
 import com.team5449.frc2025.subsystems.apriltagvision.AprilTagVision;
@@ -41,6 +42,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -153,21 +155,21 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    // drive.setDefaultCommand(
-    //     DriveCommands.joystickDrive(
-    //         drive,
-    //         () -> driverGamepad.getLeftY(),
-    //         () -> driverGamepad.getLeftX(),
-    //         () -> -driverGamepad.getRightX()));
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            drive,
+            () -> driverGamepad.getLeftY(),
+            () -> driverGamepad.getLeftX(),
+            () -> -driverGamepad.getRightX()));
 
-    // driverGamepad
-    //     .circle()
-    //     .whileTrue(
-    //         DriveCommands.joystickDriveAtAngle(
-    //             drive,
-    //             () -> -driverGamepad.getLeftY(),
-    //             () -> -driverGamepad.getLeftX(),
-    //             Rotation2d::new));
+    driverGamepad
+        .circle()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -driverGamepad.getLeftY(),
+                () -> -driverGamepad.getLeftX(),
+                Rotation2d::new));
 
     // Reset gyro to 0 when triangle is pressed
     driverGamepad.square().whileTrue(new IDrive(drive));
@@ -203,11 +205,21 @@ public class RobotContainer {
                 .alongWith(
                     Commands.waitUntil(elevator::isStowed)
                         .andThen(arm.setStateCommand(ArmState.INTAKE).onlyIf(driverGamepad.R1()))))
-        .onFalse(arm.setStateCommand(ArmState.IDLE))
-        .and(arm::intaking)
-        .whileTrue(endEffector.intake());
+        .onFalse(arm.setStateCommand(ArmState.IDLE));
+    // .and(arm::intaking)
+    // .whileTrue(endEffector.intake());
+
+    driverGamepad
+        .R2()
+        .and(() -> elevator.atGoal(ElevatorState.L4) || elevator.atGoal(ElevatorState.L3))
+        .whileTrue(
+            new StartEndCommand(
+                () -> arm.setDesiredState(ArmState.SCORE),
+                () -> arm.setDesiredState(ArmState.IDLE)));
 
     driverGamepad.L1().and(elevator::atGoal).whileTrue(endEffector.outtake());
+
+    driverGamepad.L2().whileTrue(endEffector.reverse());
   }
 
   public Command getAutonomousCommand() {

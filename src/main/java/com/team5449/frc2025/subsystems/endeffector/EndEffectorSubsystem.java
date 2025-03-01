@@ -31,8 +31,12 @@ public class EndEffectorSubsystem extends SubsystemBase {
         .until(new Trigger(() -> inputs.accelerationRPM < -500).debounce(intakeLatency));
   }
 
+  public Command reverse() {
+    return runEnd(() -> io.setOpenLoop(-0.5), () -> io.setOpenLoop(0));
+  }
+
   public Command outtake() {
-    return runEnd(() -> io.setOpenLoop(0.8), () -> io.setOpenLoop(0));
+    return runEnd(() -> io.setOpenLoop(1), () -> io.setOpenLoop(0));
   }
 
   @Override

@@ -17,12 +17,13 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.Supplier;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, MotorIO> {
-  @AutoLogOutput @Setter private ElevatorState desiredState = ElevatorState.IDLE;
+  @AutoLogOutput @Setter @Getter private ElevatorState desiredState = ElevatorState.IDLE;
 
   public ElevatorSubsystem(final MotorIO io) {
     super(ElevatorConstants.kElevatorConfig, new MotorInputsAutoLogged(), io);
@@ -61,8 +62,8 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
   public enum ElevatorState {
     IDLE(() -> Rotation.of(0)),
     L1(() -> Rotation.of(2)),
-    L2(() -> Rotation.of(5)),
-    L3(() -> Rotation.of(11.2)),
+    L2(() -> Rotation.of(3.5)),
+    L3(() -> Rotation.of(10)),
     L4(() -> Rotation.of(20));
 
     public final Supplier<Angle> goalSetpoint;

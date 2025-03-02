@@ -7,6 +7,9 @@
 
 package com.team5449.frc2025.commands;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import com.team5449.frc2025.RobotState;
 import com.team5449.frc2025.subsystems.TunerConstants;
 import com.team5449.frc2025.subsystems.drive.Drive;
@@ -21,10 +24,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
-
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import lombok.Getter;
@@ -129,18 +128,31 @@ public class IDrive extends Command {
     running = true;
 
     // Update from tunable numbers
-    LoggedTunableNumber.ifChanged(hashCode(), ()->{
-        driveController.setP(drivekP.get());
-        driveController.setD(drivekD.get());
-        driveController.setConstraints(
-            new TrapezoidProfile.Constraints(driveMaxVelocity.get(), driveMaxAcceleration.get()));
-        driveController.setTolerance(driveTolerance.get());
-        thetaController.setP(thetakP.get());
-        thetaController.setD(thetakD.get());
-        thetaController.setConstraints(
-            new TrapezoidProfile.Constraints(thetaMaxVelocity.get(), thetaMaxAcceleration.get()));
-        thetaController.setTolerance(thetaTolerance.get());
-      }, driveMaxVelocity,driveMaxVelocitySlow,driveMaxAcceleration,driveTolerance,thetaMaxVelocity,thetaMaxAcceleration,thetaTolerance,drivekP,drivekD,thetakP,thetakD);
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> {
+          driveController.setP(drivekP.get());
+          driveController.setD(drivekD.get());
+          driveController.setConstraints(
+              new TrapezoidProfile.Constraints(driveMaxVelocity.get(), driveMaxAcceleration.get()));
+          driveController.setTolerance(driveTolerance.get());
+          thetaController.setP(thetakP.get());
+          thetaController.setD(thetakD.get());
+          thetaController.setConstraints(
+              new TrapezoidProfile.Constraints(thetaMaxVelocity.get(), thetaMaxAcceleration.get()));
+          thetaController.setTolerance(thetaTolerance.get());
+        },
+        driveMaxVelocity,
+        driveMaxVelocitySlow,
+        driveMaxAcceleration,
+        driveTolerance,
+        thetaMaxVelocity,
+        thetaMaxAcceleration,
+        thetaTolerance,
+        drivekP,
+        drivekD,
+        thetakP,
+        thetakD);
 
     // Get current pose and target pose
     Pose2d currentPose = robotPose.get();
@@ -188,12 +200,14 @@ public class IDrive extends Command {
     final double linearS = linearFF.get().getNorm() * 3.0;
     final double thetaS = Math.abs(omegaFF.getAsDouble()) * 3.0;
     driveVelocity =
-    
-    driveVelocity.interpolate(linearFF.get().times(TunerConstants.kLinearSpeedAt12Volts.in(MetersPerSecond)), linearS);
+        driveVelocity.interpolate(
+            linearFF.get().times(TunerConstants.kLinearSpeedAt12Volts.in(MetersPerSecond)),
+            linearS);
     thetaVelocity =
         MathUtil.interpolate(
-            thetaVelocity, omegaFF.getAsDouble() *
-    TunerConstants.kAngularSpeedAt12Volts.in(RadiansPerSecond), thetaS);
+            thetaVelocity,
+            omegaFF.getAsDouble() * TunerConstants.kAngularSpeedAt12Volts.in(RadiansPerSecond),
+            thetaS);
 
     // Command speeds
     drive.runVelocity(

@@ -9,8 +9,6 @@ package com.team5449.frc2025;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.team5449.frc2025.auto.AutoFactory;
-import com.team5449.frc2025.commands.DriveCommands;
-import com.team5449.frc2025.commands.IDrive;
 import com.team5449.frc2025.subsystems.TunerConstants;
 import com.team5449.frc2025.subsystems.apriltagvision.AprilTagVision;
 import com.team5449.frc2025.subsystems.apriltagvision.AprilTagVision.CameraConfig;
@@ -33,11 +31,8 @@ import com.team5449.frc2025.subsystems.endeffector.EndEffectorSubsystem;
 import com.team5449.lib.subsystems.MotorIO;
 import com.team5449.lib.subsystems.SimTalonFXIO;
 import com.team5449.lib.subsystems.TalonFXIO;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -155,47 +150,50 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> driverGamepad.getLeftY(),
-            () -> driverGamepad.getLeftX(),
-            () -> -driverGamepad.getRightX()));
+    // drive.setDefaultCommand(
+    //     DriveCommands.joystickDrive(
+    //         drive,
+    //         () -> driverGamepad.getLeftY(),
+    //         () -> driverGamepad.getLeftX(),
+    //         () -> -driverGamepad.getRightX()));
 
-    driverGamepad
-        .circle()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -driverGamepad.getLeftY(),
-                () -> -driverGamepad.getLeftX(),
-                Rotation2d::new));
+    // driverGamepad
+    //     .circle()
+    //     .whileTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> -driverGamepad.getLeftY(),
+    //             () -> -driverGamepad.getLeftX(),
+    //             Rotation2d::new));
 
-    // Reset gyro to 0 when triangle is pressed
-    driverGamepad.square().whileTrue(new IDrive(drive));
-    driverGamepad
-        .triangle()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                    drive)
-                .ignoringDisable(true));
+    // // Reset gyro to 0 when triangle is pressed
+    // driverGamepad.square().whileTrue(new IDrive(drive));
+    // driverGamepad
+    //     .triangle()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //                 () ->
+    //                     drive.setPose(
+    //                         new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+    //                 drive)
+    //             .ignoringDisable(true));
 
-    driverGamepad
-        .cross()
-        .onTrue(
-            Commands.runOnce(
-                () -> drive.setPose(new Pose2d(new Translation2d(), drive.getRotation())), drive));
+    // driverGamepad
+    //     .cross()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //             () -> drive.setPose(new Pose2d(new Translation2d(), drive.getRotation())),
+    // drive));
 
-    driverGamepad.pov(0).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L1));
+    // driverGamepad.pov(0).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L1));
 
-    driverGamepad.pov(90).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L2));
+    // driverGamepad.pov(90).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L2));
 
-    driverGamepad.pov(180).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L3));
+    // driverGamepad.pov(180).and(() ->
+    // !arm.intaking()).onTrue(elevator.setState(ElevatorState.L3));
 
-    driverGamepad.pov(270).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L4));
+    // driverGamepad.pov(270).and(() ->
+    // !arm.intaking()).onTrue(elevator.setState(ElevatorState.L4));
 
     driverGamepad
         .R1()
@@ -205,9 +203,9 @@ public class RobotContainer {
                 .alongWith(
                     Commands.waitUntil(elevator::isStowed)
                         .andThen(arm.setStateCommand(ArmState.INTAKE).onlyIf(driverGamepad.R1()))))
-        .onFalse(arm.setStateCommand(ArmState.IDLE));
-    // .and(arm::intaking)
-    // .whileTrue(endEffector.intake());
+        .onFalse(arm.setStateCommand(ArmState.IDLE))
+        .and(arm::intaking)
+        .whileTrue(endEffector.intake());
 
     driverGamepad
         .R2()

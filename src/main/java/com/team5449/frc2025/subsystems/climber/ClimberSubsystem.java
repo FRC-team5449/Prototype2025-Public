@@ -40,9 +40,9 @@ public class ClimberSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged,
 
   @RequiredArgsConstructor
   public enum ClimberState {
-    IDLE(() -> Rotation.of(0)),
-    ALIGN(() -> Rotation.of(0)),
-    CLIMB(() -> Rotation.of(0));
+    IDLE(() -> Rotation.of(5)),
+    ALIGN(() -> Rotation.of(80)),
+    CLIMB(() -> Rotation.of(30));
 
     public final Supplier<Angle> goalSetpoint;
   }

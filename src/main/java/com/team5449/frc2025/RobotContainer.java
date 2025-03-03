@@ -9,13 +9,16 @@ package com.team5449.frc2025;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.team5449.frc2025.auto.AutoFactory;
+import com.team5449.frc2025.commands.DriveCommands;
+import com.team5449.frc2025.commands.IDrive;
 import com.team5449.frc2025.subsystems.TunerConstants;
 import com.team5449.frc2025.subsystems.apriltagvision.AprilTagVision;
-import com.team5449.frc2025.subsystems.apriltagvision.AprilTagVision.CameraConfig;
 import com.team5449.frc2025.subsystems.arm.ArmSimTalonIO;
 import com.team5449.frc2025.subsystems.arm.ArmSubsystem;
 import com.team5449.frc2025.subsystems.arm.ArmSubsystem.ArmState;
 import com.team5449.frc2025.subsystems.arm.ArmTalonIO;
+import com.team5449.frc2025.subsystems.climber.ClimberConstants;
+import com.team5449.frc2025.subsystems.climber.ClimberSubsystem;
 import com.team5449.frc2025.subsystems.drive.Drive;
 import com.team5449.frc2025.subsystems.drive.GyroIO;
 import com.team5449.frc2025.subsystems.drive.GyroIOPigeon2;
@@ -31,9 +34,9 @@ import com.team5449.frc2025.subsystems.endeffector.EndEffectorSubsystem;
 import com.team5449.lib.subsystems.MotorIO;
 import com.team5449.lib.subsystems.SimTalonFXIO;
 import com.team5449.lib.subsystems.TalonFXIO;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -46,13 +49,14 @@ public class RobotContainer {
   private final ElevatorSubsystem elevator;
   private final EndEffectorSubsystem endEffector;
   private final ArmSubsystem arm;
+  private final ClimberSubsystem climber;
 
   @SuppressWarnings("unused")
   private final AprilTagVision vision;
 
-  private final CameraConfig cameraConfig1;
+  //   private final CameraConfig cameraConfig1;
 
-  private final CameraConfig[] cameraConfigs;
+  //   private final CameraConfig[] cameraConfigs;
 
   @SuppressWarnings("unused")
   private final RobotState robotState = RobotState.getInstance();
@@ -60,6 +64,7 @@ public class RobotContainer {
   private final AutoFactory autoFactory;
 
   private final CommandPS5Controller driverGamepad = new CommandPS5Controller(0);
+  private final CommandPS5Controller operatorGamepad = new CommandPS5Controller(1);
   // private final CommandPS5Controller operatorGamepad = new CommandPS5Controller(0);
 
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -82,15 +87,18 @@ public class RobotContainer {
 
         arm = new ArmSubsystem(new ArmTalonIO());
 
-        cameraConfig1 =
-            new CameraConfig(
-                "limelight-front",
-                new Transform3d(new Translation3d(), new Rotation3d()),
-                // new Rotation3d(Degree.of(90), Degree.of(0), Degree.of(180))),
-                5);
-        // TODO finish this
-        cameraConfigs = new CameraConfig[] {cameraConfig1};
-        vision = new AprilTagVision(cameraConfigs);
+        climber = new ClimberSubsystem(new TalonFXIO(ClimberConstants.kClimberConfig));
+
+        // cameraConfig1 =
+        //     new CameraConfig(
+        //         "limelight-front",
+        //         new Transform3d(new Translation3d(), new Rotation3d()),
+        //         // new Rotation3d(Degree.of(90), Degree.of(0), Degree.of(180))),
+        //         5);
+        // // TODO finish this
+        // cameraConfigs = new CameraConfig[] {cameraConfig1};
+        // vision = new AprilTagVision(cameraConfigs);
+        vision = null;
         break;
 
       case SIM:
@@ -108,8 +116,10 @@ public class RobotContainer {
 
         arm = new ArmSubsystem(new ArmSimTalonIO());
 
-        cameraConfig1 = null;
-        cameraConfigs = null;
+        climber = new ClimberSubsystem(new SimTalonFXIO(ClimberConstants.kClimberConfig));
+
+        // cameraConfig1 = null;
+        // cameraConfigs = null;
         vision = null;
         break;
 
@@ -128,8 +138,10 @@ public class RobotContainer {
 
         arm = new ArmSubsystem(new MotorIO() {});
 
-        cameraConfig1 = null;
-        cameraConfigs = null;
+        climber = new ClimberSubsystem(new MotorIO() {});
+
+        // cameraConfig1 = null;
+        // cameraConfigs = null;
         vision = null;
         break;
     }
@@ -150,50 +162,48 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    // drive.setDefaultCommand(
-    //     DriveCommands.joystickDrive(
-    //         drive,
-    //         () -> driverGamepad.getLeftY(),
-    //         () -> driverGamepad.getLeftX(),
-    //         () -> -driverGamepad.getRightX()));
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            drive,
+            () -> driverGamepad.getLeftY(),
+            () -> driverGamepad.getLeftX(),
+            () -> -driverGamepad.getRightX()));
 
-    // driverGamepad
-    //     .circle()
-    //     .whileTrue(
-    //         DriveCommands.joystickDriveAtAngle(
-    //             drive,
-    //             () -> -driverGamepad.getLeftY(),
-    //             () -> -driverGamepad.getLeftX(),
-    //             Rotation2d::new));
+    driverGamepad
+        .circle()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -driverGamepad.getLeftY(),
+                () -> -driverGamepad.getLeftX(),
+                Rotation2d::new));
 
-    // // Reset gyro to 0 when triangle is pressed
-    // driverGamepad.square().whileTrue(new IDrive(drive));
-    // driverGamepad
-    //     .triangle()
-    //     .onTrue(
-    //         Commands.runOnce(
-    //                 () ->
-    //                     drive.setPose(
-    //                         new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-    //                 drive)
-    //             .ignoringDisable(true));
+    // Reset gyro to 0 when triangle is pressed
+    driverGamepad.square().whileTrue(new IDrive(drive));
 
-    // driverGamepad
-    //     .cross()
-    //     .onTrue(
-    //         Commands.runOnce(
-    //             () -> drive.setPose(new Pose2d(new Translation2d(), drive.getRotation())),
-    // drive));
+    driverGamepad
+        .triangle()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        drive.setPose(
+                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                    drive)
+                .ignoringDisable(true));
 
-    // driverGamepad.pov(0).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L1));
+    driverGamepad
+        .cross()
+        .onTrue(
+            Commands.runOnce(
+                () -> drive.setPose(new Pose2d(new Translation2d(), drive.getRotation())), drive));
 
-    // driverGamepad.pov(90).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L2));
+    driverGamepad.pov(0).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L4));
 
-    // driverGamepad.pov(180).and(() ->
-    // !arm.intaking()).onTrue(elevator.setState(ElevatorState.L3));
+    driverGamepad.pov(90).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L3));
 
-    // driverGamepad.pov(270).and(() ->
-    // !arm.intaking()).onTrue(elevator.setState(ElevatorState.L4));
+    driverGamepad.pov(180).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L1));
+
+    driverGamepad.pov(270).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L2));
 
     driverGamepad
         .R1()
@@ -203,9 +213,9 @@ public class RobotContainer {
                 .alongWith(
                     Commands.waitUntil(elevator::isStowed)
                         .andThen(arm.setStateCommand(ArmState.INTAKE).onlyIf(driverGamepad.R1()))))
-        .onFalse(arm.setStateCommand(ArmState.IDLE))
-        .and(arm::intaking)
-        .whileTrue(endEffector.intake());
+        .onFalse(arm.setStateCommand(ArmState.IDLE));
+    // .and(arm::intaking)
+    // .whileTrue(endEffector.intake());
 
     driverGamepad
         .R2()
@@ -218,6 +228,18 @@ public class RobotContainer {
     driverGamepad.L1().and(elevator::atGoal).whileTrue(endEffector.outtake());
 
     driverGamepad.L2().whileTrue(endEffector.reverse());
+
+    // operatorGamepad.pov(0).onTrue(climber.setState(ClimberState.IDLE));
+    // operatorGamepad.pov(90).onTrue(climber.setState(ClimberState.ALIGN));
+    // operatorGamepad.pov(180).onTrue(climber.setState(ClimberState.CLIMB));
+  }
+
+  public void periodic() {
+    if (elevator.getDesiredState() == ElevatorState.L4) {
+      drive.setSlowMode(true);
+    } else {
+      drive.setSlowMode(false);
+    }
   }
 
   public Command getAutonomousCommand() {

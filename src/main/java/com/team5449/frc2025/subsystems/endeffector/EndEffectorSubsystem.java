@@ -7,10 +7,7 @@
 
 package com.team5449.frc2025.subsystems.endeffector;
 
-import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.I2C.Port;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -22,19 +19,19 @@ public class EndEffectorSubsystem extends SubsystemBase {
   private static final double intakeLatency = 0;
   private static final double currentThreshold = 0.3;
 
-  private final ColorSensorV3 colorSensor;
+  // private final ColorSensorV3 colorSensor;
   private final EndEffectorIO io;
   private final EndEffectorIOInputsAutoLogged inputs = new EndEffectorIOInputsAutoLogged();
 
   public EndEffectorSubsystem(EndEffectorIO io) {
     coralSwitch = new DigitalInput(0);
-    colorSensor = new ColorSensorV3(Port.kOnboard);
+    // colorSensor = new ColorSensorV3(Port.kOnboard);
     this.io = io;
   }
 
   @AutoLogOutput
   public boolean hasCoral() {
-    return colorSensor.getProximity() > 500;
+    return false;
   }
 
   public Command intake() {
@@ -54,10 +51,6 @@ public class EndEffectorSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("R", colorSensor.getRed());
-    SmartDashboard.putNumber("G", colorSensor.getGreen());
-    SmartDashboard.putNumber("B", colorSensor.getBlue());
-    SmartDashboard.putNumber("a", colorSensor.getProximity());
     io.updateInputs(inputs);
     Logger.processInputs(getName(), inputs);
   }

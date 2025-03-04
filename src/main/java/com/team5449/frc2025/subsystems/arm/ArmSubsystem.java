@@ -58,9 +58,9 @@ public class ArmSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, Mot
 
   @RequiredArgsConstructor
   public enum ArmState {
-    IDLE(() -> Rotation.of(0.22)),
-    INTAKE(() -> Rotation.of(0.292)),
-    SCORE(() -> Rotation.of(0.13));
+    IDLE(() -> Rotation.of(0.182891)),
+    INTAKE(() -> Rotation.of(0.255)),
+    SCORE(() -> Rotation.of(0.092891));
 
     public final Supplier<Angle> goalSetpoint;
   }

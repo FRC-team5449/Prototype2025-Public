@@ -34,7 +34,7 @@ public class ElevatorConstants {
     kElevatorConfig.canSlaveId = 2;
     kElevatorConfig.isSlaveOpposite = true;
 
-    kElevatorConfig.kMaxPositionUnits = 21;
+    kElevatorConfig.kMaxPositionUnits = 21 * (5.0 / 4.0);
     kElevatorConfig.kMinPositionUnits = -0.05;
 
     TalonFXConfiguration talonConfiguration = new TalonFXConfiguration();
@@ -60,8 +60,8 @@ public class ElevatorConstants {
             .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     talonConfiguration.MotionMagic =
         new MotionMagicConfigs()
-            .withMotionMagicCruiseVelocity(35)
-            .withMotionMagicAcceleration(300)
+            .withMotionMagicCruiseVelocity(50)
+            .withMotionMagicAcceleration(500)
             .withMotionMagicExpo_kV(0.19)
             .withMotionMagicExpo_kA(0.3);
 

@@ -27,7 +27,8 @@ public class ArmSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, Mot
 
   public ArmSubsystem(final MotorIO io) {
     super(ArmConstants.kArmConfig, new MotorInputsAutoLogged(), io);
-    setDefaultCommand(motionMagicSetpointCommand(this::getStateAngle));
+    // TODO Delete this
+    // setDefaultCommand(motionMagicSetpointCommand(this::getStateAngle));
   }
 
   private Angle getStateAngle() {

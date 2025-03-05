@@ -192,7 +192,7 @@ public class AprilTagVision extends SubsystemBase {
     for (CameraConfig camera : cameras.values()) {
       // Try MegaTag2 first
       Optional<VisionObservation> megaTag2Estimate =
-          getMegaTag2Estimate(camera.limelightName(), camera.stdDevCoefficient());
+          getMegaTagEstimate(camera.limelightName(), camera.stdDevCoefficient());
       if (megaTag2Estimate.isPresent()) {
         observations.add(megaTag2Estimate.get());
         Logger.recordOutput("Vision/Timestamp", megaTag2Estimate.get().timestamp());
@@ -208,5 +208,111 @@ public class AprilTagVision extends SubsystemBase {
     observations.stream()
         .sorted(Comparator.comparingDouble(VisionObservation::timestamp))
         .forEach(RobotState.getInstance()::addVisionObservation);
+  }
+
+  /**
+   * Get the target info for a specific AprilTag
+   *
+   * @param cameraName The name of the limelight camera
+   * @param tagId The ID of the AprilTag
+   * @return The target info, or null if not visible
+   */
+  private LimelightHelpers.RawFiducial getTargetInfo(String cameraName, int tagId) {
+    LimelightHelpers.RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(cameraName);
+
+    for (LimelightHelpers.RawFiducial fiducial : fiducials) {
+      if (fiducial.id == tagId) {
+        return fiducial;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Get the longitudinal distance (forward/backward) to an AprilTag
+   *
+   * @param cameraName The name of the limelight camera
+   * @param tagId The ID of the AprilTag
+   * @return The longitudinal distance in meters, or empty if not visible
+   */
+  public Optional<Double> getLongitudinalDistance(String cameraName, int tagId) {
+    // First check if the specific tag is visible
+    LimelightHelpers.RawFiducial targetInfo = getTargetInfo(cameraName, tagId);
+    if (targetInfo == null) {
+      return Optional.empty();
+    }
+
+    // Get the target pose in robot space directly from Limelight
+    double[] targetPose = LimelightHelpers.getTargetPose_RobotSpace(cameraName);
+    if (targetPose.length < 6) {
+      return Optional.empty();
+    }
+
+    // The X component represents the forward/backward distance in robot space
+    double longitudinalDistance = -targetPose[1];
+
+    Logger.recordOutput("Vision/Longitudinal Dist", longitudinalDistance);
+
+    return Optional.of(longitudinalDistance);
+  }
+
+  /**
+   * Get the lateral distance (side-to-side) to an AprilTag
+   *
+   * @param cameraName The name of the limelight camera
+   * @param tagId The ID of the AprilTag
+   * @return The lateral distance in meters, or empty if not visible
+   */
+  public Optional<Double> getLateralDistance(String cameraName, int tagId) {
+    // First check if the specific tag is visible
+    LimelightHelpers.RawFiducial targetInfo = getTargetInfo(cameraName, tagId);
+    if (targetInfo == null) {
+      return Optional.empty();
+    }
+
+    // Get the target pose in robot space directly from Limelight
+    double[] targetPose = LimelightHelpers.getTargetPose_RobotSpace(cameraName);
+    if (targetPose.length < 6) {
+      return Optional.empty();
+    }
+
+    // The Y component represents the side-to-side distance in robot space
+    // Negative because right is negative in robot space
+    double lateralDistance = -targetPose[0];
+
+    Logger.recordOutput("Vision/Lateral Dist", lateralDistance);
+
+    return Optional.of(lateralDistance);
+  }
+
+  /**
+   * Get the rotation between the robot and a specific AprilTag using raw data This returns the
+   * horizontal angle to the tag (how far left/right it is)
+   *
+   * @param cameraName The name of the limelight camera
+   * @param tagId The ID of the AprilTag
+   * @return The horizontal angle in degrees, or empty if not visible
+   */
+  public Optional<Double> getTagHorizontalAngle(String cameraName, int tagId) {
+    // First check if the specific tag is visible
+    LimelightHelpers.RawFiducial targetInfo = getTargetInfo(cameraName, tagId);
+    if (targetInfo == null) {
+      return Optional.empty();
+    }
+
+    // Get the target pose in robot space directly from Limelight
+    double[] targetPose = LimelightHelpers.getTargetPose_RobotSpace(cameraName);
+    if (targetPose.length < 6) {
+      return Optional.empty();
+    }
+
+    // The yaw component (index 5) gives us the horizontal angle
+    double horizontalAngle = targetPose[4];
+
+    Logger.recordOutput("Vision/Tag Horizontal Angle", horizontalAngle);
+
+    // Negate the angle to match your previous implementation's convention
+    return Optional.of(-horizontalAngle);
   }
 }

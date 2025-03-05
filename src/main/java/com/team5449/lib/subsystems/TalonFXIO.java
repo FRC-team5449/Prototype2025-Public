@@ -111,6 +111,7 @@ public class TalonFXIO implements MotorIO {
   @Override
   public void setOpenLoopDutyCycle(double dutyCycle) {
     talon.setControl(new DutyCycleOut(dutyCycle));
+    setSlaveMotorFollowing();
   }
 
   @Override

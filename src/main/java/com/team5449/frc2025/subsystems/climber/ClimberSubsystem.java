@@ -27,7 +27,7 @@ public class ClimberSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged,
   public ClimberSubsystem(final MotorIO io) {
     super(ClimberConstants.kClimberConfig, new MotorInputsAutoLogged(), io);
     setCurrentPositionAsZero();
-    setDefaultCommand(motionMagicSetpointCommand(this::getStateAngle));
+    // setDefaultCommand(motionMagicSetpointCommand(this::getStateAngle));
   }
 
   public Angle getStateAngle() {
@@ -36,6 +36,14 @@ public class ClimberSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged,
 
   public Command setState(ClimberState state) {
     return Commands.runOnce(() -> setDesiredState(state));
+  }
+
+  public Command decline() {
+    return runEnd(() -> io.setOpenLoopDutyCycle(0.4), () -> io.setOpenLoopDutyCycle(0));
+  }
+
+  public Command elevate() {
+    return runEnd(() -> io.setOpenLoopDutyCycle(-0.4), () -> io.setOpenLoopDutyCycle(0));
   }
 
   @RequiredArgsConstructor

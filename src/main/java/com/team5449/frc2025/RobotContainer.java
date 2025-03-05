@@ -8,11 +8,13 @@
 package com.team5449.frc2025;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.team5449.frc2025.auto.AutoCommand;
 import com.team5449.frc2025.auto.AutoFactory;
 import com.team5449.frc2025.commands.DriveCommands;
 import com.team5449.frc2025.commands.IDrive;
 import com.team5449.frc2025.subsystems.TunerConstants;
 import com.team5449.frc2025.subsystems.apriltagvision.AprilTagVision;
+import com.team5449.frc2025.subsystems.apriltagvision.AprilTagVision.CameraConfig;
 import com.team5449.frc2025.subsystems.arm.ArmSimTalonIO;
 import com.team5449.frc2025.subsystems.arm.ArmSubsystem;
 import com.team5449.frc2025.subsystems.arm.ArmSubsystem.ArmState;
@@ -36,6 +38,7 @@ import com.team5449.lib.subsystems.SimTalonFXIO;
 import com.team5449.lib.subsystems.TalonFXIO;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -69,6 +72,8 @@ public class RobotContainer {
 
   private final LoggedDashboardChooser<Command> autoChooser;
 
+  private final AutoCommand autoCommand;
+
   public RobotContainer() {
 
     switch (Constants.currentMode) {
@@ -89,16 +94,10 @@ public class RobotContainer {
 
         climber = new ClimberSubsystem(new TalonFXIO(ClimberConstants.kClimberConfig));
 
-        // cameraConfig1 =
-        //     new CameraConfig(
-        //         "limelight-front",
-        //         new Transform3d(new Translation3d(), new Rotation3d()),
-        //         // new Rotation3d(Degree.of(90), Degree.of(0), Degree.of(180))),
-        //         5);
-        // // TODO finish this
-        // cameraConfigs = new CameraConfig[] {cameraConfig1};
-        // vision = new AprilTagVision(cameraConfigs);
-        vision = null;
+        vision =
+            new AprilTagVision(
+                new CameraConfig[] {new CameraConfig("limelight", new Transform3d(), 0)});
+        // vision = null;
         break;
 
       case SIM:
@@ -147,6 +146,7 @@ public class RobotContainer {
     }
 
     autoFactory = new AutoFactory(drive, elevator, arm, endEffector);
+    autoCommand = new AutoCommand(drive, elevator, arm, endEffector, vision);
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", new SendableChooser<Command>());
     autoChooser.addDefaultOption("None", Commands.none());
@@ -219,7 +219,11 @@ public class RobotContainer {
 
     driverGamepad
         .R2()
-        .and(() -> elevator.atGoal(ElevatorState.L4) || elevator.atGoal(ElevatorState.L3))
+        .and(
+            () ->
+                elevator.atGoal(ElevatorState.L4)
+                    || elevator.atGoal(ElevatorState.L3)
+                    || elevator.atGoal(ElevatorState.L1))
         .whileTrue(
             new StartEndCommand(
                 () -> arm.setDesiredState(ArmState.SCORE),
@@ -227,11 +231,17 @@ public class RobotContainer {
 
     driverGamepad.L1().and(elevator::atGoal).whileTrue(endEffector.outtake());
 
-    driverGamepad.L2().whileTrue(endEffector.reverse());
+    // driverGamepad.L2().whileTrue(endEffector.reverse());
+    driverGamepad
+        .L2()
+        .whileTrue(autoCommand.alignWithAprilTagAndRotation(7, "limelight", 0.1, 0, 0));
 
     // operatorGamepad.pov(0).onTrue(climber.setState(ClimberState.IDLE));
     // operatorGamepad.pov(90).onTrue(climber.setState(ClimberState.ALIGN));
     // operatorGamepad.pov(180).onTrue(climber.setState(ClimberState.CLIMB));
+
+    operatorGamepad.L1().whileTrue(climber.elevate());
+    operatorGamepad.R1().whileTrue(climber.decline());
   }
 
   public void periodic() {

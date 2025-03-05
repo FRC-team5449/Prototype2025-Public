@@ -28,7 +28,8 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
   public ElevatorSubsystem(final MotorIO io) {
     super(ElevatorConstants.kElevatorConfig, new MotorInputsAutoLogged(), io);
     setCurrentPositionAsZero();
-    setDefaultCommand(motionMagicSetpointCommand(this::getStateAngle));
+    // TODO Delete this
+    // setDefaultCommand(motionMagicSetpointCommand(this::getStateAngle));
   }
 
   public Angle getStateAngle() {
@@ -61,10 +62,10 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
   @RequiredArgsConstructor
   public enum ElevatorState {
     IDLE(() -> Rotation.of(0)),
-    L1(() -> Rotation.of(2)),
-    L2(() -> Rotation.of(3.5)),
-    L3(() -> Rotation.of(10)),
-    L4(() -> Rotation.of(20));
+    L1(() -> Rotation.of(2 * (5.0 / 4.0))),
+    L2(() -> Rotation.of(3.5 * (5.0 / 4.0))),
+    L3(() -> Rotation.of(10 * (5.0 / 4.0))),
+    L4(() -> Rotation.of(20 * (5.0 / 4.0)));
 
     public final Supplier<Angle> goalSetpoint;
   }

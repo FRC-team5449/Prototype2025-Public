@@ -7,7 +7,6 @@
 
 package com.team5449.frc2025.subsystems.endeffector;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -15,7 +14,6 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class EndEffectorSubsystem extends SubsystemBase {
-  private final DigitalInput coralSwitch;
   private static final double intakeLatency = 0;
   private static final double currentThreshold = 0.3;
 
@@ -24,7 +22,6 @@ public class EndEffectorSubsystem extends SubsystemBase {
   private final EndEffectorIOInputsAutoLogged inputs = new EndEffectorIOInputsAutoLogged();
 
   public EndEffectorSubsystem(EndEffectorIO io) {
-    coralSwitch = new DigitalInput(0);
     // colorSensor = new ColorSensorV3(Port.kOnboard);
     this.io = io;
   }

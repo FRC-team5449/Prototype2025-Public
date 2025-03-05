@@ -65,11 +65,11 @@ public class ArmConstants {
             .withSupplyCurrentLimit(70);
     talonConfiguration.Slot0 =
         new Slot0Configs()
-            .withKP(30)
-            .withKI(0.2)
-            .withKD(0)
-            .withKS(0)
-            .withKG(0.43)
+            .withKP(40)
+            .withKI(0)
+            .withKD(1)
+            .withKS(0.01) // TODO: Should be 0.23 when mech is fixed.
+            .withKG(0.44)
             .withGravityType(GravityTypeValue.Arm_Cosine)
             .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     talonConfiguration.Feedback =
@@ -86,7 +86,7 @@ public class ArmConstants {
   }
 
   static {
-    armCanCoderConfig.MagnetSensor.MagnetOffset = 0.211914;
+    armCanCoderConfig.MagnetSensor.MagnetOffset = 0.174560921875;
     armCanCoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
     armCanCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
   }

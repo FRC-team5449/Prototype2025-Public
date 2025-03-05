@@ -10,7 +10,6 @@ package com.team5449.frc2025;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -28,6 +27,9 @@ public class FieldConstants {
   public static final Pose2d[] blueCenterFaces =
       new Pose2d[6]; // Starting facing the driver station in clockwise order
   public static final Pose2d[] redCenterFaces = new Pose2d[6];
+
+  public static final int[] blueTagIds = {17, 18, 19, 20, 21, 22};
+  public static final int[] redTagIds = {6, 7, 8, 9, 10, 11};
 
   static {
     blueCenterFaces[0] = tagLayout.getTagPose(18).get().toPose2d();
@@ -51,11 +53,9 @@ public class FieldConstants {
               ? List.of(blueCenterFaces)
               : List.of(redCenterFaces));
 
-  static {
-    for (int face = 0; face < 6; face++) {
-      Pose2d poseDirection = new Pose2d(center, Rotation2d.fromDegrees(180 - (60 * face)));
-      double adjustX = Units.inchesToMeters(30.738);
-      double adjustY = Units.inchesToMeters(6.469);
-    }
-  }
+  public static final int[] tagIds =
+      DriverStation.getAlliance().get() == Alliance.Blue ? blueTagIds : redTagIds;
+
+  public static final Pose2d leftBranchTargetPoseRelativeToTag = new Pose2d();
+  public static final Pose2d rightBranchTargetPoseRelativeToTag = new Pose2d();
 }

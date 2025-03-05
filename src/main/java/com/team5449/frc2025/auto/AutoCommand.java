@@ -13,8 +13,11 @@ import com.team5449.frc2025.subsystems.arm.ArmSubsystem;
 import com.team5449.frc2025.subsystems.drive.Drive;
 import com.team5449.frc2025.subsystems.elevator.ElevatorSubsystem;
 import com.team5449.frc2025.subsystems.endeffector.EndEffectorSubsystem;
+import com.team5449.lib.util.GeomUtil;
+
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -23,7 +26,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.ExtensionMethod;
 
+import com.team5449.frc2025.FieldConstants;
+import com.team5449.frc2025.RobotState;
+
+@ExtensionMethod({GeomUtil.class})
 @RequiredArgsConstructor
 public class AutoCommand {
   private final Drive drive;
@@ -79,9 +87,8 @@ public class AutoCommand {
             Commands.run(
                     () -> {
                       // Get current distances to the tag
-                      Optional<Double> longDistOpt =
-                          vision.getLongitudinalDistance(cameraName, tagId);
-                      Optional<Double> latDistOpt = vision.getLateralDistance(cameraName, tagId);
+                      Optional<Double> longDistOpt = vision.getLongitudinalDistance(cameraName);
+                      Optional<Double> latDistOpt = vision.getLateralDistance(cameraName);
 
                       if (longDistOpt.isEmpty() || latDistOpt.isEmpty()) {
                         // Tag not visible, stop or rotate to search
@@ -114,9 +121,8 @@ public class AutoCommand {
                 .until(
                     () -> {
                       // Check if we're within tolerance
-                      Optional<Double> longDistOpt =
-                          vision.getLongitudinalDistance(cameraName, tagId);
-                      Optional<Double> latDistOpt = vision.getLateralDistance(cameraName, tagId);
+                      Optional<Double> longDistOpt = vision.getLongitudinalDistance(cameraName);
+                      Optional<Double> latDistOpt = vision.getLateralDistance(cameraName);
 
                       if (longDistOpt.isEmpty() || latDistOpt.isEmpty()) {
                         return false; // Can't end if we don't see the tag
@@ -156,7 +162,6 @@ public class AutoCommand {
    * @return A command that aligns the robot with the specified AprilTag
    */
   public Command alignWithAprilTagAndRotation(
-      int tagId,
       String cameraName,
       double targetLongitudinalDistance,
       double targetLateralDistance,
@@ -189,7 +194,6 @@ public class AutoCommand {
             // Initialize controllers
             Commands.runOnce(
                 () -> {
-                  System.out.println("Starting alignment with AprilTag " + tagId);
                   longitudinalController.reset(0);
                   lateralController.reset(0);
                   rotationController.reset(0);
@@ -199,16 +203,14 @@ public class AutoCommand {
             Commands.run(
                     () -> {
                       // Get current distances to the tag
-                      Optional<Double> longDistOpt =
-                          vision.getLongitudinalDistance(cameraName, tagId);
-                      Optional<Double> latDistOpt = vision.getLateralDistance(cameraName, tagId);
-                      Optional<Double> tagAngleOpt =
-                          vision.getTagHorizontalAngle(cameraName, tagId);
+                      Optional<Double> longDistOpt = vision.getLongitudinalDistance(cameraName);
+                      Optional<Double> latDistOpt = vision.getLateralDistance(cameraName);
+                      Optional<Double> tagAngleOpt = vision.getTagHorizontalAngle(cameraName);
 
                       if (longDistOpt.isEmpty() || latDistOpt.isEmpty() || tagAngleOpt.isEmpty()) {
                         // Tag not visible, stop or rotate to search
                         drive.stop();
-                        System.out.println("AprilTag " + tagId + " not visible");
+                        System.out.println("AprilTag not visible");
                         return;
                       }
 
@@ -245,11 +247,9 @@ public class AutoCommand {
                 .until(
                     () -> {
                       // Check if we're within tolerance
-                      Optional<Double> longDistOpt =
-                          vision.getLongitudinalDistance(cameraName, tagId);
-                      Optional<Double> latDistOpt = vision.getLateralDistance(cameraName, tagId);
-                      Optional<Double> tagAngleOpt =
-                          vision.getTagHorizontalAngle(cameraName, tagId);
+                      Optional<Double> longDistOpt = vision.getLongitudinalDistance(cameraName);
+                      Optional<Double> latDistOpt = vision.getLateralDistance(cameraName);
+                      Optional<Double> tagAngleOpt = vision.getTagHorizontalAngle(cameraName);
 
                       if (longDistOpt.isEmpty() || latDistOpt.isEmpty() || tagAngleOpt.isEmpty()) {
                         return false; // Can't end if we don't see the tag
@@ -277,7 +277,6 @@ public class AutoCommand {
             Commands.runOnce(
                 () -> {
                   drive.stop();
-                  System.out.println("Alignment with AprilTag " + tagId + " complete");
                 }));
     alignCommand.addRequirements(drive);
     return alignCommand;
@@ -297,7 +296,6 @@ public class AutoCommand {
    * @return A command that positions the robot near the tag and then precisely aligns with it
    */
   public Command driveToAndAlignWithAprilTag(
-      int tagId,
       String cameraName,
       Pose2d approachPose,
       double targetLongitudinalDistance,
@@ -320,6 +318,105 @@ public class AutoCommand {
 
         // Then use the precise alignment command
         alignWithAprilTagAndRotation(
-            tagId, cameraName, targetLongitudinalDistance, targetLateralDistance, targetYaw));
+            cameraName, targetLongitudinalDistance, targetLateralDistance, targetYaw));
+  }
+
+  /**
+   * Creates a command that drives to a branch target position relative to an AprilTag
+   *
+   * @param cameraName The name of the camera to use for vision
+   * @param useLeftBranch Whether to use the left branch target (true) or right branch target (false)
+   * @return A command that drives to the branch target position
+   */
+  public Command driveToBranchTarget(String cameraName, boolean useLeftBranch) {
+    return Commands.sequence(
+        // First, check if we can see the tag
+        Commands.runOnce(
+            () -> {
+              System.out.println("Starting drive to branch target, using " + 
+                  (useLeftBranch ? "left" : "right") + " branch");
+            }),
+        
+        // Create a command that continuously updates the target pose based on vision
+        Commands.run(
+            () -> {
+              // Get the tag pose relative to the robot
+              Optional<Pose3d> tagPoseRelativeToRobotOpt = 
+                  vision.getTagPoseRelativeToRobot(cameraName);
+              
+              if (tagPoseRelativeToRobotOpt.isEmpty()) {
+                // If we can't see the tag, stop
+                drive.stop();
+                return;
+              }
+              
+              // Convert the 3D pose to 2D
+              Pose2d tagPoseRelativeToRobot = tagPoseRelativeToRobotOpt.get().toPose2d();
+              
+              // Get the appropriate branch target pose relative to the tag
+              Pose2d branchTargetRelativeToTag = useLeftBranch ? 
+                  FieldConstants.leftBranchTargetPoseRelativeToTag : 
+                  FieldConstants.rightBranchTargetPoseRelativeToTag;
+              
+              // Transform the branch target pose to be relative to the robot
+              Pose2d branchTargetRelativeToRobot = 
+                  tagPoseRelativeToRobot.transformBy(
+                      new Pose2d(
+                          branchTargetRelativeToTag.getTranslation(),
+                          branchTargetRelativeToTag.getRotation())
+                      .toTransform2d());
+              
+              // Transform the branch target pose to be relative to the field
+              Pose2d robotPose = RobotState.getInstance().getPose();
+              Pose2d branchTargetPoseField = robotPose.transformBy(
+                  branchTargetRelativeToRobot.toTransform2d());
+              
+              // Set the target pose for the drive subsystem
+              drive.setTargetPose(branchTargetPoseField);
+            }),
+        
+        // Wait until we have a valid target pose
+        Commands.waitUntil(() -> drive.getTargetPose() != null),
+        
+        // Use IDrive to drive to the target pose
+        new IDrive(drive)
+            .until(() -> {
+              // Check if we're close enough to the target pose
+              return drive.getTargetPose() != null && 
+                     new IDrive(drive).withinTolerance(0.1, Rotation2d.fromDegrees(5.0));
+            })
+            .withTimeout(5.0), // Timeout to prevent getting stuck
+        
+        // Stop when done
+        Commands.runOnce(() -> {
+          drive.stop();
+          System.out.println("Branch target approach complete");
+        }));
+  }
+
+  /**
+   * Creates a command that drives to a branch target position and then aligns with the AprilTag
+   *
+   * @param cameraName The name of the camera to use for vision
+   * @param useLeftBranch Whether to use the left branch target (true) or right branch target (false)
+   * @param targetLongitudinalDistance The desired forward/backward distance to maintain from the tag (meters)
+   * @param targetLateralDistance The desired side-to-side distance to maintain from the tag (meters)
+   * @param targetYaw The desired yaw angle relative to the AprilTag (degrees)
+   * @return A command that drives to the branch target position and then aligns with the tag
+   */
+  public Command driveToBranchTargetAndAlign(
+      String cameraName,
+      boolean useLeftBranch,
+      double targetLongitudinalDistance,
+      double targetLateralDistance,
+      double targetYaw) {
+    
+    return Commands.sequence(
+        // First drive to the branch target
+        driveToBranchTarget(cameraName, useLeftBranch),
+        
+        // Then align with the tag
+        alignWithAprilTagAndRotation(
+            cameraName, targetLongitudinalDistance, targetLateralDistance, targetYaw));
   }
 }

@@ -232,9 +232,7 @@ public class RobotContainer {
     driverGamepad.L1().and(elevator::atGoal).whileTrue(endEffector.outtake());
 
     // driverGamepad.L2().whileTrue(endEffector.reverse());
-    driverGamepad
-        .L2()
-        .whileTrue(autoCommand.alignWithAprilTagAndRotation(7, "limelight", 0.1, 0, 0));
+    driverGamepad.L2().whileTrue(autoCommand.alignWithAprilTagAndRotation("limelight", 0.1, 0, 0));
 
     // operatorGamepad.pov(0).onTrue(climber.setState(ClimberState.IDLE));
     // operatorGamepad.pov(90).onTrue(climber.setState(ClimberState.ALIGN));

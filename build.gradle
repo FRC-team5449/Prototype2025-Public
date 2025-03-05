@@ -128,6 +128,14 @@ deployArtifact.jarTask = jar
 wpi.java.configureExecutableTasks(jar)
 wpi.java.configureTestTasks(test)
 
+// Add JMX configuration for RoboRIO
+deployArtifact.jvmArgs.add('-Dcom.sun.management.jmxremote')
+deployArtifact.jvmArgs.add('-Dcom.sun.management.jmxremote.port=1099')
+deployArtifact.jvmArgs.add('-Dcom.sun.management.jmxremote.local.only=false')
+deployArtifact.jvmArgs.add('-Dcom.sun.management.jmxremote.ssl=false')
+deployArtifact.jvmArgs.add('-Dcom.sun.management.jmxremote.authenticate=false')
+deployArtifact.jvmArgs.add('-Djava.rmi.server.hostname=10.54.49.2') // Replace with your team's RoboRIO IP
+
 // Configure string concat to always inline compile
 tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'

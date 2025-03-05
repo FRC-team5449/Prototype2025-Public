@@ -10,6 +10,7 @@ package com.team5449.frc2025.subsystems.apriltagvision;
 import static edu.wpi.first.units.Units.Meters;
 
 import com.team5449.frc2025.Constants;
+import com.team5449.frc2025.FieldConstants;
 import com.team5449.frc2025.RobotState;
 import com.team5449.frc2025.RobotState.VisionObservation;
 import com.team5449.lib.thirdpartylibs.LimelightHelpers;
@@ -18,6 +19,8 @@ import com.team5449.lib.util.AllianceFlipUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -217,12 +220,14 @@ public class AprilTagVision extends SubsystemBase {
    * @param tagId The ID of the AprilTag
    * @return The target info, or null if not visible
    */
-  private LimelightHelpers.RawFiducial getTargetInfo(String cameraName, int tagId) {
+  private LimelightHelpers.RawFiducial getTargetInfo(String cameraName) {
     LimelightHelpers.RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(cameraName);
 
     for (LimelightHelpers.RawFiducial fiducial : fiducials) {
-      if (fiducial.id == tagId) {
-        return fiducial;
+      for (int tagId : FieldConstants.tagIds) {
+        if (fiducial.id == tagId) {
+          return fiducial;
+        }
       }
     }
 
@@ -236,9 +241,9 @@ public class AprilTagVision extends SubsystemBase {
    * @param tagId The ID of the AprilTag
    * @return The longitudinal distance in meters, or empty if not visible
    */
-  public Optional<Double> getLongitudinalDistance(String cameraName, int tagId) {
+  public Optional<Double> getLongitudinalDistance(String cameraName) {
     // First check if the specific tag is visible
-    LimelightHelpers.RawFiducial targetInfo = getTargetInfo(cameraName, tagId);
+    LimelightHelpers.RawFiducial targetInfo = getTargetInfo(cameraName);
     if (targetInfo == null) {
       return Optional.empty();
     }
@@ -264,9 +269,9 @@ public class AprilTagVision extends SubsystemBase {
    * @param tagId The ID of the AprilTag
    * @return The lateral distance in meters, or empty if not visible
    */
-  public Optional<Double> getLateralDistance(String cameraName, int tagId) {
+  public Optional<Double> getLateralDistance(String cameraName) {
     // First check if the specific tag is visible
-    LimelightHelpers.RawFiducial targetInfo = getTargetInfo(cameraName, tagId);
+    LimelightHelpers.RawFiducial targetInfo = getTargetInfo(cameraName);
     if (targetInfo == null) {
       return Optional.empty();
     }
@@ -294,9 +299,9 @@ public class AprilTagVision extends SubsystemBase {
    * @param tagId The ID of the AprilTag
    * @return The horizontal angle in degrees, or empty if not visible
    */
-  public Optional<Double> getTagHorizontalAngle(String cameraName, int tagId) {
+  public Optional<Double> getTagHorizontalAngle(String cameraName) {
     // First check if the specific tag is visible
-    LimelightHelpers.RawFiducial targetInfo = getTargetInfo(cameraName, tagId);
+    LimelightHelpers.RawFiducial targetInfo = getTargetInfo(cameraName);
     if (targetInfo == null) {
       return Optional.empty();
     }
@@ -314,5 +319,25 @@ public class AprilTagVision extends SubsystemBase {
 
     // Negate the angle to match your previous implementation's convention
     return Optional.of(-horizontalAngle);
+  }
+
+  public Optional<Pose3d> getTagPoseRelativeToRobot(String cameraName) {
+    LimelightHelpers.RawFiducial targetInfo = getTargetInfo(cameraName);
+    if (targetInfo == null) {
+      return Optional.empty();
+    }
+
+    // Get the target pose in robot space directly from Limelight
+    double[] targetPose = LimelightHelpers.getTargetPose_RobotSpace(cameraName);
+    if (targetPose.length < 6) {
+      return Optional.empty();
+    }
+
+    return Optional.of(
+        new Pose3d(
+            targetPose[0],
+            targetPose[1],
+            targetPose[2],
+            new Rotation3d(targetPose[3], targetPose[4], targetPose[5])));
   }
 }

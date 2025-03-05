@@ -7,10 +7,7 @@
 
 package com.team5449.frc2025;
 
-import com.team5449.lib.LoggedTunableNumber;
 import com.team5449.lib.thirdpartylibs.Elastic;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -25,14 +22,6 @@ public class Robot extends LoggedRobot {
   private Command autonomousCommand;
 
   private final RobotContainer robotContainer;
-
-  private final LoggedTunableNumber poseX = new LoggedTunableNumber("RobotState/Pose_X", 0.0);
-  private final LoggedTunableNumber poseY = new LoggedTunableNumber("RobotState/Pose_Y", 0.0);
-  private final LoggedTunableNumber poseRotation =
-      new LoggedTunableNumber("RobotState/Pose_Rotation_Degree", 0.0);
-  private final LoggedTunableNumber targetX = new LoggedTunableNumber("targetPose/X", 0);
-  private final LoggedTunableNumber targetY = new LoggedTunableNumber("targetPose/Y", 0);
-  private final LoggedTunableNumber targetT = new LoggedTunableNumber("targetPose/T", 0);
 
   public Robot() {
     switch (Constants.currentMode) {
@@ -63,26 +52,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotPeriodic() {
-    LoggedTunableNumber.ifChanged(
-        hashCode(),
-        () ->
-            RobotState.getInstance()
-                .setPose(
-                    new Pose2d(
-                        poseX.get(), poseY.get(), Rotation2d.fromDegrees(poseRotation.get()))),
-        poseX,
-        poseY,
-        poseRotation);
-    LoggedTunableNumber.ifChanged(
-        hashCode(),
-        () ->
-            RobotState.getInstance()
-                .setTargetPose(
-                    new Pose2d(
-                        targetX.get(), targetY.get(), Rotation2d.fromDegrees(targetT.get()))),
-        targetX,
-        targetY,
-        targetT);
     Threads.setCurrentThreadPriority(true, 99);
 
     CommandScheduler.getInstance().run();

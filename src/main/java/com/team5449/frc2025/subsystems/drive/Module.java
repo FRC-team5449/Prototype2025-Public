@@ -7,7 +7,6 @@
 
 package com.team5449.frc2025.subsystems.drive;
 
-import com.team5449.frc2025.subsystems.TunerConstants;
 import com.team5449.lib.LoggedTunableNumber;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;

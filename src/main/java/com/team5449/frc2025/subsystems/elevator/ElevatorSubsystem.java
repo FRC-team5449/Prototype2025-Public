@@ -29,7 +29,7 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
     super(ElevatorConstants.kElevatorConfig, new MotorInputsAutoLogged(), io);
     setCurrentPositionAsZero();
     // TODO Delete this
-    // setDefaultCommand(motionMagicSetpointCommand(this::getStateAngle));
+    setDefaultCommand(motionMagicSetpointCommand(this::getStateAngle));
   }
 
   public Angle getStateAngle() {
@@ -69,4 +69,6 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
 
     public final Supplier<Angle> goalSetpoint;
   }
+
+  // Check for initialization delays or homing sequence
 }

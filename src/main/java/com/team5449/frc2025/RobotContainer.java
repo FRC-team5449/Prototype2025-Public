@@ -12,7 +12,6 @@ import com.team5449.frc2025.auto.AutoCommand;
 import com.team5449.frc2025.auto.AutoFactory;
 import com.team5449.frc2025.commands.DriveCommands;
 import com.team5449.frc2025.commands.IDrive;
-import com.team5449.frc2025.subsystems.TunerConstants;
 import com.team5449.frc2025.subsystems.apriltagvision.AprilTagVision;
 import com.team5449.frc2025.subsystems.apriltagvision.AprilTagVision.CameraConfig;
 import com.team5449.frc2025.subsystems.arm.ArmSimTalonIO;
@@ -27,6 +26,7 @@ import com.team5449.frc2025.subsystems.drive.GyroIOPigeon2;
 import com.team5449.frc2025.subsystems.drive.ModuleIO;
 import com.team5449.frc2025.subsystems.drive.ModuleIOSim;
 import com.team5449.frc2025.subsystems.drive.ModuleIOTalonFX;
+import com.team5449.frc2025.subsystems.drive.TunerConstants;
 import com.team5449.frc2025.subsystems.elevator.ElevatorConstants;
 import com.team5449.frc2025.subsystems.elevator.ElevatorSubsystem;
 import com.team5449.frc2025.subsystems.elevator.ElevatorSubsystem.ElevatorState;
@@ -75,6 +75,7 @@ public class RobotContainer {
   private final AutoCommand autoCommand;
 
   public RobotContainer() {
+    // Check constructor for heavy initialization
 
     switch (Constants.currentMode) {
       case REAL:
@@ -178,7 +179,7 @@ public class RobotContainer {
                 () -> -driverGamepad.getLeftX(),
                 Rotation2d::new));
 
-    // Reset gyro to 0 when triangle is pressed
+    // Reset gyro to 0 when triangle is pressed
     driverGamepad.square().whileTrue(new IDrive(drive));
 
     driverGamepad
@@ -213,9 +214,9 @@ public class RobotContainer {
                 .alongWith(
                     Commands.waitUntil(elevator::isStowed)
                         .andThen(arm.setStateCommand(ArmState.INTAKE).onlyIf(driverGamepad.R1()))))
-        .onFalse(arm.setStateCommand(ArmState.IDLE));
-    // .and(arm::intaking)
-    // .whileTrue(endEffector.intake());
+        .onFalse(arm.setStateCommand(ArmState.IDLE))
+        .and(arm::intaking)
+        .whileTrue(endEffector.intake());
 
     driverGamepad
         .R2()
@@ -238,8 +239,8 @@ public class RobotContainer {
     // operatorGamepad.pov(90).onTrue(climber.setState(ClimberState.ALIGN));
     // operatorGamepad.pov(180).onTrue(climber.setState(ClimberState.CLIMB));
 
-    operatorGamepad.L1().whileTrue(climber.elevate());
-    operatorGamepad.R1().whileTrue(climber.decline());
+    // operatorGamepad.L1().whileTrue(climber.elevate());
+    // operatorGamepad.R1().whileTrue(climber.decline());
   }
 
   public void periodic() {

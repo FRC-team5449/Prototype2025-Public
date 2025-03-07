@@ -27,7 +27,6 @@ import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 import com.team5449.frc2025.Constants;
 import com.team5449.frc2025.Constants.Mode;
 import com.team5449.frc2025.RobotState;
-import com.team5449.frc2025.subsystems.TunerConstants;
 import com.team5449.lib.thirdpartylibs.LocalADStarAK;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;

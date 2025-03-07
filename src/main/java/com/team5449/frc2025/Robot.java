@@ -7,7 +7,6 @@
 
 package com.team5449.frc2025;
 
-import com.team5449.lib.thirdpartylibs.Elastic;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -70,8 +69,6 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.schedule();
     }
-
-    Elastic.selectTab("Autonomous");
   }
 
   @Override
@@ -82,7 +79,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
-    Elastic.selectTab("Teleoperated");
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }

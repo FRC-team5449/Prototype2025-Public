@@ -57,8 +57,4 @@ public class StaticCharacterizationCommand extends Command {
     SmartDashboard.putNumber("Reuslt", currentInput);
     inputConsumer.accept(0);
   }
-
-  // 2.12
-
-  // 3.706
 }

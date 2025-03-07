@@ -7,8 +7,6 @@
 
 package com.team5449.frc2025.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.Rotation;
-
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -19,11 +17,10 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.team5449.lib.subsystems.ServoMotorSubsystemConfig;
-import edu.wpi.first.units.measure.Angle;
 
 public class ElevatorConstants {
   public static final ServoMotorSubsystemConfig kElevatorConfig = new ServoMotorSubsystemConfig();
-  public static final Angle positionTolerance = Rotation.of(0.3);
+  public static final double positionTolerance = 0.3;
 
   static {
     kElevatorConfig.name = "Elevator";

@@ -23,6 +23,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team5449.lib.subsystems.MotorIO;
 import com.team5449.lib.subsystems.ServoMotorSubsystemConfig;
 import com.team5449.lib.util.UnitUtil;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -91,6 +92,13 @@ public class ArmTalonIO implements MotorIO {
   public void setMotionMagicSetpoint(Angle position) {
     Angle setPosition = UnitUtil.clamp(position, minPosition, maxPosition);
     talon.setControl(motionMagicVoltageControl.withPosition(setPosition));
+  }
+
+  @Override
+  public void setMotionMagicSetpoint(double positionRotation) {
+    positionRotation =
+        MathUtil.clamp(positionRotation, mConfig.kMinPositionUnits, mConfig.kMaxPositionUnits);
+    talon.setControl(motionMagicVoltageControl.withPosition(positionRotation));
   }
 
   @Override

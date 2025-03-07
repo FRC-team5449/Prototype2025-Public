@@ -36,6 +36,8 @@ public interface MotorIO {
 
   public default void setMotionMagicSetpoint(Angle position) {}
 
+  public default void setMotionMagicSetpoint(double positionRotation) {}
+
   public default void setNeutralMode(NeutralModeValue mode) {}
 
   public default void setVelocitySetpoint(AngularVelocity velocity) {}

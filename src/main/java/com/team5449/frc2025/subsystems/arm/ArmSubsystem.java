@@ -12,11 +12,10 @@ import static edu.wpi.first.units.Units.Rotation;
 import com.team5449.lib.subsystems.MotorIO;
 import com.team5449.lib.subsystems.MotorInputsAutoLogged;
 import com.team5449.lib.subsystems.ServoMotorSubsystem;
-import com.team5449.lib.util.UnitUtil;
-import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import java.util.function.Supplier;
+import java.util.function.DoubleSupplier;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -27,12 +26,11 @@ public class ArmSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, Mot
 
   public ArmSubsystem(final MotorIO io) {
     super(ArmConstants.kArmConfig, new MotorInputsAutoLogged(), io);
-    // TODO Delete this
     setDefaultCommand(motionMagicSetpointCommand(this::getStateAngle));
   }
 
-  private Angle getStateAngle() {
-    return desiredState.goalSetpoint.get();
+  private double getStateAngle() {
+    return desiredState.goalSetpoint.getAsDouble();
   }
 
   public Command setStateCommand(ArmState state) {
@@ -53,16 +51,18 @@ public class ArmSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, Mot
   }
 
   public boolean atGoal(ArmState setState) {
-    return UnitUtil.isNear(
-        inputs.position, setState.goalSetpoint.get(), ArmConstants.positionTolerance);
+    return MathUtil.isNear(
+        inputs.position.in(Rotation),
+        setState.goalSetpoint.getAsDouble(),
+        ArmConstants.positionTolerance);
   }
 
   @RequiredArgsConstructor
   public enum ArmState {
-    IDLE(() -> Rotation.of(0.182891)),
-    INTAKE(() -> Rotation.of(0.255)),
-    SCORE(() -> Rotation.of(0.092891));
+    IDLE(() -> 0.182891),
+    INTAKE(() -> 0.255),
+    SCORE(() -> 0.092891);
 
-    public final Supplier<Angle> goalSetpoint;
+    public final DoubleSupplier goalSetpoint;
   }
 }

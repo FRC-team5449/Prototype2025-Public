@@ -35,9 +35,6 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
     this.config = config;
     this.io = io;
     this.inputs = inputs;
-
-    // setDefaultCommand((() -> 0.0).withName(
-    //   getName() + " Default Command Neutral"));
   }
 
   @Override
@@ -74,6 +71,12 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
   protected void setMotionMagicSetpointImpl(Supplier<Angle> positionSupplier) {
     positionSetpoint = positionSupplier.get();
     Logger.recordOutput(getName() + "/API/setMotionMagicSetpointImp/Units", positionSetpoint);
+    io.setMotionMagicSetpoint(positionSetpoint);
+  }
+
+  protected void setMotionMagicSetpointImpl(DoubleSupplier positionSupplier) {
+    double positionSetpoint = positionSupplier.getAsDouble();
+    Logger.recordOutput(getName() + "/API/setMotionMagicSetpointImp/Rotation", positionSetpoint);
     io.setMotionMagicSetpoint(positionSetpoint);
   }
 
@@ -116,6 +119,15 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
   }
 
   public Command motionMagicSetpointCommand(Supplier<Angle> positionSupplier) {
+    return runEnd(
+            () -> {
+              setMotionMagicSetpointImpl(positionSupplier);
+            },
+            () -> {})
+        .withName(getName() + " motionMagicSetpointCommand");
+  }
+
+  public Command motionMagicSetpointCommand(DoubleSupplier positionSupplier) {
     return runEnd(
             () -> {
               setMotionMagicSetpointImpl(positionSupplier);

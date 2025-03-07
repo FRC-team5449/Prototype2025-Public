@@ -39,11 +39,11 @@ public class ClimberSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged,
   }
 
   public Command decline() {
-    return runEnd(() -> io.setOpenLoopDutyCycle(0.4), () -> io.setOpenLoopDutyCycle(0));
+    return startEnd(() -> io.setOpenLoopDutyCycle(0.4), () -> io.setOpenLoopDutyCycle(0));
   }
 
   public Command elevate() {
-    return runEnd(() -> io.setOpenLoopDutyCycle(-0.4), () -> io.setOpenLoopDutyCycle(0));
+    return startEnd(() -> io.setOpenLoopDutyCycle(-0.4), () -> io.setOpenLoopDutyCycle(0));
   }
 
   @RequiredArgsConstructor

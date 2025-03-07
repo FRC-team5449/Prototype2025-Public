@@ -12,11 +12,10 @@ import static edu.wpi.first.units.Units.Rotation;
 import com.team5449.lib.subsystems.MotorIO;
 import com.team5449.lib.subsystems.MotorInputsAutoLogged;
 import com.team5449.lib.subsystems.ServoMotorSubsystem;
-import com.team5449.lib.util.UnitUtil;
-import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import java.util.function.Supplier;
+import java.util.function.DoubleSupplier;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -28,12 +27,11 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
   public ElevatorSubsystem(final MotorIO io) {
     super(ElevatorConstants.kElevatorConfig, new MotorInputsAutoLogged(), io);
     setCurrentPositionAsZero();
-    // TODO Delete this
     setDefaultCommand(motionMagicSetpointCommand(this::getStateAngle));
   }
 
-  public Angle getStateAngle() {
-    return desiredState.goalSetpoint.get();
+  public double getStateAngle() {
+    return desiredState.goalSetpoint.getAsDouble();
   }
 
   public Command setState(ElevatorState state) {
@@ -51,8 +49,10 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
   }
 
   public boolean atGoal(ElevatorState setState) {
-    return UnitUtil.isNear(
-        inputs.position, setState.goalSetpoint.get(), ElevatorConstants.positionTolerance);
+    return MathUtil.isNear(
+        inputs.position.in(Rotation),
+        setState.goalSetpoint.getAsDouble(),
+        ElevatorConstants.positionTolerance);
   }
 
   public Command setStateOk(ElevatorState state) {
@@ -61,13 +61,13 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
 
   @RequiredArgsConstructor
   public enum ElevatorState {
-    IDLE(() -> Rotation.of(0)),
-    L1(() -> Rotation.of(2 * (5.0 / 4.0))),
-    L2(() -> Rotation.of(3.5 * (5.0 / 4.0))),
-    L3(() -> Rotation.of(10 * (5.0 / 4.0))),
-    L4(() -> Rotation.of(20 * (5.0 / 4.0)));
+    IDLE(() -> 0),
+    L1(() -> 2 * (5.0 / 4.0)),
+    L2(() -> 3.5 * (5.0 / 4.0)),
+    L3(() -> 10 * (5.0 / 4.0)),
+    L4(() -> 20 * (5.0 / 4.0));
 
-    public final Supplier<Angle> goalSetpoint;
+    public final DoubleSupplier goalSetpoint;
   }
 
   // Check for initialization delays or homing sequence

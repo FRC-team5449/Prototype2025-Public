@@ -7,8 +7,6 @@
 
 package com.team5449.frc2025.subsystems.arm;
 
-import static edu.wpi.first.units.Units.Rotation;
-
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
@@ -24,11 +22,10 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.team5449.lib.subsystems.ServoMotorSubsystemConfig;
-import edu.wpi.first.units.measure.Angle;
 
 public class ArmConstants {
   public static final ServoMotorSubsystemConfig kArmConfig = new ServoMotorSubsystemConfig();
-  public static final Angle positionTolerance = Rotation.of(0.02);
+  public static final double positionTolerance = 0.02;
 
   public static final double kArmGearRatio = 41.66667;
 

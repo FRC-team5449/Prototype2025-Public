@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.littletonrobotics.junction.Logger;
 
 public class AprilTagVision extends SubsystemBase {
@@ -51,6 +52,7 @@ public class AprilTagVision extends SubsystemBase {
       String limelightName, Transform3d robotToCamera, double stdDevCoefficient) {}
 
   private final Map<String, CameraConfig> cameras;
+  private final Set<String> limelightNames;
 
   /** Creates a new AprilTagVision. */
   public AprilTagVision(CameraConfig[] cameras) {
@@ -67,11 +69,12 @@ public class AprilTagVision extends SubsystemBase {
           camera.robotToCamera().getRotation().getY(),
           camera.robotToCamera().getRotation().getZ());
     }
+    limelightNames = this.cameras.keySet();
   }
 
   /** Updates robot orientation for all cameras */
   public void updateRobotOrientation() {
-    for (String limelightName : cameras.keySet()) {
+    for (String limelightName : limelightNames) {
       LimelightHelpers.SetRobotOrientation(
           limelightName, RobotState.getInstance().getRotation().getDegrees(), 0, 0, 0, 0, 0);
     }
@@ -113,15 +116,15 @@ public class AprilTagVision extends SubsystemBase {
       PoseEstimate estimate, double stdDevCoefficient) {
 
     // Validate pose is within field bounds
-    if (!isOnField(estimate.pose)) {
-      return Optional.empty();
-    }
-    Pose2d projectedPose = projectOnField(estimate.pose);
+    // if (!isOnField(estimate.pose)) {
+    //   return Optional.empty();
+    // }
+    // Pose2d projectedPose = projectOnField(estimate.pose);
     // Calculate standard deviations
     Matrix<N3, N1> stdDevs = calculateStdDevs(estimate, stdDevCoefficient);
 
     // TODO Which timestamp second is right
-    return Optional.of(new VisionObservation(projectedPose, estimate.timestampSeconds, stdDevs));
+    return Optional.of(new VisionObservation(estimate.pose, estimate.timestampSeconds, stdDevs));
 
     // return Optional.of(
     //         new VisionObservation(

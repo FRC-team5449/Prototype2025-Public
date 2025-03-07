@@ -28,6 +28,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team5449.frc2025.Robot;
 import com.team5449.lib.util.UnitUtil;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -95,6 +96,10 @@ public class TalonFXIO implements MotorIO {
         };
     tryUntilOk(5, () -> BaseStatusSignal.setUpdateFrequencyForAll(50.0, signals));
     tryUntilOk(5, () -> talon.optimizeBusUtilization());
+
+    velocityVoltageControl.UpdateFreqHz = 50.0;
+    positionVoltageControl.UpdateFreqHz = 50.0;
+    motionMagicVoltageControl.UpdateFreqHz = 50.0;
   }
 
   @Override
@@ -126,6 +131,14 @@ public class TalonFXIO implements MotorIO {
   public void setMotionMagicSetpoint(Angle position) {
     Angle setPosition = UnitUtil.clamp(position, minPosition, maxPosition);
     talon.setControl(motionMagicVoltageControl.withPosition(setPosition));
+    setSlaveMotorFollowing();
+  }
+
+  @Override
+  public void setMotionMagicSetpoint(double positionRotation) {
+    positionRotation =
+        MathUtil.clamp(positionRotation, mConfig.kMinPositionUnits, mConfig.kMaxPositionUnits);
+    talon.setControl(motionMagicVoltageControl.withPosition(positionRotation));
     setSlaveMotorFollowing();
   }
 

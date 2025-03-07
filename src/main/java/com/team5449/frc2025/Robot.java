@@ -20,13 +20,13 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
 
-  private final RobotContainer robotContainer;
+  // private final RobotContainer robotContainer;
 
   public Robot() {
     switch (Constants.currentMode) {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
-        Logger.addDataReceiver(new WPILOGWriter());
+        // Logger.addDataReceiver(new WPILOGWriter());
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
@@ -46,12 +46,12 @@ public class Robot extends LoggedRobot {
 
     // Start AdvantageKit logger
     Logger.start();
-    robotContainer = new RobotContainer();
+    // robotContainer = new RobotContainer();
   }
 
   @Override
   public void robotPeriodic() {
-    CommandScheduler.getInstance().run();
+    // CommandScheduler.getInstance().run();
   }
 
   @Override
@@ -65,7 +65,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
-    autonomousCommand = robotContainer.getAutonomousCommand();
+    // autonomousCommand = robotContainer.getAutonomousCommand();
 
     if (autonomousCommand != null) {
       autonomousCommand.schedule();
@@ -89,9 +89,7 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {
-    robotContainer.periodic();
-  }
+  public void teleopPeriodic() {}
 
   @Override
   public void teleopExit() {}

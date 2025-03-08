@@ -328,6 +328,15 @@ public class AprilTagVision extends SubsystemBase {
     return Optional.of(-horizontalAngle);
   }
 
+  public Optional<Integer> getTagId(String cameraName) {
+    double targetId = LimelightHelpers.getFiducialID(cameraName);
+    if ((int) targetId == -1) {
+      return Optional.empty();
+    }
+
+    return Optional.of((int) targetId);
+  }
+
   public Optional<Pose3d> getTagPoseRelativeToRobot(String cameraName) {
     // LimelightHelpers.RawFiducial targetInfo = getTargetInfo(cameraName);
     // if (targetInfo == null) {

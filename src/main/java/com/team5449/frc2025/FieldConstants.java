@@ -17,7 +17,9 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FieldConstants {
   public static final AprilTagFieldLayout tagLayout =
@@ -26,34 +28,34 @@ public class FieldConstants {
   public static final Translation2d center =
       new Translation2d(Units.inchesToMeters(176.746), tagLayout.getFieldWidth() / 2.0);
 
-  public static final Pose2d[] blueCenterFaces =
-      new Pose2d[6]; // Starting facing the driver station in clockwise order
-  public static final Pose2d[] redCenterFaces = new Pose2d[6];
+  public static final Map<Integer, Pose2d> blueCenterFaces =
+      new HashMap<>(); // Starting facing the driver station in clockwise order
+  public static final Map<Integer, Pose2d> redCenterFaces = new HashMap<>();
 
   public static final int[] blueTagIds = {17, 18, 19, 20, 21, 22};
   public static final int[] redTagIds = {6, 7, 8, 9, 10, 11};
 
   static {
-    blueCenterFaces[0] = tagLayout.getTagPose(18).get().toPose2d();
-    blueCenterFaces[1] = tagLayout.getTagPose(19).get().toPose2d();
-    blueCenterFaces[2] = tagLayout.getTagPose(20).get().toPose2d();
-    blueCenterFaces[3] = tagLayout.getTagPose(21).get().toPose2d();
-    blueCenterFaces[4] = tagLayout.getTagPose(22).get().toPose2d();
-    blueCenterFaces[5] = tagLayout.getTagPose(17).get().toPose2d();
+    blueCenterFaces.put(17, tagLayout.getTagPose(17).get().toPose2d());
+    blueCenterFaces.put(18, tagLayout.getTagPose(18).get().toPose2d());
+    blueCenterFaces.put(19, tagLayout.getTagPose(19).get().toPose2d());
+    blueCenterFaces.put(20, tagLayout.getTagPose(20).get().toPose2d());
+    blueCenterFaces.put(21, tagLayout.getTagPose(21).get().toPose2d());
+    blueCenterFaces.put(22, tagLayout.getTagPose(22).get().toPose2d());
 
-    redCenterFaces[0] = tagLayout.getTagPose(7).get().toPose2d();
-    redCenterFaces[1] = tagLayout.getTagPose(8).get().toPose2d();
-    redCenterFaces[2] = tagLayout.getTagPose(9).get().toPose2d();
-    redCenterFaces[3] = tagLayout.getTagPose(10).get().toPose2d();
-    redCenterFaces[4] = tagLayout.getTagPose(11).get().toPose2d();
-    redCenterFaces[5] = tagLayout.getTagPose(6).get().toPose2d();
+    redCenterFaces.put(6, tagLayout.getTagPose(6).get().toPose2d());
+    redCenterFaces.put(7, tagLayout.getTagPose(7).get().toPose2d());
+    redCenterFaces.put(8, tagLayout.getTagPose(8).get().toPose2d());
+    redCenterFaces.put(9, tagLayout.getTagPose(9).get().toPose2d());
+    redCenterFaces.put(10, tagLayout.getTagPose(10).get().toPose2d());
+    redCenterFaces.put(11, tagLayout.getTagPose(11).get().toPose2d());
   }
 
   public static final List<Pose2d> targetPoses =
       new ArrayList<Pose2d>(
           DriverStation.getAlliance().get() == Alliance.Blue
-              ? List.of(blueCenterFaces)
-              : List.of(redCenterFaces));
+              ? blueCenterFaces.values()
+              : redCenterFaces.values());
 
   public static final int[] tagIds =
       DriverStation.getAlliance().get() == Alliance.Blue ? blueTagIds : redTagIds;

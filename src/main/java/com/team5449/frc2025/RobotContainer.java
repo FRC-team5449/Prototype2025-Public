@@ -257,7 +257,7 @@ public class RobotContainer {
         .whileTrue(endEffector.l1Outtake());
 
     // driverGamepad.L2().whileTrue(endEffector.reverse());
-    driverGamepad.L2().whileTrue(autoCommand.driveToBranchTarget("limelight", false));
+    driverGamepad.L2().onTrue(autoCommand.driveToBranchTarget("limelight", false));
     // driverGamepad.L2().whileTrue(autoCommand.alignWithAprilTagAndRotation("limelight", 0.1, 0,
     // 0));
 

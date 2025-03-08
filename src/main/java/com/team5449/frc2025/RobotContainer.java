@@ -42,7 +42,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -213,11 +212,7 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    driverGamepad
-        .cross()
-        .onTrue(
-            Commands.runOnce(
-                () -> drive.setPose(new Pose2d(new Translation2d(), drive.getRotation())), drive));
+    // driverGamepad.cross().whileTrue(AutoCommand)
 
     driverGamepad.pov(0).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L4));
 
@@ -262,7 +257,7 @@ public class RobotContainer {
         .whileTrue(endEffector.l1Outtake());
 
     // driverGamepad.L2().whileTrue(endEffector.reverse());
-    driverGamepad.L2().onTrue(autoCommand.driveToBranchTarget("limelight", false));
+    driverGamepad.L2().whileTrue(autoCommand.driveToBranchTarget("limelight", false));
     // driverGamepad.L2().whileTrue(autoCommand.alignWithAprilTagAndRotation("limelight", 0.1, 0,
     // 0));
 

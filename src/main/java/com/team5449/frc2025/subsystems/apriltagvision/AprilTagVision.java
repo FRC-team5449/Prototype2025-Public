@@ -196,7 +196,7 @@ public class AprilTagVision extends SubsystemBase {
     List<VisionObservation> observations = new ArrayList<>();
 
     // Update orientation for all cameras
-    // updateRobotOrientation();
+    updateRobotOrientation();
 
     // Get estimates from each camera
     for (CameraConfig camera : cameras.values()) {
@@ -210,9 +210,9 @@ public class AprilTagVision extends SubsystemBase {
       // }
 
       // Fallback to original MegaTag
-      Optional<VisionObservation> megaTagEstimate =
-          getMegaTagEstimate(camera.limelightName(), camera.stdDevCoefficient());
-      megaTagEstimate.ifPresent(observations::add);
+      Optional<VisionObservation> megaTag2Estimate =
+          getMegaTag2Estimate(camera.limelightName(), camera.stdDevCoefficient());
+      megaTag2Estimate.ifPresent(observations::add);
     }
 
     observations.stream()

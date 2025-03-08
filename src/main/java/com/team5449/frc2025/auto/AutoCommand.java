@@ -8,18 +8,18 @@
 package com.team5449.frc2025.auto;
 
 import com.team5449.frc2025.FieldConstants;
-import com.team5449.frc2025.RobotState;
 import com.team5449.frc2025.commands.IDrive;
 import com.team5449.frc2025.subsystems.apriltagvision.AprilTagVision;
 import com.team5449.frc2025.subsystems.arm.ArmSubsystem;
 import com.team5449.frc2025.subsystems.drive.Drive;
 import com.team5449.frc2025.subsystems.elevator.ElevatorSubsystem;
 import com.team5449.frc2025.subsystems.endeffector.EndEffectorSubsystem;
+import com.team5449.lib.util.AllianceFlipUtil;
 import com.team5449.lib.util.GeomUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -28,7 +28,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
-import org.littletonrobotics.junction.Logger;
 
 @ExtensionMethod({GeomUtil.class})
 @RequiredArgsConstructor
@@ -329,87 +328,106 @@ public class AutoCommand {
    * @return A command that drives to the branch target position
    */
   public Command driveToBranchTarget(String cameraName, boolean useLeftBranch) {
+    return Commands.sequence(Commands.runOnce(
+              () -> {
+                System.out.println(
+                    "Starting drive to branch target, using "
+                        + (useLeftBranch ? "left" : "right")
+                        + " branch");
+              }),Commands.runOnce(()->{
     IDrive iDrive = new IDrive(drive);
-    return Commands.sequence(
-        // First, check if we can see the tag
-        Commands.runOnce(
-            () -> {
-              System.out.println(
-                  "Starting drive to branch target, using "
-                      + (useLeftBranch ? "left" : "right")
-                      + " branch");
-            }),
+    Pose2d tagPose =
+        AllianceFlipUtil.shouldFlip()
+            ? FieldConstants.redCenterFaces[0]
+            : FieldConstants.blueCenterFaces[0];
+    Transform2d transformer =
+        useLeftBranch
+            ? FieldConstants.leftBranchTargetPoseRelativeToTag
+            : FieldConstants.rightBranchTargetPoseRelativeToTag;
+    Pose2d branchPose =
+        tagPose.transformBy(transformer).transformBy(new Transform2d(0, 0, Rotation2d.k180deg));
+    drive.setTargetPose(branchPose);}));
+    // return Commands.sequence(
+    //     // First, check if we can see the tag
+    //     Commands.runOnce(
+    //         () -> {
+    //           System.out.println(
+    //               "Starting drive to branch target, using "
+    //                   + (useLeftBranch ? "left" : "right")
+    //                   + " branch");
+    //         }),
 
-        // Create a command that continuously updates the target pose based on vision (BAD CURSOR!
-        // We only need to update once)
-        Commands.runOnce(
-            () -> {
-              // Get the tag pose relative to the robot
-              Optional<Pose3d> tagPoseRelativeToRobotOpt =
-                  vision.getTagPoseRelativeToRobot(cameraName);
+    //     // Create a command that continuously updates the target pose based on vision (BAD
+    // CURSOR!
+    //     // We only need to update once)
+    //     Commands.runOnce(
+    //         () -> {
+    //           // Get the tag pose relative to the robot
+    //           Optional<Pose3d> tagPoseRelativeToRobotOpt =
+    //               vision.getTagPoseRelativeToRobot(cameraName);
 
-              Logger.recordOutput("AutoAlign/isEmpty", tagPoseRelativeToRobotOpt.isEmpty());
+    //           Logger.recordOutput("AutoAlign/isEmpty", tagPoseRelativeToRobotOpt.isEmpty());
 
-              if (tagPoseRelativeToRobotOpt.isEmpty()) {
-                // If we can't see the tag, stop
-                drive.stop();
-                return;
-              }
+    //           if (tagPoseRelativeToRobotOpt.isEmpty()) {
+    //             // If we can't see the tag, stop
+    //             drive.stop();
+    //             return;
+    //           }
 
-              // Convert the 3D pose to 2D
-              // The Pose3d from Limelight uses a different coordinate system:
-              // X is left/right, Y is up/down, Z is forward/backward
-              // When converting to Pose2d, we need to use X and Z
-              Pose3d tagPose3d = tagPoseRelativeToRobotOpt.get();
-              Pose2d tagPoseRelativeToRobot =
-                  new Pose2d(
-                      tagPose3d.getZ(), // Forward/backward becomes X in 2D
-                      -tagPose3d
-                          .getX(), // Left/right becomes Y in 2D (negated to match conventions)
-                      new Rotation2d(tagPose3d.getRotation().getZ()) // Use yaw for 2D rotation
-                      );
+    //           // Convert the 3D pose to 2D
+    //           // The Pose3d from Limelight uses a different coordinate system:
+    //           // X is left/right, Y is up/down, Z is forward/backward
+    //           // When converting to Pose2d, we need to use X and Z
+    //           Pose3d tagPose3d = tagPoseRelativeToRobotOpt.get();
+    //           Pose2d tagPoseRelativeToRobot =
+    //               new Pose2d(
+    //                   tagPose3d.getZ(), // Forward/backward becomes X in 2D
+    //                   -tagPose3d
+    //                       .getX(), // Left/right becomes Y in 2D (negated to match conventions)
+    //                   new Rotation2d(tagPose3d.getRotation().getZ()) // Use yaw for 2D rotation
+    //                   );
 
-              // Get the appropriate branch target pose relative to the tag
-              Pose2d branchTargetRelativeToTag =
-                  useLeftBranch
-                      ? FieldConstants.leftBranchTargetPoseRelativeToTag
-                      : FieldConstants.rightBranchTargetPoseRelativeToTag;
+    //           // Get the appropriate branch target pose relative to the tag
+    //           Pose2d branchTargetRelativeToTag =
+    //               useLeftBranch
+    //                   ? FieldConstants.leftBranchTargetPoseRelativeToTag
+    //                   : FieldConstants.rightBranchTargetPoseRelativeToTag;
 
-              // Transform the branch target pose to be relative to the robot
-              Pose2d branchTargetRelativeToRobot =
-                  tagPoseRelativeToRobot.transformBy(branchTargetRelativeToTag.toTransform2d());
+    //           // Transform the branch target pose to be relative to the robot
+    //           Pose2d branchTargetRelativeToRobot =
+    //               tagPoseRelativeToRobot.transformBy(branchTargetRelativeToTag.toTransform2d());
 
-              // Transform the branch target pose to be relative to the field
-              Pose2d robotPose = RobotState.getInstance().getPose();
-              Pose2d branchTargetPoseField =
-                  robotPose.transformBy(branchTargetRelativeToRobot.toTransform2d());
+    //           // Transform the branch target pose to be relative to the field
+    //           Pose2d robotPose = RobotState.getInstance().getPose();
+    //           Pose2d branchTargetPoseField =
+    //               robotPose.transformBy(branchTargetRelativeToRobot.toTransform2d());
 
-              System.out.println("Branch target field pose: " + branchTargetPoseField);
-              Logger.recordOutput("Odometry/BranchTargetPose", branchTargetPoseField);
+    //           System.out.println("Branch target field pose: " + branchTargetPoseField);
+    //           Logger.recordOutput("Odometry/BranchTargetPose", branchTargetPoseField);
 
-              // Set the target pose for the drive subsystem
-              drive.setTargetPose(branchTargetPoseField);
-            }),
+    //           // Set the target pose for the drive subsystem
+    //           drive.setTargetPose(branchTargetPoseField);
+    //         }),
 
-        // Wait until we have a valid target pose
-        // Commands.waitUntil(() -> drive.getTargetPose() != null),
+    //     // Wait until we have a valid target pose
+    //     // Commands.waitUntil(() -> drive.getTargetPose() != null),
 
-        // // Use IDrive to drive to the target pose
-        // iDrive
-        //     .until(
-        //         () -> {
-        //           // Check if we're close enough to the target pose
-        //           return drive.getTargetPose() != null
-        //               && iDrive.withinTolerance(0.1, Rotation2d.fromDegrees(5.0));
-        //         })
-        //     .withTimeout(5.0), // Timeout to prevent getting stuck
+    //     // // Use IDrive to drive to the target pose
+    //     // iDrive
+    //     //     .until(
+    //     //         () -> {
+    //     //           // Check if we're close enough to the target pose
+    //     //           return drive.getTargetPose() != null
+    //     //               && iDrive.withinTolerance(0.1, Rotation2d.fromDegrees(5.0));
+    //     //         })
+    //     //     .withTimeout(5.0), // Timeout to prevent getting stuck
 
-        // Stop when done
-        Commands.runOnce(
-            () -> {
-              drive.stop();
-              System.out.println("Branch target approach complete");
-            }));
+    //     // Stop when done
+    //     Commands.runOnce(
+    //         () -> {
+    //           drive.stop();
+    //           System.out.println("Branch target approach complete");
+    //         }));
   }
 
   /**

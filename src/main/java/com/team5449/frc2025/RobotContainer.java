@@ -48,9 +48,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import lombok.Setter;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
+
+  @Setter private double flip = 1;
   private final Drive drive;
   private final ElevatorSubsystem elevator;
   private final EndEffectorSubsystem endEffector;
@@ -184,8 +187,8 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> driverGamepad.getLeftY(),
-            () -> driverGamepad.getLeftX(),
+            () -> driverGamepad.getLeftY() * flip,
+            () -> driverGamepad.getLeftX() * flip,
             () -> -driverGamepad.getRightX()));
 
     driverGamepad
@@ -193,8 +196,8 @@ public class RobotContainer {
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 drive,
-                () -> -driverGamepad.getLeftY(),
-                () -> -driverGamepad.getLeftX(),
+                () -> -driverGamepad.getLeftY() * flip,
+                () -> -driverGamepad.getLeftX() * flip,
                 Rotation2d::new));
 
     // Reset gyro to 0 when triangle is pressed

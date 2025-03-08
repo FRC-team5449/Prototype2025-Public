@@ -218,25 +218,22 @@ public class Drive extends SubsystemBase {
         rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
       }
 
-      // Apply update
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
     }
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
 
-    // Consume vision measurements
-    // RobotState.getInstance()
-    //     .consumeVisionObservation()
-    //     .ifPresent(
-    //         observation -> {
-    //           poseEstimator.addVisionMeasurement(
-    //               new Pose2d(
-    //                   observation.visionPose().getTranslation(),
-    //                   RobotState.getInstance().getRotation()),
-    //               observation.timestamp(),
-    //               observation.stdDevs());
-    //         });
+    RobotState.getInstance()
+        .consumeVisionObservation()
+        .ifPresent(
+            observation -> {
+              addVisionMeasurement(
+                  /*new Pose2d(observation.visionPose().getTranslation(), getRotation())*/ observation
+                      .visionPose(),
+                  observation.timestamp(),
+                  observation.stdDevs());
+            });
 
     // Update robot state with current pose
     RobotState.getInstance().updatePose(poseEstimator.getEstimatedPosition());

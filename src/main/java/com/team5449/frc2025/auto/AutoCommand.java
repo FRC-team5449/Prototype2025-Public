@@ -361,11 +361,13 @@ public class AutoCommand {
               // X is left/right, Y is up/down, Z is forward/backward
               // When converting to Pose2d, we need to use X and Z
               Pose3d tagPose3d = tagPoseRelativeToRobotOpt.get();
-              Pose2d tagPoseRelativeToRobot = new Pose2d(
-                  tagPose3d.getZ(),  // Forward/backward becomes X in 2D
-                  -tagPose3d.getX(), // Left/right becomes Y in 2D (negated to match conventions)
-                  new Rotation2d(tagPose3d.getRotation().getZ())  // Use yaw for 2D rotation
-              );
+              Pose2d tagPoseRelativeToRobot =
+                  new Pose2d(
+                      tagPose3d.getZ(), // Forward/backward becomes X in 2D
+                      -tagPose3d
+                          .getX(), // Left/right becomes Y in 2D (negated to match conventions)
+                      new Rotation2d(tagPose3d.getRotation().getZ()) // Use yaw for 2D rotation
+                      );
 
               // Get the appropriate branch target pose relative to the tag
               Pose2d branchTargetRelativeToTag =
@@ -375,8 +377,7 @@ public class AutoCommand {
 
               // Transform the branch target pose to be relative to the robot
               Pose2d branchTargetRelativeToRobot =
-                  tagPoseRelativeToRobot.transformBy(
-                      branchTargetRelativeToTag.toTransform2d());
+                  tagPoseRelativeToRobot.transformBy(branchTargetRelativeToTag.toTransform2d());
 
               // Transform the branch target pose to be relative to the field
               Pose2d robotPose = RobotState.getInstance().getPose();

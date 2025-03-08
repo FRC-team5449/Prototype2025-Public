@@ -60,14 +60,14 @@ public class AprilTagVision extends SubsystemBase {
     for (CameraConfig camera : cameras) {
       this.cameras.put(camera.limelightName(), camera);
       // Configure each camera
-      LimelightHelpers.setCameraPose_RobotSpace(
-          camera.limelightName(),
-          camera.robotToCamera().getX(),
-          camera.robotToCamera().getY(),
-          camera.robotToCamera().getZ(),
-          camera.robotToCamera().getRotation().getX(),
-          camera.robotToCamera().getRotation().getY(),
-          camera.robotToCamera().getRotation().getZ());
+      // LimelightHelpers.setCameraPose_RobotSpace(
+      //     camera.limelightName(),
+      //     camera.robotToCamera().getX(),
+      //     camera.robotToCamera().getY(),
+      //     camera.robotToCamera().getZ(),
+      //     camera.robotToCamera().getRotation().getX(),
+      //     camera.robotToCamera().getRotation().getY(),
+      //     camera.robotToCamera().getRotation().getZ());
     }
     limelightNames = this.cameras.keySet();
   }
@@ -124,7 +124,11 @@ public class AprilTagVision extends SubsystemBase {
     Matrix<N3, N1> stdDevs = calculateStdDevs(estimate, stdDevCoefficient);
 
     // TODO Which timestamp second is right
-    return Optional.of(new VisionObservation(estimate.pose, estimate.timestampSeconds, stdDevs));
+    return Optional.of(
+        new VisionObservation(
+            /*new Pose2d(estimate.pose.getTranslation(), new Rotation2d())*/ estimate.pose,
+            estimate.timestampSeconds,
+            stdDevs));
 
     // return Optional.of(
     //         new VisionObservation(
@@ -197,13 +201,13 @@ public class AprilTagVision extends SubsystemBase {
     // Get estimates from each camera
     for (CameraConfig camera : cameras.values()) {
       // Try MegaTag2 first
-      Optional<VisionObservation> megaTag2Estimate =
-          getMegaTag2Estimate(camera.limelightName(), camera.stdDevCoefficient());
-      if (megaTag2Estimate.isPresent()) {
-        observations.add(megaTag2Estimate.get());
-        Logger.recordOutput("Vision/Timestamp", megaTag2Estimate.get().timestamp());
-        continue;
-      }
+      // Optional<VisionObservation> megaTag2Estimate =
+      //     getMegaTag2Estimate(camera.limelightName(), camera.stdDevCoefficient());
+      // if (megaTag2Estimate.isPresent()) {
+      //   observations.add(megaTag2Estimate.get());
+      //   Logger.recordOutput("Vision/Timestamp", megaTag2Estimate.get().timestamp());
+      //   continue;
+      // }
 
       // Fallback to original MegaTag
       Optional<VisionObservation> megaTagEstimate =

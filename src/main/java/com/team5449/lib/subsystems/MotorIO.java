@@ -24,7 +24,6 @@ public interface MotorIO {
     public double appliedVolts = 0.0;
     public double currentStatorAmps = 0.0;
     public double currentSupplyAmps = 0.0;
-    public double slaveAppliedVolts = 0.0;
   }
 
   public default void updateInputs(MotorInputs inputs) {}

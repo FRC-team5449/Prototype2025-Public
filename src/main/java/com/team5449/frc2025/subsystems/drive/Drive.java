@@ -226,13 +226,17 @@ public class Drive extends SubsystemBase {
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
 
     // Consume vision measurements
-    RobotState.getInstance()
-        .consumeVisionObservation()
-        .ifPresent(
-            observation -> {
-              poseEstimator.addVisionMeasurement(
-                  observation.visionPose(), observation.timestamp(), observation.stdDevs());
-            });
+    // RobotState.getInstance()
+    //     .consumeVisionObservation()
+    //     .ifPresent(
+    //         observation -> {
+    //           poseEstimator.addVisionMeasurement(
+    //               new Pose2d(
+    //                   observation.visionPose().getTranslation(),
+    //                   RobotState.getInstance().getRotation()),
+    //               observation.timestamp(),
+    //               observation.stdDevs());
+    //         });
 
     // Update robot state with current pose
     RobotState.getInstance().updatePose(poseEstimator.getEstimatedPosition());
@@ -369,6 +373,10 @@ public class Drive extends SubsystemBase {
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+  }
+
+  public void setPosition(Pose2d pose) {
+    setPose(new Pose2d(pose.getTranslation(), rawGyroRotation));
   }
 
   public void setTargetPose(Pose2d pose) {

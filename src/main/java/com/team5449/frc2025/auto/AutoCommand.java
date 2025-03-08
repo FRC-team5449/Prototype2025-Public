@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
+import org.littletonrobotics.junction.Logger;
 
 @ExtensionMethod({GeomUtil.class})
 @RequiredArgsConstructor
@@ -339,12 +340,15 @@ public class AutoCommand {
                       + " branch");
             }),
 
-        // Create a command that continuously updates the target pose based on vision
-        Commands.run(
+        // Create a command that continuously updates the target pose based on vision (BAD CURSOR!
+        // We only need to update once)
+        Commands.runOnce(
             () -> {
               // Get the tag pose relative to the robot
               Optional<Pose3d> tagPoseRelativeToRobotOpt =
                   vision.getTagPoseRelativeToRobot(cameraName);
+
+              Logger.recordOutput("AutoAlign/isEmpty", tagPoseRelativeToRobotOpt.isEmpty());
 
               if (tagPoseRelativeToRobotOpt.isEmpty()) {
                 // If we can't see the tag, stop
@@ -353,7 +357,15 @@ public class AutoCommand {
               }
 
               // Convert the 3D pose to 2D
-              Pose2d tagPoseRelativeToRobot = tagPoseRelativeToRobotOpt.get().toPose2d();
+              // The Pose3d from Limelight uses a different coordinate system:
+              // X is left/right, Y is up/down, Z is forward/backward
+              // When converting to Pose2d, we need to use X and Z
+              Pose3d tagPose3d = tagPoseRelativeToRobotOpt.get();
+              Pose2d tagPoseRelativeToRobot = new Pose2d(
+                  tagPose3d.getZ(),  // Forward/backward becomes X in 2D
+                  -tagPose3d.getX(), // Left/right becomes Y in 2D (negated to match conventions)
+                  new Rotation2d(tagPose3d.getRotation().getZ())  // Use yaw for 2D rotation
+              );
 
               // Get the appropriate branch target pose relative to the tag
               Pose2d branchTargetRelativeToTag =
@@ -364,32 +376,32 @@ public class AutoCommand {
               // Transform the branch target pose to be relative to the robot
               Pose2d branchTargetRelativeToRobot =
                   tagPoseRelativeToRobot.transformBy(
-                      new Pose2d(
-                              branchTargetRelativeToTag.getTranslation(),
-                              branchTargetRelativeToTag.getRotation())
-                          .toTransform2d());
+                      branchTargetRelativeToTag.toTransform2d());
 
               // Transform the branch target pose to be relative to the field
               Pose2d robotPose = RobotState.getInstance().getPose();
               Pose2d branchTargetPoseField =
                   robotPose.transformBy(branchTargetRelativeToRobot.toTransform2d());
 
+              System.out.println("Branch target field pose: " + branchTargetPoseField);
+              Logger.recordOutput("Odometry/BranchTargetPose", branchTargetPoseField);
+
               // Set the target pose for the drive subsystem
               drive.setTargetPose(branchTargetPoseField);
             }),
 
         // Wait until we have a valid target pose
-        Commands.waitUntil(() -> drive.getTargetPose() != null),
+        // Commands.waitUntil(() -> drive.getTargetPose() != null),
 
-        // Use IDrive to drive to the target pose
-        iDrive
-            .until(
-                () -> {
-                  // Check if we're close enough to the target pose
-                  return drive.getTargetPose() != null
-                      && iDrive.withinTolerance(0.1, Rotation2d.fromDegrees(5.0));
-                })
-            .withTimeout(5.0), // Timeout to prevent getting stuck
+        // // Use IDrive to drive to the target pose
+        // iDrive
+        //     .until(
+        //         () -> {
+        //           // Check if we're close enough to the target pose
+        //           return drive.getTargetPose() != null
+        //               && iDrive.withinTolerance(0.1, Rotation2d.fromDegrees(5.0));
+        //         })
+        //     .withTimeout(5.0), // Timeout to prevent getting stuck
 
         // Stop when done
         Commands.runOnce(

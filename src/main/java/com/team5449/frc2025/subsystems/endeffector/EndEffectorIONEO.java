@@ -62,4 +62,10 @@ public class EndEffectorIONEO implements EndEffectorIO {
     rollerLeft.set(outputVolts);
     rollerRight.set(outputVolts);
   }
+
+  @Override
+  public void differentialOpenLoop(double leftOutput, double rightOutput) {
+    rollerLeft.set(leftOutput);
+    rollerRight.set(rightOutput);
+  }
 }

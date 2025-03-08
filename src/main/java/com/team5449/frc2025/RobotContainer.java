@@ -33,11 +33,14 @@ import com.team5449.frc2025.subsystems.elevator.ElevatorSubsystem.ElevatorState;
 import com.team5449.frc2025.subsystems.endeffector.EndEffectorIONEO;
 import com.team5449.frc2025.subsystems.endeffector.EndEffectorIOSim;
 import com.team5449.frc2025.subsystems.endeffector.EndEffectorSubsystem;
+import com.team5449.frc2025.subsystems.hopper.HopperConstants;
+import com.team5449.frc2025.subsystems.hopper.HopperSubsystem;
 import com.team5449.lib.subsystems.MotorIO;
 import com.team5449.lib.subsystems.SimTalonFXIO;
 import com.team5449.lib.subsystems.TalonFXIO;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -52,6 +55,9 @@ public class RobotContainer {
   private final ElevatorSubsystem elevator;
   private final EndEffectorSubsystem endEffector;
   private final ArmSubsystem arm;
+  private final HopperSubsystem hopper;
+
+  @SuppressWarnings("unused")
   private final ClimberSubsystem climber;
 
   @SuppressWarnings("unused")
@@ -67,7 +73,10 @@ public class RobotContainer {
   private final AutoFactory autoFactory;
 
   private final CommandPS5Controller driverGamepad = new CommandPS5Controller(0);
+
+  @SuppressWarnings("unused")
   private final CommandPS5Controller operatorGamepad = new CommandPS5Controller(1);
+
   // private final CommandPS5Controller operatorGamepad = new CommandPS5Controller(0);
 
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -97,8 +106,13 @@ public class RobotContainer {
 
         vision =
             new AprilTagVision(
-                new CameraConfig[] {new CameraConfig("limelight", new Transform3d(), 0)});
+                new CameraConfig[] {
+                  new CameraConfig(
+                      "limelight", new Transform3d(0.35, 0, 0.175, new Rotation3d(0, 15, 0)), 0.08)
+                });
         // vision = null;
+
+        hopper = new HopperSubsystem(new TalonFXIO(HopperConstants.kHopperConfig));
         break;
 
       case SIM:
@@ -121,6 +135,8 @@ public class RobotContainer {
         // cameraConfig1 = null;
         // cameraConfigs = null;
         vision = null;
+
+        hopper = new HopperSubsystem(new SimTalonFXIO(HopperConstants.kHopperConfig));
         break;
 
       default:
@@ -143,6 +159,8 @@ public class RobotContainer {
         // cameraConfig1 = null;
         // cameraConfigs = null;
         vision = null;
+
+        hopper = new HopperSubsystem(new MotorIO() {});
         break;
     }
 
@@ -230,17 +248,30 @@ public class RobotContainer {
                 () -> arm.setDesiredState(ArmState.SCORE),
                 () -> arm.setDesiredState(ArmState.IDLE)));
 
-    driverGamepad.L1().and(elevator::atGoal).whileTrue(endEffector.outtake());
+    driverGamepad
+        .L1()
+        .and(() -> !elevator.atGoal(ElevatorState.L1) && elevator.atGoal() && !elevator.isStowed())
+        .whileTrue(endEffector.outtake());
+
+    driverGamepad
+        .L1()
+        .and(() -> elevator.atGoal(ElevatorState.L1))
+        .whileTrue(endEffector.l1Outtake());
 
     // driverGamepad.L2().whileTrue(endEffector.reverse());
-    driverGamepad.L2().whileTrue(autoCommand.alignWithAprilTagAndRotation("limelight", 0.1, 0, 0));
+    driverGamepad.L2().onTrue(autoCommand.driveToBranchTarget("limelight", false));
+    // driverGamepad.L2().whileTrue(autoCommand.alignWithAprilTagAndRotation("limelight", 0.1, 0,
+    // 0));
 
     // operatorGamepad.pov(0).onTrue(climber.setState(ClimberState.IDLE));
     // operatorGamepad.pov(90).onTrue(climber.setState(ClimberState.ALIGN));
     // operatorGamepad.pov(180).onTrue(climber.setState(ClimberState.CLIMB));
 
-    // operatorGamepad.L1().whileTrue(climber.elevate());
-    // operatorGamepad.R1().whileTrue(climber.decline());
+    operatorGamepad.L1().whileTrue(climber.elevate());
+    operatorGamepad.R1().whileTrue(climber.decline());
+
+    operatorGamepad.L2().whileTrue(hopper.elevate());
+    operatorGamepad.R2().whileTrue(hopper.decline());
   }
 
   public void periodic() {

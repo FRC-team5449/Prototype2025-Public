@@ -192,13 +192,13 @@ public class AprilTagVision extends SubsystemBase {
     List<VisionObservation> observations = new ArrayList<>();
 
     // Update orientation for all cameras
-    updateRobotOrientation();
+    // updateRobotOrientation();
 
     // Get estimates from each camera
     for (CameraConfig camera : cameras.values()) {
       // Try MegaTag2 first
       Optional<VisionObservation> megaTag2Estimate =
-          getMegaTagEstimate(camera.limelightName(), camera.stdDevCoefficient());
+          getMegaTag2Estimate(camera.limelightName(), camera.stdDevCoefficient());
       if (megaTag2Estimate.isPresent()) {
         observations.add(megaTag2Estimate.get());
         Logger.recordOutput("Vision/Timestamp", megaTag2Estimate.get().timestamp());
@@ -325,13 +325,14 @@ public class AprilTagVision extends SubsystemBase {
   }
 
   public Optional<Pose3d> getTagPoseRelativeToRobot(String cameraName) {
-    LimelightHelpers.RawFiducial targetInfo = getTargetInfo(cameraName);
-    if (targetInfo == null) {
-      return Optional.empty();
-    }
+    // LimelightHelpers.RawFiducial targetInfo = getTargetInfo(cameraName);
+    // if (targetInfo == null) {
+    //   return Optional.empty();
+    // }
 
     // Get the target pose in robot space directly from Limelight
     double[] targetPose = LimelightHelpers.getTargetPose_RobotSpace(cameraName);
+    Logger.recordOutput("Target Pose", targetPose);
     if (targetPose.length < 6) {
       return Optional.empty();
     }
@@ -339,8 +340,8 @@ public class AprilTagVision extends SubsystemBase {
     return Optional.of(
         new Pose3d(
             targetPose[0],
-            targetPose[1],
             targetPose[2],
+            targetPose[1],
             new Rotation3d(targetPose[3], targetPose[4], targetPose[5])));
   }
 }

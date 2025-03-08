@@ -49,8 +49,6 @@ public class TalonFXIO implements MotorIO {
   private final StatusSignal<Current> currentStatorSignal;
   private final StatusSignal<Current> currentSupplySignal;
 
-  private final StatusSignal<Voltage> slaveVoltageSignal;
-
   private final Angle maxPosition;
   private final Angle minPosition;
 
@@ -83,16 +81,9 @@ public class TalonFXIO implements MotorIO {
     currentStatorSignal = talon.getStatorCurrent();
     currentSupplySignal = talon.getSupplyCurrent();
 
-    slaveVoltageSignal = talonSlave.getMotorVoltage();
-
     signals =
         new BaseStatusSignal[] {
-          positionSignal,
-          velocitySignal,
-          voltageSignal,
-          currentStatorSignal,
-          currentSupplySignal,
-          slaveVoltageSignal
+          positionSignal, velocitySignal, voltageSignal, currentStatorSignal, currentSupplySignal
         };
     tryUntilOk(5, () -> BaseStatusSignal.setUpdateFrequencyForAll(50.0, signals));
     tryUntilOk(5, () -> talon.optimizeBusUtilization());
@@ -110,7 +101,6 @@ public class TalonFXIO implements MotorIO {
     inputs.currentSupplyAmps = currentSupplySignal.getValueAsDouble();
     inputs.position = positionSignal.getValue();
     inputs.velocity = velocitySignal.getValue();
-    inputs.slaveAppliedVolts = slaveVoltageSignal.getValueAsDouble();
   }
 
   @Override

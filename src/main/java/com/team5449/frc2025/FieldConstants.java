@@ -10,6 +10,7 @@ package com.team5449.frc2025;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -56,6 +57,7 @@ public class FieldConstants {
   public static final int[] tagIds =
       DriverStation.getAlliance().get() == Alliance.Blue ? blueTagIds : redTagIds;
 
-  public static final Pose2d leftBranchTargetPoseRelativeToTag = new Pose2d();
-  public static final Pose2d rightBranchTargetPoseRelativeToTag = new Pose2d();
+  public static final Pose2d leftBranchTargetPoseRelativeToTag = new Pose2d(0, 0, Rotation2d.kZero);
+  public static final Pose2d rightBranchTargetPoseRelativeToTag =
+      new Pose2d(0, 0, Rotation2d.kZero);
 }

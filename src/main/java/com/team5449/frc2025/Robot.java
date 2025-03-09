@@ -9,6 +9,10 @@ package com.team5449.frc2025;
 
 import com.team5449.lib.thirdpartylibs.LimelightHelpers;
 import com.team5449.lib.util.AllianceFlipUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -50,8 +54,15 @@ public class Robot extends LoggedRobot {
     FieldConstants.initializeField();
     robotContainer = new RobotContainer();
 
-    LimelightHelpers.SetIMUMode("limelight", 1);
+    LimelightHelpers.SetIMUMode("limelight", 0);
     LimelightHelpers.SetRobotOrientation("limelight", FieldConstants.initialHeading, 0, 0, 0, 0, 0);
+
+    // TODO You must change this
+    RobotState.getInstance()
+        .setPose(
+            DriverStation.getAlliance().get() == Alliance.Red
+                ? new Pose2d()
+                : new Pose2d(0, 0, Rotation2d.k180deg));
   }
 
   @Override
@@ -77,7 +88,7 @@ public class Robot extends LoggedRobot {
       autonomousCommand.schedule();
     }
 
-    LimelightHelpers.SetIMUMode("limelight", 2);
+    // LimelightHelpers.SetIMUMode("limelight", 2);
   }
 
   @Override
@@ -92,7 +103,7 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-    LimelightHelpers.SetIMUMode("limelight", 2);
+    // LimelightHelpers.SetIMUMode("limelight", 2);
   }
 
   @Override

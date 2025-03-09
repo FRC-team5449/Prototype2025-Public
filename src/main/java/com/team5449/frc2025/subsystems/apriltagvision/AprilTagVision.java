@@ -13,6 +13,7 @@ import com.team5449.frc2025.Constants;
 import com.team5449.frc2025.FieldConstants;
 import com.team5449.frc2025.RobotState;
 import com.team5449.frc2025.RobotState.VisionObservation;
+import com.team5449.frc2025.subsystems.drive.Drive;
 import com.team5449.lib.thirdpartylibs.LimelightHelpers;
 import com.team5449.lib.thirdpartylibs.LimelightHelpers.PoseEstimate;
 import com.team5449.lib.util.AllianceFlipUtil;
@@ -42,11 +43,11 @@ public class AprilTagVision extends SubsystemBase {
       Math.hypot(Constants.botLength.in(Meters), Constants.botWidth.in(Meters)) / 2;
   // Tuning constants
   private static final double MIN_TAG_AREA = 0.1;
-  private static final double MAX_TAG_DISTANCE = 6.0;
+  private static final double MAX_TAG_DISTANCE = 1.0;
   private static final double XY_STD_DEV_COEFFICIENT = 0.05;
   private static final double THETA_STD_DEV_COEFFICIENT = 0.1;
   private static final double MIN_TAG_SPACING = 1.0;
-  private static final double MAX_TAG_TO_CAM_DISTANCE = 3;
+  private static final double MAX_TAG_TO_CAM_DISTANCE = 2;
 
   public record CameraConfig(
       String limelightName, Transform3d robotToCamera, double stdDevCoefficient) {}
@@ -67,7 +68,13 @@ public class AprilTagVision extends SubsystemBase {
   public void updateRobotOrientation() {
     for (String limelightName : limelightNames) {
       LimelightHelpers.SetRobotOrientation(
-          limelightName, RobotState.getInstance().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+          limelightName,
+          Drive.gyroRotation.getDegrees(),
+          Units.radiansToDegrees(RobotState.getInstance().getRobotSpeeds().omegaRadiansPerSecond),
+          0,
+          0,
+          0,
+          0);
     }
   }
 
@@ -202,7 +209,7 @@ public class AprilTagVision extends SubsystemBase {
 
       // Fallback to original MegaTag
       Optional<VisionObservation> megaTag2Estimate =
-          getMegaTag2Estimate(camera.limelightName(), camera.stdDevCoefficient());
+          getMegaTagEstimate(camera.limelightName(), camera.stdDevCoefficient());
       megaTag2Estimate.ifPresent(observations::add);
     }
 

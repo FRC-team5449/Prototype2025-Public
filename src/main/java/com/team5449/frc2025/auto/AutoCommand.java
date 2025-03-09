@@ -328,89 +328,75 @@ public class AutoCommand {
    * @return A command that drives to the branch target position
    */
   public Command driveToBranchTarget(String cameraName, boolean useLeftBranch) {
+    IDrive iDrive = new IDrive(drive);
     return Commands.sequence(
-        Commands.runOnce(
-            () -> {
-              long startTime = System.currentTimeMillis();
-              System.out.println(
-                  "Starting drive to branch target, using "
-                      + (useLeftBranch ? "left" : "right")
-                      + " branch");
-              System.out.println(
-                  "Time elapsed: " + (System.currentTimeMillis() - startTime) + "ms");
-            }),
-        Commands.runOnce(
-            () -> {
-              long startTime = System.currentTimeMillis();
-              // long stepTime = startTime;
+            Commands.runOnce(
+                () -> {
+                  long startTime = System.currentTimeMillis();
+                  // long stepTime = startTime;
 
-              IDrive iDrive = new IDrive(drive);
-              // System.out.println("iDrive constructed");
-              // System.out.println("Time elapsed: " + (System.currentTimeMillis() - stepTime) +
-              // "ms");
-              // stepTime = System.currentTimeMillis();
+                  // System.out.println("iDrive constructed");
+                  // System.out.println("Time elapsed: " + (System.currentTimeMillis() - stepTime) +
+                  // "ms");
+                  // stepTime = System.currentTimeMillis();
 
-              Integer tagID = vision.getTagId(cameraName).orElse(5449);
+                  Integer tagID = vision.getTagId(cameraName).orElse(5449);
 
-              // System.out.println("tagID fetched!");
-              // System.out.println("Time elapsed: " + (System.currentTimeMillis() - stepTime) +
-              // "ms");
-              // stepTime = System.currentTimeMillis();
+                  // System.out.println("tagID fetched!");
+                  // System.out.println("Time elapsed: " + (System.currentTimeMillis() - stepTime) +
+                  // "ms");
+                  // stepTime = System.currentTimeMillis();
 
-              if (tagID == 5449) {
-                System.out.println("Invalid or no tag detected");
-                return; // invalid or no tag
-              }
+                  if (tagID == 5449) {
+                    System.out.println("Invalid or no tag detected");
+                    return; // invalid or no tag
+                  }
 
-              // // If we are red alliance but the tag is blue
-              // if (AllianceFlipUtil.shouldFlip() == true
-              //     && Arrays.stream(FieldConstants.blueTagIds).anyMatch(x -> x == tagID)) {
-              //   System.out.println("Red alliance detected blue tag - returning");
-              //   System.out.println(
-              //       "Total time elapsed: " + (System.currentTimeMillis() - startTime) + "ms");
-              //   return;
-              // }
+                  // // If we are red alliance but the tag is blue
+                  // if (AllianceFlipUtil.shouldFlip() == true
+                  //     && Arrays.stream(FieldConstants.blueTagIds).anyMatch(x -> x == tagID)) {
+                  //   System.out.println("Red alliance detected blue tag - returning");
+                  //   System.out.println(
+                  //       "Total time elapsed: " + (System.currentTimeMillis() - startTime) +
+                  // "ms");
+                  //   return;
+                  // }
 
-              // // If we are blue alliance but the tag is red
-              // if (AllianceFlipUtil.shouldFlip() == false
-              //     && Arrays.stream(FieldConstants.redTagIds).anyMatch(x -> x == tagID)) {
-              //   System.out.println("Blue alliance detected red tag - returning");
-              //   System.out.println(
-              //       "Total time elapsed: " + (System.currentTimeMillis() - startTime) + "ms");
-              //   return;
-              // }
+                  // // If we are blue alliance but the tag is red
+                  // if (AllianceFlipUtil.shouldFlip() == false
+                  //     && Arrays.stream(FieldConstants.redTagIds).anyMatch(x -> x == tagID)) {
+                  //   System.out.println("Blue alliance detected red tag - returning");
+                  //   System.out.println(
+                  //       "Total time elapsed: " + (System.currentTimeMillis() - startTime) +
+                  // "ms");
+                  //   return;
+                  // }
 
-              // System.out.println("filtering done!");
-              // System.out.println("Time elapsed: " + (System.currentTimeMillis() - stepTime) +
-              // "ms");
-              // stepTime = System.currentTimeMillis();
-              // System.out.println("TagID: " + tagID);
-              // System.out.println("redcenter" + FieldConstants.redCenterFaces);
+                  // System.out.println("filtering done!");
+                  // System.out.println("Time elapsed: " + (System.currentTimeMillis() - stepTime) +
+                  // "ms");
+                  // stepTime = System.currentTimeMillis();
+                  // System.out.println("TagID: " + tagID);
+                  // System.out.println("redcenter" + FieldConstants.redCenterFaces);
 
-              Pose2d tagPose =
-                  AllianceFlipUtil.shouldFlip()
-                      ? FieldConstants.redCenterFaces.get(tagID)
-                      : FieldConstants.blueCenterFaces.get(tagID);
+                  Pose2d tagPose =
+                      AllianceFlipUtil.shouldFlip()
+                          ? FieldConstants.redCenterFaces.get(tagID)
+                          : FieldConstants.blueCenterFaces.get(tagID);
 
-              System.out.println("tagpose" + tagPose);
-              Transform2d transformer =
-                  useLeftBranch
-                      ? FieldConstants.leftBranchTargetPoseRelativeToTag
-                      : FieldConstants.rightBranchTargetPoseRelativeToTag;
+                  Transform2d transformer =
+                      useLeftBranch
+                          ? FieldConstants.leftBranchTargetPoseRelativeToTag
+                          : FieldConstants.rightBranchTargetPoseRelativeToTag;
 
-              System.out.println("transformer created!");
-              Pose2d branchPose =
-                  tagPose
-                      .transformBy(transformer)
-                      .transformBy(new Transform2d(0, 0, Rotation2d.k180deg));
-
-              System.out.println("branchPose transformed!");
-
-              drive.setTargetPose(branchPose);
-              System.out.println("Target pose set");
-              System.out.println(
-                  "Total time elapsed: " + (System.currentTimeMillis() - startTime) + "ms");
-            }));
+                  Pose2d branchPose =
+                      tagPose
+                          .transformBy(transformer)
+                          .transformBy(new Transform2d(0, 0, Rotation2d.k180deg));
+                  drive.setTargetPose(branchPose);
+                }),
+            iDrive)
+        .until(iDrive::atGoal);
     // return Commands.sequence(
     //     // First, check if we can see the tag
     //     Commands.runOnce(

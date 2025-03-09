@@ -265,11 +265,11 @@ public class RobotContainer {
     // operatorGamepad.pov(90).onTrue(climber.setState(ClimberState.ALIGN));
     // operatorGamepad.pov(180).onTrue(climber.setState(ClimberState.CLIMB));
 
-    operatorGamepad.L1().whileTrue(climber.elevate());
-    operatorGamepad.R1().whileTrue(climber.decline());
+    // operatorGamepad.L1().whileTrue(climber.elevate());
+    // operatorGamepad.R1().whileTrue(climber.decline());
 
-    operatorGamepad.L2().whileTrue(hopper.elevate());
-    operatorGamepad.R2().whileTrue(hopper.decline());
+    // operatorGamepad.L2().whileTrue(hopper.elevate());
+    // operatorGamepad.R2().whileTrue(hopper.decline());
   }
 
   public void periodic() {

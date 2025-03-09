@@ -238,6 +238,11 @@ public class IDrive extends Command {
     Logger.recordOutput("IDrive/Goal", new Pose2d[] {});
   }
 
+  //   @Override
+  //   public boolean isFinished() {
+  //     return atGoal();
+  //   }
+
   /** Checks if the robot is stopped at the final pose. */
   public boolean atGoal() {
     return running && driveController.atGoal() && thetaController.atGoal();

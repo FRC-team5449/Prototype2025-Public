@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BooleanSupplier;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 
@@ -329,7 +330,8 @@ public class AutoCommand {
    *     (false)
    * @return A command that drives to the branch target position
    */
-  public Command driveToBranchTarget(String cameraName, boolean useLeftBranch) {
+  public Command driveToBranchTarget(
+      String cameraName, boolean useLeftBranch, BooleanSupplier useLevel4) {
     IDrive iDrive = new IDrive(drive);
     AtomicBoolean targetPoseExist = new AtomicBoolean(false);
     return Commands.sequence(
@@ -359,8 +361,12 @@ public class AutoCommand {
 
                   Transform2d transformer =
                       useLeftBranch
-                          ? FieldConstants.leftBranchTargetPoseRelativeToTag
-                          : FieldConstants.rightBranchTargetPoseRelativeToTag;
+                          ? useLevel4.getAsBoolean()
+                              ? FieldConstants.leftBranchTargetPoseRelativeToTagL4
+                              : FieldConstants.leftBranchTargetPoseRelativeToTag
+                          : useLevel4.getAsBoolean()
+                              ? FieldConstants.rightBranchTargetPoseRelativeToTagL4
+                              : FieldConstants.rightBranchTargetPoseRelativeToTag;
 
                   Pose2d branchPose =
                       tagPose
@@ -385,19 +391,19 @@ public class AutoCommand {
    * @param targetYaw The desired yaw angle relative to the AprilTag (degrees)
    * @return A command that drives to the branch target position and then aligns with the tag
    */
-  public Command driveToBranchTargetAndAlign(
-      String cameraName,
-      boolean useLeftBranch,
-      double targetLongitudinalDistance,
-      double targetLateralDistance,
-      double targetYaw) {
+  // public Command driveToBranchTargetAndAlign(
+  //     String cameraName,
+  //     boolean useLeftBranch,
+  //     double targetLongitudinalDistance,
+  //     double targetLateralDistance,
+  //     double targetYaw) {
 
-    return Commands.sequence(
-        // First drive to the branch target
-        driveToBranchTarget(cameraName, useLeftBranch),
+  //   return Commands.sequence(
+  //       // First drive to the branch target
+  //       driveToBranchTarget(cameraName, useLeftBranch),
 
-        // Then align with the tag
-        alignWithAprilTagAndRotation(
-            cameraName, targetLongitudinalDistance, targetLateralDistance, targetYaw));
-  }
+  //       // Then align with the tag
+  //       alignWithAprilTagAndRotation(
+  //           cameraName, targetLongitudinalDistance, targetLateralDistance, targetYaw));
+  // }
 }

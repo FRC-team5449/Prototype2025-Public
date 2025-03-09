@@ -42,7 +42,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -59,27 +61,25 @@ public class RobotContainer {
   private final ArmSubsystem arm;
   private final HopperSubsystem hopper;
 
-  @SuppressWarnings("unused")
   private final ClimberSubsystem climber;
 
-  @SuppressWarnings("unused")
   private final AprilTagVision vision;
 
   //   private final CameraConfig cameraConfig1;
 
   //   private final CameraConfig[] cameraConfigs;
 
-  @SuppressWarnings("unused")
   private final RobotState robotState = RobotState.getInstance();
 
   private final AutoFactory autoFactory;
 
   private final CommandPS5Controller driverGamepad = new CommandPS5Controller(0);
 
-  @SuppressWarnings("unused")
   private final CommandPS5Controller operatorGamepad = new CommandPS5Controller(1);
 
   // private final CommandPS5Controller operatorGamepad = new CommandPS5Controller(0);
+
+  private boolean useLevel4 = true;
 
   private final LoggedDashboardChooser<Command> autoChooser;
 
@@ -254,11 +254,13 @@ public class RobotContainer {
     driverGamepad
         .L2()
         .and(elevator::isStowed)
-        .onTrue(autoCommand.driveToBranchTarget("limelight", true));
+        .onTrue(autoCommand.driveToBranchTarget("limelight", true, () -> useLevel4));
     driverGamepad
         .R2()
         .and(elevator::isStowed)
-        .onTrue(autoCommand.driveToBranchTarget("limelight", false));
+        .onTrue(autoCommand.driveToBranchTarget("limelight", false, () -> useLevel4));
+
+    driverGamepad.options().onTrue(Commands.runOnce(() -> useLevel4 = !useLevel4));
     // driverGamepad.L2().whileTrue(autoCommand.alignWithAprilTagAndRotation("limelight", 0.1, 0,
     // 0));
 
@@ -280,12 +282,20 @@ public class RobotContainer {
         elevator.setState(state));
   }
 
+  public Command controllerRumbleCommand() {
+    return Commands.startEnd(
+        () -> driverGamepad.getHID().setRumble(RumbleType.kBothRumble, 1.0),
+        () -> driverGamepad.getHID().setRumble(RumbleType.kBothRumble, 0.0));
+  }
+
   public void periodic() {
     if (elevator.getDesiredState() == ElevatorState.L4) {
       drive.setSlowMode(true);
     } else {
       drive.setSlowMode(false);
     }
+
+    SmartDashboard.putBoolean("L4 Now", useLevel4);
   }
 
   public Command getAutonomousCommand() {

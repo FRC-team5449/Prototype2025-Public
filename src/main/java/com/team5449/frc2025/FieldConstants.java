@@ -35,7 +35,7 @@ public class FieldConstants {
   public static final int[] blueTagIds = {17, 18, 19, 20, 21, 22};
   public static final int[] redTagIds = {6, 7, 8, 9, 10, 11};
 
-  static {
+  public static void initializeField() {
     blueCenterFaces.put(17, tagLayout.getTagPose(17).get().toPose2d());
     blueCenterFaces.put(18, tagLayout.getTagPose(18).get().toPose2d());
     blueCenterFaces.put(19, tagLayout.getTagPose(19).get().toPose2d());
@@ -60,8 +60,11 @@ public class FieldConstants {
   public static final int[] tagIds =
       DriverStation.getAlliance().get() == Alliance.Blue ? blueTagIds : redTagIds;
 
+  public static final double initialHeading =
+      DriverStation.getAlliance().get() == Alliance.Red ? 0 : 180;
+
   public static final Transform2d leftBranchTargetPoseRelativeToTag =
-      new Transform2d(1, 0, Rotation2d.kZero);
+      new Transform2d(0.56, -0.165, Rotation2d.kZero);
   public static final Transform2d rightBranchTargetPoseRelativeToTag =
-      new Transform2d(1, 0, Rotation2d.kZero);
+      new Transform2d(0.56, 0.165, Rotation2d.kZero);
 }

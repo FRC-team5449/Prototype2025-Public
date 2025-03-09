@@ -22,7 +22,7 @@ import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class ArmSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, MotorIO> {
-  @Setter @Getter private ArmState desiredState = ArmState.IDLE;
+  @Setter @Getter private ArmState desiredState = ArmState.INTAKE;
 
   public ArmSubsystem(final MotorIO io) {
     super(ArmConstants.kArmConfig, new MotorInputsAutoLogged(), io);

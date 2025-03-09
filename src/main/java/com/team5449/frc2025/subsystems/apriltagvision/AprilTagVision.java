@@ -59,15 +59,6 @@ public class AprilTagVision extends SubsystemBase {
     this.cameras = new HashMap<>();
     for (CameraConfig camera : cameras) {
       this.cameras.put(camera.limelightName(), camera);
-      // Configure each camera
-      // LimelightHelpers.setCameraPose_RobotSpace(
-      //     camera.limelightName(),
-      //     camera.robotToCamera().getX(),
-      //     camera.robotToCamera().getY(),
-      //     camera.robotToCamera().getZ(),
-      //     camera.robotToCamera().getRotation().getX(),
-      //     camera.robotToCamera().getRotation().getY(),
-      //     camera.robotToCamera().getRotation().getZ());
     }
     limelightNames = this.cameras.keySet();
   }
@@ -196,7 +187,7 @@ public class AprilTagVision extends SubsystemBase {
     List<VisionObservation> observations = new ArrayList<>();
 
     // Update orientation for all cameras
-    updateRobotOrientation();
+    // updateRobotOrientation();
 
     // Get estimates from each camera
     for (CameraConfig camera : cameras.values()) {

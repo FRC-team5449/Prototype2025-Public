@@ -112,7 +112,6 @@ public class RobotContainer {
                   new CameraConfig(
                       "limelight", new Transform3d(0.35, 0, 0.175, new Rotation3d(0, 15, 0)), 0.08)
                 });
-        // vision = null;
 
         hopper = new HopperSubsystem(new TalonFXIO(HopperConstants.kHopperConfig));
         break;
@@ -175,10 +174,6 @@ public class RobotContainer {
     autoChooser.addOption("Auto Try", autoFactory.autoPathTry());
     autoChooser.addOption("test", new PathPlannerAuto("New Auto"));
     autoChooser.addOption("mid", autoFactory.poor());
-    // File autoDir = new File("/deploy/pathplanner/autos");
-    // for (File file : autoDir.listFiles()) {
-    //   autoChooser.addOption(file.getName(), new PathPlannerAuto(file.getName()));
-    // }
     configureBindings();
   }
 
@@ -214,13 +209,13 @@ public class RobotContainer {
 
     // driverGamepad.cross().whileTrue(AutoCommand)
 
-    driverGamepad.pov(0).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L4));
+    driverGamepad.pov(0).onTrue(setElevatorState(ElevatorState.L4));
 
-    driverGamepad.pov(90).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L3));
+    driverGamepad.pov(90).onTrue(setElevatorState(ElevatorState.L3));
 
-    driverGamepad.pov(180).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L1));
+    driverGamepad.pov(180).onTrue(setElevatorState(ElevatorState.L1));
 
-    driverGamepad.pov(270).and(() -> !arm.intaking()).onTrue(elevator.setState(ElevatorState.L2));
+    driverGamepad.pov(270).onTrue(setElevatorState(ElevatorState.L2));
 
     driverGamepad
         .R1()
@@ -229,8 +224,7 @@ public class RobotContainer {
                 .setState(ElevatorState.IDLE)
                 .alongWith(
                     Commands.waitUntil(elevator::isStowed)
-                        .andThen(arm.setStateCommand(ArmState.INTAKE).onlyIf(driverGamepad.R1()))))
-        .onFalse(arm.setStateCommand(ArmState.IDLE))
+                        .andThen(arm.setStateCommand(ArmState.INTAKE))))
         .and(arm::intaking)
         .whileTrue(endEffector.intake());
 
@@ -257,7 +251,14 @@ public class RobotContainer {
         .whileTrue(endEffector.l1Outtake());
 
     // driverGamepad.L2().whileTrue(endEffector.reverse());
-    driverGamepad.L2().onTrue(autoCommand.driveToBranchTarget("limelight", false));
+    driverGamepad
+        .L2()
+        .and(elevator::isStowed)
+        .onTrue(autoCommand.driveToBranchTarget("limelight", true));
+    driverGamepad
+        .R2()
+        .and(elevator::isStowed)
+        .onTrue(autoCommand.driveToBranchTarget("limelight", false));
     // driverGamepad.L2().whileTrue(autoCommand.alignWithAprilTagAndRotation("limelight", 0.1, 0,
     // 0));
 
@@ -270,6 +271,13 @@ public class RobotContainer {
 
     // operatorGamepad.L2().whileTrue(hopper.elevate());
     // operatorGamepad.R2().whileTrue(hopper.decline());
+  }
+
+  public Command setElevatorState(ElevatorState state) {
+    return Commands.sequence(
+        arm.setStateCommand(ArmState.IDLE),
+        Commands.waitUntil(() -> arm.atGoal(ArmState.IDLE)),
+        elevator.setState(state));
   }
 
   public void periodic() {

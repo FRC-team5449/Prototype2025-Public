@@ -7,6 +7,7 @@
 
 package com.team5449.frc2025;
 
+import com.team5449.lib.thirdpartylibs.LimelightHelpers;
 import com.team5449.lib.util.AllianceFlipUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -46,7 +47,11 @@ public class Robot extends LoggedRobot {
 
     // Start AdvantageKit logger
     Logger.start();
+    FieldConstants.initializeField();
     robotContainer = new RobotContainer();
+
+    LimelightHelpers.SetIMUMode("limelight", 1);
+    LimelightHelpers.SetRobotOrientation("limelight", FieldConstants.initialHeading, 0, 0, 0, 0, 0);
   }
 
   @Override
@@ -70,6 +75,8 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.schedule();
     }
+
+    LimelightHelpers.SetIMUMode("limelight", 2);
   }
 
   @Override
@@ -84,6 +91,7 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+    LimelightHelpers.SetIMUMode("limelight", 2);
   }
 
   @Override

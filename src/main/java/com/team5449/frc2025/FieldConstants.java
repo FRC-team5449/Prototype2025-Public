@@ -20,6 +20,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+
+import com.team5449.lib.util.AllianceFlipUtil;
 
 public class FieldConstants {
   public static final AprilTagFieldLayout tagLayout =
@@ -31,9 +35,15 @@ public class FieldConstants {
   public static final Translation2d center =
       new Translation2d(Units.inchesToMeters(176.746), tagLayout.getFieldWidth() / 2.0);
 
+      public static final Translation2d blueReefCenter=new Translation2d();
+      public static final Translation2d redReefCenter=new Translation2d();
+
   public static final Map<Integer, Pose2d> blueCenterFaces =
       new HashMap<>(); // Starting facing the driver station in clockwise order
   public static final Map<Integer, Pose2d> redCenterFaces = new HashMap<>();
+
+    public static final Map<Integer,Integer> blueNumToTag=new HashMap<>();
+    public static final Map<Integer,Integer> redNumToTag=new HashMap<>();
 
   public static final int[] blueTagIds = {17, 18, 19, 20, 21, 22};
   public static final int[] redTagIds = {6, 7, 8, 9, 10, 11};
@@ -52,6 +62,20 @@ public class FieldConstants {
     redCenterFaces.put(9, tagLayout.getTagPose(9).get().toPose2d());
     redCenterFaces.put(10, tagLayout.getTagPose(10).get().toPose2d());
     redCenterFaces.put(11, tagLayout.getTagPose(11).get().toPose2d());
+
+    blueNumToTag.put(0, 7);
+    blueNumToTag.put(1, 8);
+    blueNumToTag.put(2, 9);
+    blueNumToTag.put(3, 10);
+    blueNumToTag.put(4, 11);
+    blueNumToTag.put(5, 6);
+
+    redNumToTag.put(0,21);
+    redNumToTag.put(1,20);
+    redNumToTag.put(2,19);
+    redNumToTag.put(3,18);
+    redNumToTag.put(4,17);
+    redNumToTag.put(5,22);
   }
 
   public static final List<Pose2d> targetPoses =
@@ -75,4 +99,10 @@ public class FieldConstants {
       new Transform2d(0.5, -0.165, Rotation2d.kZero);
   public static final Transform2d rightBranchTargetPoseRelativeToTag =
       new Transform2d(0.5, 0.165, Rotation2d.kZero);
+
+    public static Optional<Pose2d> getReefTagPose(Translation2d botPosition){
+        Translation2d dist=botPosition.minus(AllianceFlipUtil.shouldFlip()?redReefCenter:blueReefCenter);
+        if(dist.getNorm()>4) return Optional.empty();
+        return Optional.of((AllianceFlipUtil.shouldFlip()?redCenterFaces:blueCenterFaces).get((AllianceFlipUtil.shouldFlip()?redNumToTag:blueNumToTag).get((int) Math.floor((dist.getAngle().getDegrees()+30)/60))));
+    }
 }

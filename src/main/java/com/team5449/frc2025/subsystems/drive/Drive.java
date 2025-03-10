@@ -268,7 +268,7 @@ public class Drive extends SubsystemBase {
 
     SwerveModuleState[] setpointStates = previousSetpoint.moduleStates();
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        setpointStates, TunerConstants.kLinearSpeedAt12Volts);
+        setpointStates, TunerConstants.kLinearSpeedDesaturate);
 
     // Log unoptimized setpoints and setpoint speeds
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);

@@ -11,7 +11,6 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.team5449.frc2025.auto.AutoCommand;
 import com.team5449.frc2025.auto.AutoFactory;
 import com.team5449.frc2025.commands.DriveCommands;
-import com.team5449.frc2025.commands.IDrive;
 import com.team5449.frc2025.subsystems.apriltagvision.AprilTagVision;
 import com.team5449.frc2025.subsystems.apriltagvision.AprilTagVision.CameraConfig;
 import com.team5449.frc2025.subsystems.arm.ArmSimTalonIO;
@@ -36,10 +35,10 @@ import com.team5449.frc2025.subsystems.endeffector.EndEffectorIOSim;
 import com.team5449.frc2025.subsystems.endeffector.EndEffectorSubsystem;
 import com.team5449.frc2025.subsystems.hopper.HopperConstants;
 import com.team5449.frc2025.subsystems.hopper.HopperSubsystem;
+import com.team5449.frc2025.subsystems.hopper.HopperSubsystem.HopperState;
 import com.team5449.lib.subsystems.MotorIO;
 import com.team5449.lib.subsystems.SimTalonFXIO;
 import com.team5449.lib.subsystems.TalonFXIO;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -196,21 +195,6 @@ public class RobotContainer {
                 () -> -driverGamepad.getLeftX() * flip,
                 Rotation2d::new));
 
-    // Reset gyro to 0 when triangle is pressed
-    driverGamepad.square().whileTrue(new IDrive(drive));
-
-    driverGamepad
-        .triangle()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                    drive)
-                .ignoringDisable(true));
-
-    // driverGamepad.cross().whileTrue(AutoCommand)
-
     driverGamepad.pov(0).onTrue(setElevatorState(ElevatorState.L4));
 
     driverGamepad.pov(90).onTrue(setElevatorState(ElevatorState.L3));
@@ -264,18 +248,28 @@ public class RobotContainer {
         .onTrue(autoCommand.driveToBranchTarget("limelight", false, () -> useLevel4));
 
     driverGamepad.options().onTrue(Commands.runOnce(() -> useLevel4 = !useLevel4));
-    // driverGamepad.L2().whileTrue(autoCommand.alignWithAprilTagAndRotation("limelight", 0.1, 0,
-    // 0));
 
-    operatorGamepad.pov(0).onTrue(climber.setState(ClimberState.IDLE));
-    operatorGamepad.pov(90).onTrue(climber.setState(ClimberState.ALIGN));
-    operatorGamepad.pov(180).onTrue(climber.setState(ClimberState.CLIMB));
 
-    operatorGamepad.L1().whileTrue(climber.elevate());
-    operatorGamepad.R1().whileTrue(climber.decline());
+    driverGamepad
+        .triangle()
+        .and(() -> elevator.isStowed() && climber.atGoal(ClimberState.IDLE))
+        .onTrue(climber.setStateOk(ClimberState.ALIGN).andThen(hopper.setState(HopperState.FOLD)));
 
-    operatorGamepad.L2().whileTrue(hopper.elevate());
-    operatorGamepad.R2().whileTrue(hopper.decline());
+    driverGamepad
+        .triangle()
+        .and(() -> elevator.isStowed() && climber.atGoal(ClimberState.ALIGN))
+        .onTrue(climber.setState(ClimberState.IDLE));
+
+    driverGamepad
+        .cross()
+        .and(() -> elevator.isStowed() && hopper.atGoal(HopperState.FOLD))
+        .onTrue(
+            Commands.either(
+                    climber.setStateOk(ClimberState.ALIGN),
+                    Commands.none(),
+                    () -> climber.atGoal(ClimberState.IDLE))
+                .andThen(
+                    hopper.setStateOk(HopperState.INTAKE), climber.setState(ClimberState.IDLE)));
   }
 
   public Command setElevatorState(ElevatorState state) {

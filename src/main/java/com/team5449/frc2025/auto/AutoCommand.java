@@ -337,22 +337,23 @@ public class AutoCommand {
     return Commands.sequence(
             Commands.runOnce(
                 () -> {
-                  // Integer tagID = vision.getTagId(cameraName).orElse(5449);
+                  Integer tagID = vision.getTagId(cameraName).orElse(5449);
 
-                  // if (tagID == 5449) {
-                  //   System.out.println("Invalid or no tag detected");
-                  //   drive.setTargetPose(null);
-                  //   targetPoseExist.set(false);
-                  //   return;
-                  // }
+                  if (tagID == 5449) {
+                    System.out.println("Invalid or no tag detected");
+                    drive.setTargetPose(null);
+                    targetPoseExist.set(false);
+                    return;
+                  }
 
-                  // Pose2d tagPose =
-                  //     DriverStation.getAlliance().get() == Alliance.Red
-                  //         ? FieldConstants.redCenterFaces.get(tagID)
-                  //         : FieldConstants.blueCenterFaces.get(tagID);
-                  Optional<Pose2d> tagPose=FieldConstants.getReefTagPose(drive.getPose().getTranslation());
+                  Pose2d tagPose =
+                      DriverStation.getAlliance().get() == Alliance.Red
+                          ? FieldConstants.redCenterFaces.get(tagID)
+                          : FieldConstants.blueCenterFaces.get(tagID);
+                  // Optional<Pose2d>
+                  // tagPose=FieldConstants.getReefTagPose(drive.getPose().getTranslation());
 
-                  if (tagPose.isEmpty()) {
+                  if (tagPose == null) {
                     drive.setTargetPose(null);
                     targetPoseExist.set(false);
                     return;
@@ -370,12 +371,12 @@ public class AutoCommand {
                               : FieldConstants.rightBranchTargetPoseRelativeToTag;
 
                   Pose2d branchPose =
-                      tagPose.get()
+                      tagPose
                           .transformBy(transformer)
                           .transformBy(new Transform2d(0, 0, Rotation2d.k180deg));
                   drive.setTargetPose(branchPose);
                 })
-            /*,Commands.either(iDrive, Commands.none(), () -> targetPoseExist.get())*/)
+            /*,Commands.either(iDrive, Commands.none(), () -> targetPoseExist.get())*/ )
         .until(() -> !targetPoseExist.get() || iDrive.atGoal());
   }
 }

@@ -76,6 +76,7 @@ public class AprilTagVision extends SubsystemBase {
           0);
     }
   }
+
   @SuppressWarnings("unused")
   private Optional<VisionObservation> getMegaTag2Estimate(
       String cameraName, double stdDevCoefficient) {
@@ -89,6 +90,7 @@ public class AprilTagVision extends SubsystemBase {
 
     return processEstimate(poseEstimate, stdDevCoefficient);
   }
+
   @SuppressWarnings("unused")
   private Optional<VisionObservation> getMegaTagEstimate(
       String cameraName, double stdDevCoefficient) {

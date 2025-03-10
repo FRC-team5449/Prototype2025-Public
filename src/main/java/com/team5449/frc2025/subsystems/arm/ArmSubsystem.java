@@ -33,7 +33,7 @@ public class ArmSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, Mot
     return desiredState.goalSetpoint.getAsDouble();
   }
 
-  public Command setStateCommand(ArmState state) {
+  public Command setState(ArmState state) {
     return Commands.runOnce(() -> this.setDesiredState(state));
   }
 
@@ -48,6 +48,10 @@ public class ArmSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, Mot
 
   public boolean atGoal() {
     return atGoal(desiredState);
+  }
+
+  public Command setStateOk(ArmState state) {
+    return setState(state).andThen(Commands.waitUntil(this::atGoal));
   }
 
   public boolean atGoal(ArmState setState) {

@@ -16,7 +16,6 @@ import com.team5449.frc2025.RobotState.VisionObservation;
 import com.team5449.frc2025.subsystems.drive.Drive;
 import com.team5449.lib.thirdpartylibs.LimelightHelpers;
 import com.team5449.lib.thirdpartylibs.LimelightHelpers.PoseEstimate;
-import com.team5449.lib.util.AllianceFlipUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -37,8 +36,8 @@ import java.util.Set;
 import org.littletonrobotics.junction.Logger;
 
 public class AprilTagVision extends SubsystemBase {
-  private static final double FIELD_LENGTH_METERS = AllianceFlipUtil.fieldLength;
-  private static final double FIELD_WIDTH_METERS = AllianceFlipUtil.fieldWidth;
+  private static final double FIELD_LENGTH_METERS = FieldConstants.fieldLength;
+  private static final double FIELD_WIDTH_METERS = FieldConstants.fieldWidth;
   private static final double BOT_RADIUS =
       Math.hypot(Constants.botLength.in(Meters), Constants.botWidth.in(Meters)) / 2;
   // Tuning constants

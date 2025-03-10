@@ -20,6 +20,7 @@ import com.team5449.frc2025.subsystems.arm.ArmSubsystem.ArmState;
 import com.team5449.frc2025.subsystems.arm.ArmTalonIO;
 import com.team5449.frc2025.subsystems.climber.ClimberConstants;
 import com.team5449.frc2025.subsystems.climber.ClimberSubsystem;
+import com.team5449.frc2025.subsystems.climber.ClimberSubsystem.ClimberState;
 import com.team5449.frc2025.subsystems.drive.Drive;
 import com.team5449.frc2025.subsystems.drive.GyroIO;
 import com.team5449.frc2025.subsystems.drive.GyroIOPigeon2;
@@ -165,8 +166,9 @@ public class RobotContainer {
         break;
     }
 
-    autoFactory = new AutoFactory(drive, elevator, arm, endEffector);
     autoCommand = new AutoCommand(drive, elevator, arm, endEffector, vision);
+
+    autoFactory = new AutoFactory(drive, elevator, arm, endEffector, autoCommand);
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", new SendableChooser<Command>());
     autoChooser.addDefaultOption("None", Commands.none());
@@ -223,8 +225,7 @@ public class RobotContainer {
             elevator
                 .setState(ElevatorState.IDLE)
                 .alongWith(
-                    Commands.waitUntil(elevator::isStowed)
-                        .andThen(arm.setStateCommand(ArmState.INTAKE))))
+                    Commands.waitUntil(elevator::isStowed).andThen(arm.setState(ArmState.INTAKE))))
         .and(arm::intaking)
         .whileTrue(endEffector.intake());
 
@@ -245,6 +246,8 @@ public class RobotContainer {
         .and(() -> !elevator.atGoal(ElevatorState.L1) && elevator.atGoal() && !elevator.isStowed())
         .whileTrue(endEffector.outtake());
 
+    driverGamepad.L1().and(elevator::isStowed).whileTrue(endEffector.outtake());
+
     driverGamepad
         .L1()
         .and(() -> elevator.atGoal(ElevatorState.L1))
@@ -264,20 +267,20 @@ public class RobotContainer {
     // driverGamepad.L2().whileTrue(autoCommand.alignWithAprilTagAndRotation("limelight", 0.1, 0,
     // 0));
 
-    // operatorGamepad.pov(0).onTrue(climber.setState(ClimberState.IDLE));
-    // operatorGamepad.pov(90).onTrue(climber.setState(ClimberState.ALIGN));
-    // operatorGamepad.pov(180).onTrue(climber.setState(ClimberState.CLIMB));
+    operatorGamepad.pov(0).onTrue(climber.setState(ClimberState.IDLE));
+    operatorGamepad.pov(90).onTrue(climber.setState(ClimberState.ALIGN));
+    operatorGamepad.pov(180).onTrue(climber.setState(ClimberState.CLIMB));
 
-    // operatorGamepad.L1().whileTrue(climber.elevate());
-    // operatorGamepad.R1().whileTrue(climber.decline());
+    operatorGamepad.L1().whileTrue(climber.elevate());
+    operatorGamepad.R1().whileTrue(climber.decline());
 
-    // operatorGamepad.L2().whileTrue(hopper.elevate());
-    // operatorGamepad.R2().whileTrue(hopper.decline());
+    operatorGamepad.L2().whileTrue(hopper.elevate());
+    operatorGamepad.R2().whileTrue(hopper.decline());
   }
 
   public Command setElevatorState(ElevatorState state) {
     return Commands.sequence(
-        arm.setStateCommand(ArmState.IDLE),
+        arm.setState(ArmState.IDLE),
         Commands.waitUntil(() -> arm.atGoal(ArmState.IDLE)),
         elevator.setState(state));
   }

@@ -31,30 +31,6 @@
         {
           "type": "path",
           "data": {
-            "pathName": "sourceToReefJ"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "reefJToSource"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
             "pathName": "sourceToReefK"
           }
         },
@@ -68,6 +44,18 @@
           "type": "path",
           "data": {
             "pathName": "reefKToSource"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "sourceToReefL"
           }
         }
       ]

@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Amp;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.CANBus;
@@ -62,9 +63,9 @@ public class Drive extends SubsystemBase {
   static final Lock odometryLock = new ReentrantLock();
 
   // PathPlanner config constants
-  private static final double ROBOT_MASS_KG = 20;
-  private static final double ROBOT_MOI = 4.883;
-  private static final double WHEEL_COF = 1.2;
+  private static final double ROBOT_MASS_KG = 55;
+  private static final double ROBOT_MOI = 6;
+  private static final double WHEEL_COF = 1;
   private static final RobotConfig PP_CONFIG =
       new RobotConfig(
           ROBOT_MASS_KG,
@@ -144,7 +145,7 @@ public class Drive extends SubsystemBase {
         new PPHolonomicDriveController(
             new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5, 0.0, 0)),
         PP_CONFIG,
-        () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+        () -> DriverStation.getAlliance().get() == Alliance.Red,
         this);
     Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback(
@@ -163,7 +164,7 @@ public class Drive extends SubsystemBase {
             new SysIdRoutine.Config(
                 null,
                 null,
-                null,
+                Second.of(5),
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
@@ -234,6 +235,7 @@ public class Drive extends SubsystemBase {
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
 
+    // TODO Rotation always wrong
     RobotState.getInstance()
         .consumeVisionObservation()
         .ifPresent(

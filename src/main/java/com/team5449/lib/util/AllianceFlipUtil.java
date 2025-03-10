@@ -7,22 +7,20 @@
 
 package com.team5449.lib.util;
 
+import com.team5449.frc2025.FieldConstants;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public final class AllianceFlipUtil {
-  public static final double fieldWidth = Units.feetToMeters(26.0) + Units.inchesToMeters(5.0);
-  public static final double fieldLength = Units.feetToMeters(57.0) + Units.inchesToMeters(6.875);
 
   public static double applyX(double x) {
-    return shouldFlip() ? fieldLength - x : x;
+    return shouldFlip() ? FieldConstants.fieldLength - x : x;
   }
 
   public static double applyY(double y) {
-    return shouldFlip() ? fieldWidth - y : y;
+    return shouldFlip() ? FieldConstants.fieldWidth - y : y;
   }
 
   public static Translation2d apply(Translation2d translation) {

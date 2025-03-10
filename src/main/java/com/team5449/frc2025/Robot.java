@@ -9,6 +9,7 @@ package com.team5449.frc2025;
 
 import com.team5449.lib.thirdpartylibs.LimelightHelpers;
 import com.team5449.lib.util.AllianceFlipUtil;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -63,6 +64,8 @@ public class Robot extends LoggedRobot {
             DriverStation.getAlliance().get() == Alliance.Red
                 ? new Pose2d()
                 : new Pose2d(0, 0, Rotation2d.k180deg));
+
+    CameraServer.startAutomaticCapture();
   }
 
   @Override
@@ -107,7 +110,9 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    
+  }
 
   @Override
   public void teleopExit() {}

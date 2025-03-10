@@ -337,21 +337,22 @@ public class AutoCommand {
     return Commands.sequence(
             Commands.runOnce(
                 () -> {
-                  Integer tagID = vision.getTagId(cameraName).orElse(5449);
+                  // Integer tagID = vision.getTagId(cameraName).orElse(5449);
 
-                  if (tagID == 5449) {
-                    System.out.println("Invalid or no tag detected");
-                    drive.setTargetPose(null);
-                    targetPoseExist.set(false);
-                    return;
-                  }
+                  // if (tagID == 5449) {
+                  //   System.out.println("Invalid or no tag detected");
+                  //   drive.setTargetPose(null);
+                  //   targetPoseExist.set(false);
+                  //   return;
+                  // }
 
-                  Pose2d tagPose =
-                      DriverStation.getAlliance().get() == Alliance.Red
-                          ? FieldConstants.redCenterFaces.get(tagID)
-                          : FieldConstants.blueCenterFaces.get(tagID);
+                  // Pose2d tagPose =
+                  //     DriverStation.getAlliance().get() == Alliance.Red
+                  //         ? FieldConstants.redCenterFaces.get(tagID)
+                  //         : FieldConstants.blueCenterFaces.get(tagID);
+                  Optional<Pose2d> tagPose=FieldConstants.getReefTagPose(drive.getPose().getTranslation());
 
-                  if (tagPose == null) {
+                  if (tagPose.isEmpty()) {
                     drive.setTargetPose(null);
                     targetPoseExist.set(false);
                     return;
@@ -369,41 +370,12 @@ public class AutoCommand {
                               : FieldConstants.rightBranchTargetPoseRelativeToTag;
 
                   Pose2d branchPose =
-                      tagPose
+                      tagPose.get()
                           .transformBy(transformer)
                           .transformBy(new Transform2d(0, 0, Rotation2d.k180deg));
                   drive.setTargetPose(branchPose);
-                }),
-            Commands.either(iDrive, Commands.none(), () -> targetPoseExist.get()))
+                })
+            /*,Commands.either(iDrive, Commands.none(), () -> targetPoseExist.get())*/)
         .until(() -> !targetPoseExist.get() || iDrive.atGoal());
   }
-
-  /**
-   * Creates a command that drives to a branch target position and then aligns with the AprilTag
-   *
-   * @param cameraName The name of the camera to use for vision
-   * @param useLeftBranch Whether to use the left branch target (true) or right branch target
-   *     (false)
-   * @param targetLongitudinalDistance The desired forward/backward distance to maintain from the
-   *     tag (meters)
-   * @param targetLateralDistance The desired side-to-side distance to maintain from the tag
-   *     (meters)
-   * @param targetYaw The desired yaw angle relative to the AprilTag (degrees)
-   * @return A command that drives to the branch target position and then aligns with the tag
-   */
-  // public Command driveToBranchTargetAndAlign(
-  //     String cameraName,
-  //     boolean useLeftBranch,
-  //     double targetLongitudinalDistance,
-  //     double targetLateralDistance,
-  //     double targetYaw) {
-
-  //   return Commands.sequence(
-  //       // First drive to the branch target
-  //       driveToBranchTarget(cameraName, useLeftBranch),
-
-  //       // Then align with the tag
-  //       alignWithAprilTagAndRotation(
-  //           cameraName, targetLongitudinalDistance, targetLateralDistance, targetYaw));
-  // }
 }

@@ -77,7 +77,7 @@ public class AprilTagVision extends SubsystemBase {
           0);
     }
   }
-
+  @SuppressWarnings("unused")
   private Optional<VisionObservation> getMegaTag2Estimate(
       String cameraName, double stdDevCoefficient) {
     PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName);
@@ -90,7 +90,7 @@ public class AprilTagVision extends SubsystemBase {
 
     return processEstimate(poseEstimate, stdDevCoefficient);
   }
-
+  @SuppressWarnings("unused")
   private Optional<VisionObservation> getMegaTagEstimate(
       String cameraName, double stdDevCoefficient) {
     PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraName);
@@ -164,6 +164,7 @@ public class AprilTagVision extends SubsystemBase {
    * @param pose
    * @return Whether the pose is on field, allowing an error of {@code margin}.
    */
+  @SuppressWarnings("unused")
   private boolean isOnField(Pose2d pose) {
     double margin = .5;
     return pose.getX() >= -margin
@@ -179,6 +180,7 @@ public class AprilTagVision extends SubsystemBase {
    * @param pose
    * @return projected pose
    */
+  @SuppressWarnings("unused")
   private Pose2d projectOnField(Pose2d pose) {
     double x = pose.getX();
     double y = pose.getY();

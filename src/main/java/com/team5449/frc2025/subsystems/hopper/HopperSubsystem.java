@@ -19,7 +19,6 @@ import java.util.function.DoubleSupplier;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.littletonrobotics.junction.AutoLogOutput;
 
 public class HopperSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, MotorIO> {
   @Setter @Getter private HopperState desiredState = HopperState.INTAKE;
@@ -27,7 +26,13 @@ public class HopperSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, 
   public HopperSubsystem(final MotorIO io) {
     super(HopperConstants.kHopperConfig, new MotorInputsAutoLogged(), io);
     setCurrentPositionAsZero();
-    setDefaultCommand(motionMagicSetpointCommand(this::getStateAngle));
+    // setDefaultCommand(motionMagicSetpointCommand(this::getStateAngle));
+  }
+
+  @Override
+  public void periodic() {
+    super.periodic();
+    setMotionMagicSetpointImpl(desiredState.goalSetpoint);
   }
 
   public double getStateAngle() {

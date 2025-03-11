@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.littletonrobotics.junction.Logger;
 
 public class FieldConstants {
   public static final AprilTagFieldLayout tagLayout =
@@ -33,8 +34,8 @@ public class FieldConstants {
   public static final Translation2d center =
       new Translation2d(Units.inchesToMeters(176.746), tagLayout.getFieldWidth() / 2.0);
 
-  public static final Translation2d blueReefCenter = new Translation2d();
-  public static final Translation2d redReefCenter = new Translation2d();
+  public static final Translation2d blueReefCenter = new Translation2d(4.378, 3.884);
+  public static final Translation2d redReefCenter = new Translation2d(12.943, 3.884);
 
   public static final Map<Integer, Pose2d> blueCenterFaces =
       new HashMap<>(); // Starting facing the driver station in clockwise order
@@ -61,19 +62,22 @@ public class FieldConstants {
     redCenterFaces.put(10, tagLayout.getTagPose(10).get().toPose2d());
     redCenterFaces.put(11, tagLayout.getTagPose(11).get().toPose2d());
 
-    blueNumToTag.put(0, 7);
-    blueNumToTag.put(1, 8);
-    blueNumToTag.put(2, 9);
-    blueNumToTag.put(3, 10);
-    blueNumToTag.put(4, 11);
-    blueNumToTag.put(5, 6);
+    redNumToTag.put(0, 7);
+    redNumToTag.put(1, 8);
+    redNumToTag.put(2, 9);
+    redNumToTag.put(3, 10);
+    redNumToTag.put(4, 11);
+    redNumToTag.put(5, 6);
 
-    redNumToTag.put(0, 21);
-    redNumToTag.put(1, 20);
-    redNumToTag.put(2, 19);
-    redNumToTag.put(3, 18);
-    redNumToTag.put(4, 17);
-    redNumToTag.put(5, 22);
+    blueNumToTag.put(0, 21);
+    blueNumToTag.put(1, 20);
+    blueNumToTag.put(2, 19);
+    blueNumToTag.put(3, 18);
+    blueNumToTag.put(4, 17);
+    blueNumToTag.put(5, 22);
+
+    Logger.recordOutput("Odometry/BR", blueReefCenter);
+    Logger.recordOutput("Odometry/RR", redReefCenter);
   }
 
   public static final List<Pose2d> targetPoses =
@@ -101,11 +105,13 @@ public class FieldConstants {
   public static Optional<Pose2d> getReefTagPose(Translation2d botPosition) {
     Translation2d dist =
         botPosition.minus(AllianceFlipUtil.shouldFlip() ? redReefCenter : blueReefCenter);
-    if (dist.getNorm() > 4) return Optional.empty();
+    if (dist.getNorm() > 4) {
+      return Optional.empty();
+    }
+    int remainder = ((((int) Math.floor((dist.getAngle().getDegrees() + 30) / 60)) % 6) + 6) % 6;
+    Integer reefNumber =
+        (AllianceFlipUtil.shouldFlip() ? redNumToTag : blueNumToTag).get(remainder);
     return Optional.of(
-        (AllianceFlipUtil.shouldFlip() ? redCenterFaces : blueCenterFaces)
-            .get(
-                (AllianceFlipUtil.shouldFlip() ? redNumToTag : blueNumToTag)
-                    .get((int) Math.floor((dist.getAngle().getDegrees() + 30) / 60))));
+        (AllianceFlipUtil.shouldFlip() ? redCenterFaces : blueCenterFaces).get(reefNumber));
   }
 }

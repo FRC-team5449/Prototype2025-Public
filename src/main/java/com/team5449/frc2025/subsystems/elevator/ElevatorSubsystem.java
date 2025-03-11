@@ -22,12 +22,18 @@ import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, MotorIO> {
-  @AutoLogOutput @Setter @Getter private ElevatorState desiredState = ElevatorState.IDLE;
+  @Setter @Getter private ElevatorState desiredState = ElevatorState.IDLE;
 
   public ElevatorSubsystem(final MotorIO io) {
     super(ElevatorConstants.kElevatorConfig, new MotorInputsAutoLogged(), io);
     setCurrentPositionAsZero();
-    setDefaultCommand(motionMagicSetpointCommand(this::getStateAngle));
+    // setDefaultCommand(motionMagicSetpointCommand(this::getStateAngle));
+  }
+
+  @Override
+  public void periodic() {
+    super.periodic();
+    setMotionMagicSetpointImpl(desiredState.goalSetpoint);
   }
 
   public double getStateAngle() {
@@ -62,7 +68,7 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
   @RequiredArgsConstructor
   public enum ElevatorState {
     IDLE(() -> 0),
-    L1(() -> 2 * (5.0 / 4.0)),
+    L1(() -> 2),
     L2(() -> 3.5 * (5.0 / 4.0)),
     L3(() -> 10 * (5.0 / 4.0)),
     L4(() -> 20 * (5.0 / 4.0));

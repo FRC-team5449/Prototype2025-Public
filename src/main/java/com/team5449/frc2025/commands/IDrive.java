@@ -54,12 +54,12 @@ public class IDrive extends Command {
       new LoggedTunableNumber("IDrive/FFMaxRadius");
 
   static {
-    drivekP.initDefault(2);
+    drivekP.initDefault(2.3);
     drivekD.initDefault(0.0);
     thetakP.initDefault(5.5);
     thetakD.initDefault(0.1);
-    driveMaxVelocity.initDefault(3.8);
-    driveMaxAcceleration.initDefault(5);
+    driveMaxVelocity.initDefault(TunerConstants.kLinearSpeedAt12Volts.in(MetersPerSecond));
+    driveMaxAcceleration.initDefault(10);
     thetaMaxVelocity.initDefault(8);
     thetaMaxAcceleration.initDefault(20.0);
     driveTolerance.initDefault(0.05);

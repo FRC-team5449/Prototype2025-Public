@@ -22,8 +22,6 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Optional;
@@ -337,23 +335,23 @@ public class AutoCommand {
     return Commands.sequence(
             Commands.runOnce(
                 () -> {
-                  Integer tagID = vision.getTagId(cameraName).orElse(5449);
+                  // Integer tagID = vision.getTagId(cameraName).orElse(5449);
 
-                  if (tagID == 5449) {
-                    System.out.println("Invalid or no tag detected");
-                    drive.setTargetPose(null);
-                    targetPoseExist.set(false);
-                    return;
-                  }
+                  // if (tagID == 5449) {
+                  //   System.out.println("Invalid or no tag detected");
+                  //   drive.setTargetPose(null);
+                  //   targetPoseExist.set(false);
+                  //   return;
+                  // }
 
-                  Pose2d tagPose =
-                      DriverStation.getAlliance().get() == Alliance.Red
-                          ? FieldConstants.redCenterFaces.get(tagID)
-                          : FieldConstants.blueCenterFaces.get(tagID);
-                  // Optional<Pose2d>
-                  // tagPose=FieldConstants.getReefTagPose(drive.getPose().getTranslation());
+                  // Pose2d tagPose =
+                  //     DriverStation.getAlliance().get() == Alliance.Red
+                  //         ? FieldConstants.redCenterFaces.get(tagID)
+                  //         : FieldConstants.blueCenterFaces.get(tagID);
+                  Optional<Pose2d> tagPose =
+                      FieldConstants.getReefTagPose(drive.getPose().getTranslation());
 
-                  if (tagPose == null) {
+                  if (tagPose.isEmpty()) {
                     drive.setTargetPose(null);
                     targetPoseExist.set(false);
                     return;
@@ -372,11 +370,12 @@ public class AutoCommand {
 
                   Pose2d branchPose =
                       tagPose
+                          .get()
                           .transformBy(transformer)
                           .transformBy(new Transform2d(0, 0, Rotation2d.k180deg));
                   drive.setTargetPose(branchPose);
-                })
-            /*,Commands.either(iDrive, Commands.none(), () -> targetPoseExist.get())*/ )
+                }),
+            Commands.either(iDrive, Commands.none(), () -> targetPoseExist.get()))
         .until(() -> !targetPoseExist.get() || iDrive.atGoal());
   }
 }

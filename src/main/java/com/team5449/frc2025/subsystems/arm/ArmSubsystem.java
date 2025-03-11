@@ -26,7 +26,13 @@ public class ArmSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, Mot
 
   public ArmSubsystem(final MotorIO io) {
     super(ArmConstants.kArmConfig, new MotorInputsAutoLogged(), io);
-    setDefaultCommand(motionMagicSetpointCommand(this::getStateAngle));
+    // setDefaultCommand(motionMagicSetpointCommand(this::getStateAngle));
+  }
+
+  @Override
+  public void periodic() {
+    super.periodic();
+    setMotionMagicSetpointImpl(desiredState.goalSetpoint);
   }
 
   private double getStateAngle() {
@@ -64,7 +70,7 @@ public class ArmSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, Mot
   @RequiredArgsConstructor
   public enum ArmState {
     IDLE(() -> 0.182891),
-    INTAKE(() -> 0.255),
+    INTAKE(() -> 0.24),
     SCORE(() -> 0.092891);
 
     public final DoubleSupplier goalSetpoint;

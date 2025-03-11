@@ -43,8 +43,8 @@ public class AprilTagVision extends SubsystemBase {
   // Tuning constants
   private static final double MIN_TAG_AREA = 0.1;
   private static final double MAX_TAG_DISTANCE = 1.0;
-  private static final double XY_STD_DEV_COEFFICIENT = 0.05;
-  private static final double THETA_STD_DEV_COEFFICIENT = 0.1;
+  private static final double XY_STD_DEV_COEFFICIENT = 5;
+  private static final double THETA_STD_DEV_COEFFICIENT = 100;
   private static final double MIN_TAG_SPACING = 1.0;
   private static final double MAX_TAG_TO_CAM_DISTANCE = 2;
 
@@ -84,7 +84,7 @@ public class AprilTagVision extends SubsystemBase {
     if (poseEstimate == null
         || poseEstimate.tagCount == 0
         || Units.radiansToDegrees(RobotState.getInstance().getRobotSpeeds().omegaRadiansPerSecond)
-            > 720) {
+            > 240) {
       return Optional.empty();
     }
 
@@ -101,10 +101,12 @@ public class AprilTagVision extends SubsystemBase {
     }
 
     // Reject single-tag measurements with high ambiguity
-    if (poseEstimate.tagCount == 1
-        && poseEstimate.rawFiducials.length == 1
-        && (poseEstimate.rawFiducials[0].ambiguity > 0.7
-            || poseEstimate.rawFiducials[0].distToCamera > MAX_TAG_TO_CAM_DISTANCE)) {
+    if ((poseEstimate.tagCount == 1
+            && poseEstimate.rawFiducials.length == 1
+            && (poseEstimate.rawFiducials[0].ambiguity > 0.7
+                || poseEstimate.rawFiducials[0].distToCamera > MAX_TAG_TO_CAM_DISTANCE))
+        || Units.radiansToDegrees(RobotState.getInstance().getRobotSpeeds().omegaRadiansPerSecond)
+            > 240) {
       return Optional.empty();
     }
 
@@ -158,6 +160,7 @@ public class AprilTagVision extends SubsystemBase {
       thetaStdDev *= distanceMultiplier / areaMultiplier;
     }
 
+    // TODO I want to make the orientaiton of robot more accurat and maily affected by our pigeon
     return VecBuilder.fill(xyStdDev, xyStdDev, thetaStdDev);
   }
 
@@ -212,7 +215,7 @@ public class AprilTagVision extends SubsystemBase {
 
       // Fallback to original MegaTag
       Optional<VisionObservation> megaTag2Estimate =
-          getMegaTagEstimate(camera.limelightName(), camera.stdDevCoefficient());
+          getMegaTag2Estimate(camera.limelightName(), camera.stdDevCoefficient());
       megaTag2Estimate.ifPresent(observations::add);
     }
 

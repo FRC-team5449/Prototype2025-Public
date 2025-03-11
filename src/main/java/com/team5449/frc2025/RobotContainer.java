@@ -65,19 +65,11 @@ public class RobotContainer {
 
   private final AprilTagVision vision;
 
-  //   private final CameraConfig cameraConfig1;
-
-  //   private final CameraConfig[] cameraConfigs;
-
   private final RobotState robotState = RobotState.getInstance();
 
   private final AutoFactory autoFactory;
 
   private final CommandPS5Controller driverGamepad = new CommandPS5Controller(0);
-
-  private final CommandPS5Controller operatorGamepad = new CommandPS5Controller(1);
-
-  // private final CommandPS5Controller operatorGamepad = new CommandPS5Controller(0);
 
   private boolean useLevel4 = true;
 
@@ -237,7 +229,6 @@ public class RobotContainer {
         .and(() -> elevator.atGoal(ElevatorState.L1))
         .whileTrue(endEffector.l1Outtake());
 
-    // driverGamepad.L2().whileTrue(endEffector.reverse());
     driverGamepad
         .L2()
         .and(elevator::isStowed)
@@ -248,7 +239,6 @@ public class RobotContainer {
         .onTrue(autoCommand.driveToBranchTarget("limelight", false, () -> useLevel4));
 
     driverGamepad.options().onTrue(Commands.runOnce(() -> useLevel4 = !useLevel4));
-
 
     driverGamepad
         .triangle()
@@ -267,7 +257,7 @@ public class RobotContainer {
             Commands.either(
                     climber.setStateOk(ClimberState.ALIGN),
                     Commands.none(),
-                    () -> climber.atGoal(ClimberState.IDLE))
+                    () -> climber.getDesiredState() == ClimberState.IDLE)
                 .andThen(
                     hopper.setStateOk(HopperState.INTAKE), climber.setState(ClimberState.IDLE)));
   }
@@ -286,11 +276,11 @@ public class RobotContainer {
   }
 
   public void periodic() {
-    if (elevator.getDesiredState() == ElevatorState.L4) {
-      drive.setSlowMode(true);
-    } else {
-      drive.setSlowMode(false);
-    }
+    // if (elevator.getDesiredState() == ElevatorState.L4) {
+    //   drive.setSlowMode(true);
+    // } else {
+    //   drive.setSlowMode(false);
+    // }
 
     SmartDashboard.putBoolean("L4 Now", useLevel4);
   }

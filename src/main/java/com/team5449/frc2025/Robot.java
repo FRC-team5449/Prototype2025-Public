@@ -55,7 +55,7 @@ public class Robot extends LoggedRobot {
     FieldConstants.initializeField();
     robotContainer = new RobotContainer();
 
-    LimelightHelpers.SetIMUMode("limelight", 0);
+    LimelightHelpers.SetIMUMode("limelight", 1);
     LimelightHelpers.SetRobotOrientation("limelight", FieldConstants.initialHeading, 0, 0, 0, 0, 0);
 
     // TODO You must change this
@@ -91,7 +91,7 @@ public class Robot extends LoggedRobot {
       autonomousCommand.schedule();
     }
 
-    // LimelightHelpers.SetIMUMode("limelight", 2);
+    LimelightHelpers.SetIMUMode("limelight", 2);
   }
 
   @Override
@@ -106,7 +106,7 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-    // LimelightHelpers.SetIMUMode("limelight", 2);
+    LimelightHelpers.SetIMUMode("limelight", 2);
   }
 
   @Override

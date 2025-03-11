@@ -41,7 +41,7 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
     io.updateInputs(inputs);
-    Logger.processInputs(getName(), inputs);
+    // Logger.processInputs(getName(), inputs);
     Logger.recordOutput(getName() + "/latencyPeriodicSec", Timer.getFPGATimestamp() - timestamp);
   }
 

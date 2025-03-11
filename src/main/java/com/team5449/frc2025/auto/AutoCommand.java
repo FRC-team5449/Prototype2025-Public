@@ -335,19 +335,6 @@ public class AutoCommand {
     return Commands.sequence(
             Commands.runOnce(
                 () -> {
-                  // Integer tagID = vision.getTagId(cameraName).orElse(5449);
-
-                  // if (tagID == 5449) {
-                  //   System.out.println("Invalid or no tag detected");
-                  //   drive.setTargetPose(null);
-                  //   targetPoseExist.set(false);
-                  //   return;
-                  // }
-
-                  // Pose2d tagPose =
-                  //     DriverStation.getAlliance().get() == Alliance.Red
-                  //         ? FieldConstants.redCenterFaces.get(tagID)
-                  //         : FieldConstants.blueCenterFaces.get(tagID);
                   Optional<Pose2d> tagPose =
                       FieldConstants.getReefTagPose(drive.getPose().getTranslation());
 

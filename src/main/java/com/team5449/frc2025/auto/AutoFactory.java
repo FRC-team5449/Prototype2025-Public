@@ -7,8 +7,6 @@
 
 package com.team5449.frc2025.auto;
 
-import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.team5449.frc2025.subsystems.arm.ArmSubsystem;
@@ -43,27 +41,37 @@ public class AutoFactory {
         autoCommand.driveToBranchTarget("limelight", false, () -> true),
         extendArmAndElevate(ElevatorState.L4),
         arm.setStateOk(ArmState.SCORE),
-        endEffector.outtake().withTimeout(1),
-        stowElevatorAndArm(),
-        AutoBuilder.followPath(reef1ToSource).alongWith(arm.setState(ArmState.INTAKE)),
-        waitSeconds(1).alongWith(endEffector.intake()),
+        endEffector.outtakeAuto(),
+        Commands.parallel(
+            AutoBuilder.followPath(reef1ToSource)
+                .finallyDo(
+                    () -> {
+                      System.out.println("Path Finishshshshshshshshshsh");
+                      drive.stop();
+                    }),
+            stowElevatorAndArm().andThen(arm.setState(ArmState.INTAKE))),
+        endEffector.intake(),
         AutoBuilder.followPath(sourceToReef2),
         autoCommand.driveToBranchTarget("limelight", true, () -> true),
         extendArmAndElevate(ElevatorState.L4),
         arm.setStateOk(ArmState.SCORE),
-        endEffector.outtake().withTimeout(1),
-        stowElevatorAndArm(),
-        AutoBuilder.followPath(reef2ToSource).alongWith(arm.setState(ArmState.INTAKE)),
-        waitSeconds(1).alongWith(endEffector.intake()),
+        endEffector.outtakeAuto(),
+        Commands.sequence(stowElevatorAndArm().andThen(arm.setState(ArmState.INTAKE))),
+        Commands.parallel(
+            AutoBuilder.followPath(reef2ToSource)
+                .finallyDo(
+                    () -> {
+                      System.out.println("Path Finishshshshshshshshshsh");
+                      drive.stop();
+                    }),
+            stowElevatorAndArm().andThen(arm.setState(ArmState.INTAKE))),
+        endEffector.intake(),
         AutoBuilder.followPath(sourceToReef3),
         autoCommand.driveToBranchTarget("limelight", false, () -> true),
         extendArmAndElevate(ElevatorState.L4),
         arm.setStateOk(ArmState.SCORE),
-        endEffector.outtake().withTimeout(1),
+        endEffector.outtakeAuto(),
         stowElevatorAndArm());
-    // extendArmAndElevate(ElevatorState.L4),
-    // endEffector.outtake().withTimeout(0.5),
-    // elevator.setStateOk(ElevatorState.IDLE));
   }
 
   public Command poor() {

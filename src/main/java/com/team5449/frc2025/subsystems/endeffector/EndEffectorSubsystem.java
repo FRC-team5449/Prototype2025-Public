@@ -17,6 +17,7 @@ import org.littletonrobotics.junction.Logger;
 public class EndEffectorSubsystem extends SubsystemBase {
   private final DigitalInput digitalInput;
   private static final double intakeLatency = 0.07;
+  private static final double outtakeLatency = 0.07;
 
   // private final ColorSensorV3 colorSensor;
   private final EndEffectorIO io;
@@ -46,6 +47,11 @@ public class EndEffectorSubsystem extends SubsystemBase {
 
   public Command outtake() {
     return runEnd(() -> io.setOpenLoop(1), () -> io.setOpenLoop(0));
+  }
+
+  public Command outtakeAuto() {
+    return runEnd(() -> io.setOpenLoop(1), () -> io.setOpenLoop(0))
+        .until(new Trigger(() -> !hasCoral()).debounce(outtakeLatency));
   }
 
   public Command l1Outtake() {

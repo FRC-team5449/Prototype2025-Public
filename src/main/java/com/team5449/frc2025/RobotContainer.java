@@ -276,12 +276,6 @@ public class RobotContainer {
   }
 
   public void periodic() {
-    // if (elevator.getDesiredState() == ElevatorState.L4) {
-    //   drive.setSlowMode(true);
-    // } else {
-    //   drive.setSlowMode(false);
-    // }
-
     SmartDashboard.putBoolean("L4 Now", useLevel4);
   }
 

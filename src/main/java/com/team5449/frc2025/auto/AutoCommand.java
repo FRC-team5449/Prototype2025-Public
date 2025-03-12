@@ -14,6 +14,7 @@ import com.team5449.frc2025.subsystems.arm.ArmSubsystem;
 import com.team5449.frc2025.subsystems.drive.Drive;
 import com.team5449.frc2025.subsystems.elevator.ElevatorSubsystem;
 import com.team5449.frc2025.subsystems.endeffector.EndEffectorSubsystem;
+import com.team5449.lib.util.AllianceFlipUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -27,6 +28,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import lombok.RequiredArgsConstructor;
+import org.littletonrobotics.junction.Logger;
 
 @RequiredArgsConstructor
 public class AutoCommand {
@@ -357,6 +359,8 @@ public class AutoCommand {
                           .get()
                           .transformBy(transformer)
                           .transformBy(new Transform2d(0, 0, Rotation2d.k180deg));
+
+                  Logger.recordOutput("Odometry/BLUE TARGET", AllianceFlipUtil.apply(branchPose));
                   drive.setTargetPose(branchPose);
                 }),
             Commands.either(iDrive, Commands.none(), () -> targetPoseExist.get()))

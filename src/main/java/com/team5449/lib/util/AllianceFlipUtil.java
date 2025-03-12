@@ -32,6 +32,7 @@ public final class AllianceFlipUtil {
   }
 
   public static Pose2d apply(Pose2d pose) {
+    // TODO DO THIS NOW
     return shouldFlip()
         ? new Pose2d(apply(pose.getTranslation()), apply(pose.getRotation()))
         : pose;

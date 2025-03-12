@@ -152,4 +152,8 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
   protected void setCurrentPosition(Angle position) {
     io.setCurrentPosition(position);
   }
+
+  public void stop() {
+    io.stop();
+  }
 }

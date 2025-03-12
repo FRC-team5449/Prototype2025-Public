@@ -164,6 +164,7 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", new SendableChooser<Command>());
     autoChooser.addDefaultOption("None", Commands.none());
     autoChooser.addOption("Dummy 4 Level3", autoFactory.dummyFourLV3());
+    autoChooser.addOption("Fast Ass 3 Level4", autoFactory.fastAss3Level4());
     autoChooser.addOption("Auto Try", autoFactory.autoPathTry());
     autoChooser.addOption("test", new PathPlannerAuto("New Auto"));
     autoChooser.addOption("mid", autoFactory.poor());
@@ -277,6 +278,13 @@ public class RobotContainer {
 
   public void periodic() {
     SmartDashboard.putBoolean("L4 Now", useLevel4);
+  }
+
+  public void disblePeriodic() {
+    drive.stop();
+    elevator.stop();
+    arm.stop();
+    hopper.stop();
   }
 
   public Command getAutonomousCommand() {

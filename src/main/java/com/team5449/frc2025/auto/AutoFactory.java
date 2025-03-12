@@ -7,6 +7,8 @@
 
 package com.team5449.frc2025.auto;
 
+import static edu.wpi.first.wpilibj2.command.Commands.run;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.team5449.frc2025.subsystems.arm.ArmSubsystem;
@@ -53,6 +55,41 @@ public class AutoFactory {
         stowElevatorAndArm().andThen(arm.setState(ArmState.INTAKE)),
         AutoBuilder.followPath(reef2ToSource),
         endEffector.intake().alongWith(Commands.runOnce(drive::stop)),
+        AutoBuilder.followPath(sourceToReef3),
+        autoCommand.driveToBranchTarget("limelight", false, () -> true),
+        extendArmAndElevate(ElevatorState.L4),
+        arm.setStateOk(ArmState.SCORE),
+        endEffector.outtakeAuto(),
+        stowElevatorAndArm());
+  }
+
+  public Command fastAss3Level4() {
+    var startToReef1 = getAutoPath("upperStartToReefI");
+    var reef1ToSource = getAutoPath("reefIToSource");
+    var sourceToReef2 = getAutoPath("sourceToReefK");
+    var reef2ToSource = getAutoPath("reefKToSource");
+    var sourceToReef3 = getAutoPath("sourceToReefL");
+
+    return Commands.sequence(
+        startAt(startToReef1),
+        AutoBuilder.followPath(startToReef1),
+        autoCommand.driveToBranchTarget("limelight", false, () -> true),
+        extendArmAndElevate(ElevatorState.L4),
+        arm.setStateOk(ArmState.SCORE),
+        endEffector.outtakeAuto(),
+        Commands.parallel(
+            AutoBuilder.followPath(reef1ToSource).andThen(Commands.runOnce(drive::stop)),
+            stowElevatorAndArm().andThen(arm.setState(ArmState.INTAKE))),
+        run(drive::stop).withDeadline(endEffector.intake()),
+        AutoBuilder.followPath(sourceToReef2),
+        autoCommand.driveToBranchTarget("limelight", true, () -> true),
+        extendArmAndElevate(ElevatorState.L4),
+        arm.setStateOk(ArmState.SCORE),
+        endEffector.outtakeAuto(),
+        Commands.parallel(
+            AutoBuilder.followPath(reef2ToSource).andThen(Commands.runOnce(drive::stop)),
+            stowElevatorAndArm().andThen(arm.setState(ArmState.INTAKE))),
+        run(drive::stop).withDeadline(endEffector.intake()),
         AutoBuilder.followPath(sourceToReef3),
         autoCommand.driveToBranchTarget("limelight", false, () -> true),
         extendArmAndElevate(ElevatorState.L4),

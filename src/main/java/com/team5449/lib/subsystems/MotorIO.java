@@ -47,4 +47,6 @@ public interface MotorIO {
   public default void setEnableSlaveMotor(boolean enableSlaveMotor) {}
 
   public default void runCharacterization(double currentAmps) {}
+
+  public default void stop() {}
 }

@@ -175,4 +175,10 @@ public class TalonFXIO implements MotorIO {
   public void runCharacterization(double currentAmps) {
     talon.setControl(new TorqueCurrentFOC(currentAmps));
   }
+
+  @Override
+  public void stop() {
+    talon.set(0);
+    setSlaveMotorFollowing();
+  }
 }

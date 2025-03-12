@@ -9,6 +9,7 @@ package com.team5449.frc2025;
 
 import com.team5449.lib.util.AllianceFlipUtil;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -48,6 +49,7 @@ public class FieldConstants {
   public static final int[] redTagIds = {6, 7, 8, 9, 10, 11};
 
   public static void initializeField() {
+    tagLayout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
     blueCenterFaces.put(17, tagLayout.getTagPose(17).get().toPose2d());
     blueCenterFaces.put(18, tagLayout.getTagPose(18).get().toPose2d());
     blueCenterFaces.put(19, tagLayout.getTagPose(19).get().toPose2d());

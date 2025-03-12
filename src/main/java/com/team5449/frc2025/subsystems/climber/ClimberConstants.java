@@ -30,7 +30,7 @@ public class ClimberConstants {
     kClimberConfig.canSlaveId = 41;
     kClimberConfig.enableSlave = true;
     kClimberConfig.isSlaveOpposite = true;
-    kClimberConfig.kMinPositionUnits = 0;
+    kClimberConfig.kMinPositionUnits = -30;
     kClimberConfig.kMaxPositionUnits = 55;
     kClimberConfig.unitToRotorRatio = 1;
 
@@ -49,7 +49,7 @@ public class ClimberConstants {
             .withForwardSoftLimitEnable(true)
             .withForwardSoftLimitThreshold(55)
             .withReverseSoftLimitEnable(true)
-            .withReverseSoftLimitThreshold(0);
+            .withReverseSoftLimitThreshold(-12);
     configuration.MotionMagic =
         new MotionMagicConfigs()
             .withMotionMagicCruiseVelocity(1000)

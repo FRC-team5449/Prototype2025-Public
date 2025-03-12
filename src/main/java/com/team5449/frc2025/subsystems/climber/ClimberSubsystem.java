@@ -24,6 +24,8 @@ import org.littletonrobotics.junction.AutoLogOutput;
 public class ClimberSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, MotorIO> {
   @Setter @Getter private ClimberState desiredState = ClimberState.IDLE;
 
+  private double climbOffset = 0;
+
   public ClimberSubsystem(final MotorIO io) {
     super(ClimberConstants.kClimberConfig, new MotorInputsAutoLogged(), io);
     setCurrentPositionAsZero();
@@ -31,6 +33,9 @@ public class ClimberSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged,
   }
 
   public double getStateAngle() {
+    if (desiredState == ClimberState.ALIGN) {
+      return desiredState.goalSetpoint.getAsDouble() + climbOffset;
+    }
     return desiredState.goalSetpoint.getAsDouble();
   }
 
@@ -39,11 +44,15 @@ public class ClimberSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged,
   }
 
   public Command decline() {
-    return startEnd(() -> io.setOpenLoopDutyCycle(0.4), () -> io.setOpenLoopDutyCycle(0));
+    return Commands.runEnd(() -> climbOffset += 1, () -> {});
+  }
+
+  public Command zeroOffset() {
+    return Commands.runOnce(() -> climbOffset = 0);
   }
 
   public Command elevate() {
-    return startEnd(() -> io.setOpenLoopDutyCycle(-0.4), () -> io.setOpenLoopDutyCycle(0));
+    return Commands.runEnd(() -> climbOffset -= 1, () -> {});
   }
 
   public boolean atGoal() {

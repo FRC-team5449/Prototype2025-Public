@@ -77,6 +77,8 @@ public class RobotContainer {
 
   private final AutoCommand autoCommand;
 
+  private DriveMode currentMode = DriveMode.TELEOP;
+
   public RobotContainer() {
     // Check constructor for heavy initialization
 
@@ -188,13 +190,25 @@ public class RobotContainer {
                 () -> -driverGamepad.getLeftX() * flip,
                 Rotation2d::new));
 
-    driverGamepad.pov(0).onTrue(setElevatorState(ElevatorState.L4));
+    driverGamepad
+        .pov(0)
+        .and(() -> currentMode == DriveMode.TELEOP)
+        .onTrue(setElevatorState(ElevatorState.L4));
 
-    driverGamepad.pov(90).onTrue(setElevatorState(ElevatorState.L3));
+    driverGamepad
+        .pov(90)
+        .and(() -> currentMode == DriveMode.TELEOP)
+        .onTrue(setElevatorState(ElevatorState.L3));
 
-    driverGamepad.pov(180).onTrue(setElevatorState(ElevatorState.L1));
+    driverGamepad
+        .pov(180)
+        .and(() -> currentMode == DriveMode.TELEOP)
+        .onTrue(setElevatorState(ElevatorState.L1));
 
-    driverGamepad.pov(270).onTrue(setElevatorState(ElevatorState.L2));
+    driverGamepad
+        .pov(270)
+        .and(() -> currentMode == DriveMode.TELEOP)
+        .onTrue(setElevatorState(ElevatorState.L2));
 
     driverGamepad
         .R1()
@@ -203,16 +217,12 @@ public class RobotContainer {
                 .setState(ElevatorState.IDLE)
                 .alongWith(
                     Commands.waitUntil(elevator::isStowed).andThen(arm.setState(ArmState.INTAKE))))
-        .and(arm::intaking)
+        .and(() -> arm.intaking() && currentMode == DriveMode.TELEOP)
         .whileTrue(endEffector.intake());
 
     driverGamepad
         .R2()
-        .and(
-            () ->
-                elevator.atGoal(ElevatorState.L4)
-                    || elevator.atGoal(ElevatorState.L3)
-                    || elevator.atGoal(ElevatorState.L1))
+        .and(() -> !elevator.atGoal(ElevatorState.IDLE) && currentMode == DriveMode.TELEOP)
         .whileTrue(
             new StartEndCommand(
                 () -> arm.setDesiredState(ArmState.SCORE),
@@ -232,11 +242,12 @@ public class RobotContainer {
 
     driverGamepad
         .L2()
-        .and(elevator::isStowed)
+        .and(() -> elevator.isStowed() && currentMode == DriveMode.TELEOP)
         .onTrue(autoCommand.driveToBranchTarget("limelight", true, () -> useLevel4));
+
     driverGamepad
         .R2()
-        .and(elevator::isStowed)
+        .and(() -> elevator.isStowed() && currentMode == DriveMode.TELEOP)
         .onTrue(autoCommand.driveToBranchTarget("limelight", false, () -> useLevel4));
 
     driverGamepad.options().onTrue(Commands.runOnce(() -> useLevel4 = !useLevel4));
@@ -244,23 +255,43 @@ public class RobotContainer {
     driverGamepad
         .triangle()
         .and(() -> elevator.isStowed() && climber.atGoal(ClimberState.IDLE))
-        .onTrue(climber.setStateOk(ClimberState.ALIGN).andThen(hopper.setState(HopperState.FOLD)));
+        .onTrue(
+            climber
+                .setStateOk(ClimberState.ALIGN)
+                .alongWith(Commands.runOnce(() -> currentMode = DriveMode.CLIMB))
+                .andThen(hopper.setState(HopperState.FOLD)));
 
     driverGamepad
         .triangle()
-        .and(() -> elevator.isStowed() && climber.atGoal(ClimberState.ALIGN))
+        .and(
+            () ->
+                elevator.isStowed()
+                    && climber.atGoal(ClimberState.ALIGN)
+                    && currentMode == DriveMode.CLIMB)
         .onTrue(climber.setState(ClimberState.IDLE));
+
+    driverGamepad.R2().and(() -> currentMode == DriveMode.CLIMB).whileTrue(climber.elevate());
+
+    driverGamepad.L2().and(() -> currentMode == DriveMode.CLIMB).whileTrue(climber.decline());
 
     driverGamepad
         .cross()
-        .and(() -> elevator.isStowed() && hopper.atGoal(HopperState.FOLD))
+        .and(
+            () ->
+                elevator.isStowed()
+                    && hopper.atGoal(HopperState.FOLD)
+                    && currentMode == DriveMode.CLIMB)
         .onTrue(
-            Commands.either(
-                    climber.setStateOk(ClimberState.ALIGN),
-                    Commands.none(),
-                    () -> climber.getDesiredState() == ClimberState.IDLE)
-                .andThen(
-                    hopper.setStateOk(HopperState.INTAKE), climber.setState(ClimberState.IDLE)));
+            Commands.sequence(
+                climber.zeroOffset(),
+                Commands.either(
+                        climber.setStateOk(ClimberState.ALIGN),
+                        Commands.none(),
+                        () -> !climber.atGoal(ClimberState.ALIGN))
+                    .alongWith(Commands.runOnce(() -> currentMode = DriveMode.TELEOP))
+                    .andThen(
+                        hopper.setStateOk(HopperState.INTAKE),
+                        climber.setState(ClimberState.IDLE))));
   }
 
   public Command setElevatorState(ElevatorState state) {
@@ -285,6 +316,11 @@ public class RobotContainer {
     elevator.stop();
     arm.stop();
     hopper.stop();
+  }
+
+  enum DriveMode {
+    CLIMB,
+    TELEOP
   }
 
   public Command getAutonomousCommand() {

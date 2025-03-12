@@ -70,9 +70,22 @@ public class DriveCommands {
       DoubleSupplier omegaSupplier) {
     return Commands.run(
         () -> {
-          // Get linear velocity
-          Translation2d linearVelocity =
-              getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+          // Get joystick inputs
+          double x = xSupplier.getAsDouble();
+          double y = ySupplier.getAsDouble();
+
+          // Apply deadband
+          double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);
+
+          // Calculate linear velocity components
+          double linearX = 0;
+          double linearY = 0;
+
+          if (linearMagnitude > 1e-6) {
+            double angle = Math.atan2(y, x);
+            linearX = linearMagnitude * Math.cos(angle);
+            linearY = linearMagnitude * Math.sin(angle);
+          }
 
           // Apply rotation deadband
           double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND) * 0.8;
@@ -83,8 +96,8 @@ public class DriveCommands {
           // Convert to field relative speeds & send command
           ChassisSpeeds speeds =
               new ChassisSpeeds(
-                  linearVelocity.getX() * Drive.getMaxLinearSpeedMetersPerSec(),
-                  linearVelocity.getY() * Drive.getMaxLinearSpeedMetersPerSec(),
+                  linearX * Drive.getMaxLinearSpeedMetersPerSec(),
+                  linearY * Drive.getMaxLinearSpeedMetersPerSec(),
                   omega * Drive.getMaxAngularSpeedRadPerSec());
           boolean isFlipped = true;
           // DriverStation.getAlliance().isPresent()

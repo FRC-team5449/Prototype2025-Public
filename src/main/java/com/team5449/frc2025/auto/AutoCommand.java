@@ -14,7 +14,6 @@ import com.team5449.frc2025.subsystems.arm.ArmSubsystem;
 import com.team5449.frc2025.subsystems.drive.Drive;
 import com.team5449.frc2025.subsystems.elevator.ElevatorSubsystem;
 import com.team5449.frc2025.subsystems.endeffector.EndEffectorSubsystem;
-import com.team5449.lib.util.GeomUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -28,9 +27,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.ExtensionMethod;
 
-@ExtensionMethod({GeomUtil.class})
 @RequiredArgsConstructor
 public class AutoCommand {
   private final Drive drive;

@@ -42,30 +42,17 @@ public class AutoFactory {
         extendArmAndElevate(ElevatorState.L4),
         arm.setStateOk(ArmState.SCORE),
         endEffector.outtakeAuto(),
-        Commands.parallel(
-            AutoBuilder.followPath(reef1ToSource)
-                .finallyDo(
-                    () -> {
-                      System.out.println("Path Finishshshshshshshshshsh");
-                      drive.stop();
-                    }),
-            stowElevatorAndArm().andThen(arm.setState(ArmState.INTAKE))),
-        endEffector.intake(),
+        stowElevatorAndArm().andThen(arm.setState(ArmState.INTAKE)),
+        AutoBuilder.followPath(reef1ToSource),
+        endEffector.intake().alongWith(Commands.runOnce(drive::stop)),
         AutoBuilder.followPath(sourceToReef2),
         autoCommand.driveToBranchTarget("limelight", true, () -> true),
         extendArmAndElevate(ElevatorState.L4),
         arm.setStateOk(ArmState.SCORE),
         endEffector.outtakeAuto(),
-        Commands.sequence(stowElevatorAndArm().andThen(arm.setState(ArmState.INTAKE))),
-        Commands.parallel(
-            AutoBuilder.followPath(reef2ToSource)
-                .finallyDo(
-                    () -> {
-                      System.out.println("Path Finishshshshshshshshshsh");
-                      drive.stop();
-                    }),
-            stowElevatorAndArm().andThen(arm.setState(ArmState.INTAKE))),
-        endEffector.intake(),
+        stowElevatorAndArm().andThen(arm.setState(ArmState.INTAKE)),
+        AutoBuilder.followPath(reef2ToSource),
+        endEffector.intake().alongWith(Commands.runOnce(drive::stop)),
         AutoBuilder.followPath(sourceToReef3),
         autoCommand.driveToBranchTarget("limelight", false, () -> true),
         extendArmAndElevate(ElevatorState.L4),

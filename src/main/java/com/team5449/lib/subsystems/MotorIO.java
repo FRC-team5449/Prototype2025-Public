@@ -7,9 +7,6 @@
 
 package com.team5449.lib.subsystems;
 
-import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.Rotation;
-
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -19,8 +16,8 @@ public interface MotorIO {
   @AutoLog
   public static class MotorInputs {
     public boolean motorConnected = false;
-    public AngularVelocity velocity = RPM.of(0);
-    public Angle position = Rotation.of(0);
+    public double velocityRotationPerSec = 0;
+    public double positionRotation = 0;
     public double appliedVolts = 0.0;
     public double currentStatorAmps = 0.0;
     public double currentSupplyAmps = 0.0;

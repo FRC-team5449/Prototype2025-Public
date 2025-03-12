@@ -7,14 +7,14 @@
 
 package com.team5449.frc2025.subsystems.arm;
 
-import static edu.wpi.first.units.Units.Rotation;
-
 import com.team5449.lib.subsystems.MotorIO;
 import com.team5449.lib.subsystems.MotorInputsAutoLogged;
 import com.team5449.lib.subsystems.ServoMotorSubsystem;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import java.util.function.DoubleSupplier;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -57,12 +57,13 @@ public class ArmSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, Mot
   }
 
   public Command setStateOk(ArmState state) {
-    return setState(state).andThen(Commands.waitUntil(this::atGoal));
+    return new ParallelDeadlineGroup(
+        new WaitUntilCommand(() -> this.atGoal(state)), setState(state));
   }
 
   public boolean atGoal(ArmState setState) {
     return MathUtil.isNear(
-        inputs.position.in(Rotation),
+        inputs.positionRotation,
         setState.goalSetpoint.getAsDouble(),
         ArmConstants.positionTolerance);
   }

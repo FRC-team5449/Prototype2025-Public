@@ -7,9 +7,9 @@
 
 package com.team5449.frc2025;
 
+import com.ctre.phoenix6.CANBus;
 import com.team5449.lib.thirdpartylibs.LimelightHelpers;
 import com.team5449.lib.util.AllianceFlipUtil;
-import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -26,6 +26,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
 
+  private final CANBus canBus;
   private final RobotContainer robotContainer;
 
   public Robot() {
@@ -65,13 +66,21 @@ public class Robot extends LoggedRobot {
                 ? new Pose2d()
                 : new Pose2d(0, 0, Rotation2d.k180deg));
 
-    CameraServer.startAutomaticCapture();
+    canBus = new CANBus("*");
+
+    // CameraServer.startAutomaticCapture();
   }
 
   @Override
   public void robotPeriodic() {
     robotContainer.periodic();
     CommandScheduler.getInstance().run();
+
+    Logger.recordOutput("canivore/BusOffCount", canBus.getStatus().BusOffCount);
+    Logger.recordOutput("canivore/BusUtilization", canBus.getStatus().BusUtilization);
+    Logger.recordOutput("canivore/REC", canBus.getStatus().REC);
+    Logger.recordOutput("canivore/TEC", canBus.getStatus().TEC);
+    Logger.recordOutput("canivore/TxFullCount", canBus.getStatus().TxFullCount);
   }
 
   @Override

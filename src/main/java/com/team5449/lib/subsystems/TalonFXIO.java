@@ -99,8 +99,8 @@ public class TalonFXIO implements MotorIO {
     inputs.appliedVolts = voltageSignal.getValueAsDouble();
     inputs.currentStatorAmps = currentStatorSignal.getValueAsDouble();
     inputs.currentSupplyAmps = currentSupplySignal.getValueAsDouble();
-    inputs.position = positionSignal.getValue();
-    inputs.velocity = velocitySignal.getValue();
+    inputs.positionRotation = positionSignal.getValueAsDouble();
+    inputs.velocityRotationPerSec = velocitySignal.getValueAsDouble();
   }
 
   @Override

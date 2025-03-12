@@ -10,14 +10,11 @@ package com.team5449.lib.subsystems;
 import static edu.wpi.first.units.Units.Radian;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -41,16 +38,16 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
     io.updateInputs(inputs);
-    // Logger.processInputs(getName(), inputs);
+    Logger.processInputs(getName(), inputs);
     Logger.recordOutput(getName() + "/latencyPeriodicSec", Timer.getFPGATimestamp() - timestamp);
   }
 
-  public Angle getCurrentPosition() {
-    return inputs.position;
+  public double getCurrentPosition() {
+    return inputs.positionRotation;
   }
 
-  public AngularVelocity getCurrentVelocity() {
-    return inputs.velocity;
+  public double getCurrentVelocity() {
+    return inputs.velocityRotationPerSec;
   }
 
   public Angle getPositionSetpoint() {
@@ -136,17 +133,17 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
         .withName(getName() + " motionMagicSetpointCommand");
   }
 
-  public Command positionSetpointUntilOnTargetCommand(
-      Supplier<Angle> positionSupplier, DoubleSupplier epsilon) {
-    return new ParallelDeadlineGroup(
-        new WaitUntilCommand(
-            () ->
-                MathUtil.isNear(
-                    positionSupplier.get().in(Radian),
-                    inputs.position.in(Radian),
-                    epsilon.getAsDouble())),
-        positionSetpointCommand(positionSupplier));
-  }
+  // public Command positionSetpointUntilOnTargetCommand(
+  //     Supplier<Angle> positionSupplier, DoubleSupplier epsilon) {
+  //   return new ParallelDeadlineGroup(
+  //       new WaitUntilCommand(
+  //           () ->
+  //               MathUtil.isNear(
+  //                   positionSupplier.get().in(Radian),
+  //                   inputs.positionRotation.in(Radian),
+  //                   epsilon.getAsDouble())),
+  //       positionSetpointCommand(positionSupplier));
+  // }
 
   protected void setCurrentPositionAsZero() {
     io.setCurrentPositionAsZero();

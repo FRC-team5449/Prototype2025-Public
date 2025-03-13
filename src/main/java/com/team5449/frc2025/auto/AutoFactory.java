@@ -63,7 +63,8 @@ public class AutoFactory {
         stowElevatorAndArm());
   }
 
-  public Command fastAss3Level4() {
+  // spotless:off
+  public Command fastAss3Level4Upper() {
     var startToReef1 = getAutoPath("upperStartToReefI");
     var reef1ToSource = getAutoPath("reefIToSource");
     var sourceToReef2 = getAutoPath("sourceToReefK");
@@ -72,7 +73,7 @@ public class AutoFactory {
 
     return Commands.sequence(
         startAt(startToReef1),
-        AutoBuilder.followPath(startToReef1),
+        AutoBuilder.followPath(startToReef1).alongWith(arm.setState(ArmState.IDLE)),
         autoCommand
             .driveToBranchTarget("limelight", false, () -> true)
             .alongWith(extendArmAndElevate(ElevatorState.L4)),
@@ -82,7 +83,7 @@ public class AutoFactory {
             AutoBuilder.followPath(reef1ToSource).andThen(Commands.runOnce(drive::stop)),
             stowElevatorAndArm().andThen(arm.setState(ArmState.INTAKE))),
         run(drive::stop).withDeadline(endEffector.intake()),
-        AutoBuilder.followPath(sourceToReef2),
+        AutoBuilder.followPath(sourceToReef2).alongWith(arm.setState(ArmState.IDLE)),
         autoCommand
             .driveToBranchTarget("limelight", true, () -> true)
             .alongWith(extendArmAndElevate(ElevatorState.L4)),
@@ -92,7 +93,7 @@ public class AutoFactory {
             AutoBuilder.followPath(reef2ToSource).andThen(Commands.runOnce(drive::stop)),
             stowElevatorAndArm().andThen(arm.setState(ArmState.INTAKE))),
         run(drive::stop).withDeadline(endEffector.intake()),
-        AutoBuilder.followPath(sourceToReef3),
+        AutoBuilder.followPath(sourceToReef3).alongWith(arm.setState(ArmState.IDLE)),
         autoCommand
             .driveToBranchTarget("limelight", false, () -> true)
             .alongWith(extendArmAndElevate(ElevatorState.L4)),
@@ -100,6 +101,46 @@ public class AutoFactory {
         endEffector.outtakeAuto(),
         stowElevatorAndArm());
   }
+  // spotless:on
+
+    // spotless:off
+    public Command fastAss3Level4Lower() {
+      var startToReef1 = getAutoPath("lowerStartToReefE");
+      var reef1ToSource = getAutoPath("reefEToSource");
+      var sourceToReef2 = getAutoPath("sourceToReefD");
+      var reef2ToSource = getAutoPath("reefDToSource");
+      var sourceToReef3 = getAutoPath("sourceToReefC");
+  
+      return Commands.sequence(
+          startAt(startToReef1),
+          AutoBuilder.followPath(startToReef1).alongWith(arm.setState(ArmState.IDLE)),
+          autoCommand
+              .driveToBranchTarget("limelight", true, () -> true)
+              .alongWith(extendArmAndElevate(ElevatorState.L4)),
+          arm.setStateOk(ArmState.SCORE),
+          endEffector.outtakeAuto(),
+          Commands.parallel(
+              AutoBuilder.followPath(reef1ToSource).andThen(Commands.runOnce(drive::stop)),
+              stowElevatorAndArm().andThen(arm.setState(ArmState.INTAKE))),
+          run(drive::stop).withDeadline(endEffector.intake()),
+          AutoBuilder.followPath(sourceToReef2).alongWith(arm.setState(ArmState.IDLE)),
+          autoCommand
+              .driveToBranchTarget("limelight", false, () -> true)
+              .alongWith(extendArmAndElevate(ElevatorState.L4)),
+          arm.setStateOk(ArmState.SCORE),
+          endEffector.outtakeAuto(),
+          Commands.parallel(
+              AutoBuilder.followPath(reef2ToSource).andThen(Commands.runOnce(drive::stop)),
+              stowElevatorAndArm().andThen(arm.setState(ArmState.INTAKE))),
+          run(drive::stop).withDeadline(endEffector.intake()),
+          AutoBuilder.followPath(sourceToReef3).alongWith(arm.setState(ArmState.IDLE)),
+          autoCommand
+              .driveToBranchTarget("limelight", true, () -> true)
+              .alongWith(extendArmAndElevate(ElevatorState.L4)),
+          arm.setStateOk(ArmState.SCORE),
+          endEffector.outtakeAuto(),
+          stowElevatorAndArm());
+    }
 
   public Command poor() {
     var midStartToReefH = getAutoPath("middleStartToReefH");

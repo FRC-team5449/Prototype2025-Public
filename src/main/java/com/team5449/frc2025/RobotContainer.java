@@ -7,7 +7,6 @@
 
 package com.team5449.frc2025;
 
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.team5449.frc2025.auto.AutoCommand;
 import com.team5449.frc2025.auto.AutoFactory;
 import com.team5449.frc2025.commands.DriveCommands;
@@ -166,10 +165,8 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", new SendableChooser<Command>());
     autoChooser.addDefaultOption("None", Commands.none());
     autoChooser.addOption("Dummy 4 Level3", autoFactory.dummyFourLV3());
-    autoChooser.addOption("Fast Ass 3 Level4", autoFactory.fastAss3Level4());
-    autoChooser.addOption("Auto Try", autoFactory.autoPathTry());
-    autoChooser.addOption("test", new PathPlannerAuto("New Auto"));
-    autoChooser.addOption("mid", autoFactory.poor());
+    autoChooser.addOption("Fast Ass 3 Level4 Upper", autoFactory.fastAss3Level4Upper());
+    autoChooser.addOption("Fast Ass 3 Level4 Lower", autoFactory.fastAss3Level4Lower());
     configureBindings();
   }
 

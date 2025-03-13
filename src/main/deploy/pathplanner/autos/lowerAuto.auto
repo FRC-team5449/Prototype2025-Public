@@ -7,31 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "lowerStartToReefF"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "reefFToSource"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "sourceToReefE"
+            "pathName": "lowerStartToReefE"
           }
         },
         {
@@ -44,6 +20,18 @@
           "type": "path",
           "data": {
             "pathName": "reefEToSource"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
           }
         },
         {
@@ -68,6 +56,12 @@
           "type": "path",
           "data": {
             "pathName": "reefDToSource"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "sourceToReefC"
           }
         }
       ]

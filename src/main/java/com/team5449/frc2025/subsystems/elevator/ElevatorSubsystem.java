@@ -22,7 +22,7 @@ import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, MotorIO> {
-  @Setter @Getter private ElevatorState desiredState = ElevatorState.IDLE;
+  @AutoLogOutput @Setter @Getter private ElevatorState desiredState = ElevatorState.IDLE;
 
   public ElevatorSubsystem(final MotorIO io) {
     super(ElevatorConstants.kElevatorConfig, new MotorInputsAutoLogged(), io);

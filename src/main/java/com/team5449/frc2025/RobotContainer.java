@@ -212,6 +212,7 @@ public class RobotContainer {
         .onTrue(
             elevator
                 .setState(ElevatorState.IDLE)
+                .andThen(Commands.print("Done state setting"))
                 .alongWith(
                     Commands.waitUntil(elevator::isStowed).andThen(arm.setState(ArmState.INTAKE))))
         .and(() -> arm.intaking() && currentMode == DriveMode.TELEOP)
@@ -240,12 +241,18 @@ public class RobotContainer {
     driverGamepad
         .L2()
         .and(() -> elevator.isStowed() && currentMode == DriveMode.TELEOP)
-        .onTrue(autoCommand.driveToBranchTarget("limelight", true, () -> useLevel4));
+        .onTrue(
+            autoCommand
+                .driveToBranchTarget("limelight", true, () -> useLevel4)
+                .until(driverGamepad.create()));
 
     driverGamepad
         .R2()
         .and(() -> elevator.isStowed() && currentMode == DriveMode.TELEOP)
-        .onTrue(autoCommand.driveToBranchTarget("limelight", false, () -> useLevel4));
+        .onTrue(
+            autoCommand
+                .driveToBranchTarget("limelight", false, () -> useLevel4)
+                .until(driverGamepad.create()));
 
     driverGamepad.options().onTrue(Commands.runOnce(() -> useLevel4 = !useLevel4));
 
@@ -292,10 +299,13 @@ public class RobotContainer {
   }
 
   public Command setElevatorState(ElevatorState state) {
-    return Commands.sequence(
-        arm.setState(ArmState.IDLE),
-        Commands.waitUntil(() -> arm.atGoal(ArmState.IDLE)),
-        elevator.setState(state));
+    Command c =
+        Commands.sequence(
+            arm.setState(ArmState.IDLE),
+            Commands.waitUntil(() -> arm.atGoal(ArmState.IDLE)),
+            elevator.setState(state));
+    // c.addRequirements(elevator, arm);
+    return c;
   }
 
   public Command controllerRumbleCommand() {

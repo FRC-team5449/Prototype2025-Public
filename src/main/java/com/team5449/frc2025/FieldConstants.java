@@ -15,8 +15,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,17 +78,11 @@ public class FieldConstants {
     Logger.recordOutput("Odometry/RR", redReefCenter);
   }
 
-  public static final List<Pose2d> targetPoses =
-      new ArrayList<Pose2d>(
-          DriverStation.getAlliance().get() == Alliance.Blue
-              ? blueCenterFaces.values()
-              : redCenterFaces.values());
+  public static final List<Pose2d> targetPoses = new ArrayList<Pose2d>(blueCenterFaces.values());
 
-  public static final int[] tagIds =
-      DriverStation.getAlliance().get() == Alliance.Blue ? blueTagIds : redTagIds;
+  public static final int[] tagIds = blueTagIds;
 
-  public static final double initialHeading =
-      DriverStation.getAlliance().get() == Alliance.Red ? 0 : 180;
+  public static final double initialHeading = 180;
 
   public static final Transform2d leftBranchTargetPoseRelativeToTagL4 =
       new Transform2d(0.56, -0.165, Rotation2d.kZero);

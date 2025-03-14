@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "name": "FRC Java Project Structure",
+      "description": "Rules for navigating and understanding the FRC Java project structure",
+      "patterns": [
+        {
+          "pattern": "src/main/java/com/team5449/frc2025/**/*.java",
+          "description": "Main robot code for the 2025 season"
+        },
+        {
+          "pattern": "src/main/java/com/team5449/lib/**/*.java",
+          "description": "Library code and utilities"
+        },
+        {
+          "pattern": "src/main/deploy/**/*",
+          "description": "Files to be deployed to the robot"
+        },
+        {
+          "pattern": "build.gradle",
+          "description": "Gradle build configuration"
+        },
+        {
+          "pattern": "vendordeps/**/*.json",
+          "description": "Third-party vendor dependencies"
+        }
+      ]
+    },
+    {
+      "name": "Code Organization",
+      "description": "Rules for organizing code in the project",
+      "patterns": [
+        {
+          "pattern": "src/main/java/com/team5449/frc2025/subsystems/**/*.java",
+          "description": "Robot subsystems"
+        },
+        {
+          "pattern": "src/main/java/com/team5449/frc2025/commands/**/*.java",
+          "description": "Robot commands"
+        },
+        {
+          "pattern": "src/main/java/com/team5449/frc2025/auto/**/*.java",
+          "description": "Autonomous routines"
+        },
+        {
+          "pattern": "src/main/java/com/team5449/frc2025/constants/**/*.java",
+          "description": "Robot constants and configuration"
+        }
+      ]
+    }
+  ],
+  "ignorePatterns": [
+    "build/**/*",
+    "bin/**/*",
+    ".gradle/**/*",
+    ".wpilib/**/*",
+    "gradle/**/*"
+  ]
+} 

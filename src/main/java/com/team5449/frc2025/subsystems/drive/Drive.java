@@ -91,10 +91,7 @@ public class Drive extends SubsystemBase {
 
   private Rotation2d rawGyroRotation = new Rotation2d();
   public static Rotation2d gyroRotation = new Rotation2d();
-  private static Rotation2d gyroOffset =
-      DriverStation.getAlliance().get() == Alliance.Red
-          ? new Rotation2d()
-          : Rotation2d.k180deg.unaryMinus();
+  private static Rotation2d gyroOffset = Rotation2d.k180deg.unaryMinus();
 
   private final SwerveModulePosition[] lastModulePositions =
       new SwerveModulePosition[] {

@@ -45,6 +45,7 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -214,9 +215,11 @@ public class RobotContainer {
                 .setState(ElevatorState.IDLE)
                 .andThen(Commands.print("Done state setting"))
                 .alongWith(
-                    Commands.waitUntil(elevator::isStowed).andThen(arm.setState(ArmState.INTAKE))))
-        .and(() -> arm.intaking() && currentMode == DriveMode.TELEOP)
-        .whileTrue(endEffector.intake());
+                    Commands.waitUntil(elevator::isStowed).andThen(arm.setState(ArmState.INTAKE))));
+
+    driverGamepad.R1().and(() -> arm.intaking() && currentMode == DriveMode.TELEOP).whileTrue(endEffector.intake());
+
+    // driverGamepad.touchpad().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
 
     driverGamepad
         .R2()

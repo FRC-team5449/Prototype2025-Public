@@ -45,7 +45,6 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -207,7 +206,10 @@ public class RobotContainer {
         .pov(270)
         .and(() -> currentMode == DriveMode.TELEOP)
         .onTrue(setElevatorState(ElevatorState.L2));
-
+    driverGamepad
+        .create()
+        .and(() -> currentMode == DriveMode.TELEOP)
+        .onTrue(setElevatorState(ElevatorState.IDLE));
     driverGamepad
         .R1()
         .onTrue(
@@ -217,9 +219,13 @@ public class RobotContainer {
                 .alongWith(
                     Commands.waitUntil(elevator::isStowed).andThen(arm.setState(ArmState.INTAKE))));
 
-    driverGamepad.R1().and(() -> arm.intaking() && currentMode == DriveMode.TELEOP).whileTrue(endEffector.intake());
+    driverGamepad
+        .R1()
+        .and(() -> arm.intaking() && currentMode == DriveMode.TELEOP)
+        .whileTrue(endEffector.intake());
 
-    // driverGamepad.touchpad().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
+    // driverGamepad.touchpad().onTrue(Commands.runOnce(() ->
+    // CommandScheduler.getInstance().cancelAll()));
 
     driverGamepad
         .R2()
@@ -247,7 +253,7 @@ public class RobotContainer {
         .onTrue(
             autoCommand
                 .driveToBranchTarget("limelight", true, () -> useLevel4)
-                .until(driverGamepad.create()));
+                .until(driverGamepad.cross()));
 
     driverGamepad
         .R2()
@@ -255,7 +261,7 @@ public class RobotContainer {
         .onTrue(
             autoCommand
                 .driveToBranchTarget("limelight", false, () -> useLevel4)
-                .until(driverGamepad.create()));
+                .until(driverGamepad.cross()));
 
     driverGamepad.options().onTrue(Commands.runOnce(() -> useLevel4 = !useLevel4));
 

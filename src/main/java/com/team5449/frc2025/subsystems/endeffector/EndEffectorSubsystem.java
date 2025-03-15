@@ -55,7 +55,8 @@ public class EndEffectorSubsystem extends SubsystemBase {
   }
 
   public Command l1Outtake() {
-    return runEnd(() -> io.differentialOpenLoop(0.5, 0.18), () -> io.differentialOpenLoop(0, 0));
+    // return runEnd(() -> io.differentialOpenLoop(0.3, 0.3), () -> io.differentialOpenLoop(0, 0));
+    return runEnd(() -> io.differentialOpenLoop(0.4, 0.18), () -> io.differentialOpenLoop(0, 0));
   }
 
   @Override

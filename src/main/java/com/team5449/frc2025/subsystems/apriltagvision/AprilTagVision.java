@@ -7,9 +7,6 @@
 
 package com.team5449.frc2025.subsystems.apriltagvision;
 
-import static edu.wpi.first.units.Units.Meters;
-
-import com.team5449.frc2025.Constants;
 import com.team5449.frc2025.FieldConstants;
 import com.team5449.frc2025.RobotState;
 import com.team5449.frc2025.RobotState.VisionObservation;
@@ -38,8 +35,6 @@ import org.littletonrobotics.junction.Logger;
 public class AprilTagVision extends SubsystemBase {
   private static final double FIELD_LENGTH_METERS = FieldConstants.fieldLength;
   private static final double FIELD_WIDTH_METERS = FieldConstants.fieldWidth;
-  private static final double BOT_RADIUS =
-      Math.hypot(Constants.botLength.in(Meters), Constants.botWidth.in(Meters)) / 2;
   // Tuning constants
   private static final double MIN_TAG_AREA = 0.1;
   private static final double MAX_TAG_DISTANCE = 1.0;
@@ -77,7 +72,6 @@ public class AprilTagVision extends SubsystemBase {
     }
   }
 
-  @SuppressWarnings("unused")
   private Optional<VisionObservation> getMegaTag2Estimate(
       String cameraName, double stdDevCoefficient) {
     PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName);
@@ -124,7 +118,6 @@ public class AprilTagVision extends SubsystemBase {
     // Calculate standard deviations
     Matrix<N3, N1> stdDevs = calculateStdDevs(estimate, stdDevCoefficient);
 
-    // TODO Which timestamp second is right
     return Optional.of(
         new VisionObservation(
             /*new Pose2d(estimate.pose.getTranslation(), new Rotation2d())*/ estimate.pose,
@@ -160,7 +153,6 @@ public class AprilTagVision extends SubsystemBase {
       thetaStdDev *= distanceMultiplier / areaMultiplier;
     }
 
-    // TODO I want to make the orientaiton of robot more accurat and maily affected by our pigeon
     return VecBuilder.fill(xyStdDev, xyStdDev, thetaStdDev);
   }
 
@@ -175,24 +167,6 @@ public class AprilTagVision extends SubsystemBase {
         && pose.getX() <= FIELD_LENGTH_METERS + margin
         && pose.getY() >= -margin
         && pose.getY() <= FIELD_WIDTH_METERS + margin;
-  }
-
-  /**
-   * Projects a robot pose on the field if it is outside the field. Apply this method if {@link
-   * #isOnField()} gives {@code true}, discard this measurement otherwise.
-   *
-   * @param pose
-   * @return projected pose
-   */
-  @SuppressWarnings("unused")
-  private Pose2d projectOnField(Pose2d pose) {
-    double x = pose.getX();
-    double y = pose.getY();
-    if (x > FIELD_LENGTH_METERS - BOT_RADIUS) x = FIELD_LENGTH_METERS - BOT_RADIUS;
-    else if (x < BOT_RADIUS) x = BOT_RADIUS;
-    if (y > FIELD_WIDTH_METERS - BOT_RADIUS) x = FIELD_WIDTH_METERS - BOT_RADIUS;
-    else if (x < BOT_RADIUS) x = BOT_RADIUS;
-    return new Pose2d(x, y, pose.getRotation());
   }
 
   @Override

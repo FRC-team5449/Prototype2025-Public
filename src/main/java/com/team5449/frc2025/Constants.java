@@ -7,17 +7,15 @@
 
 package com.team5449.frc2025;
 
-import static edu.wpi.first.units.Units.Inches;
-
+import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.units.measure.Distance;
 
 public final class Constants {
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = Robot.isReal() ? Mode.REAL : simMode;
   public static final boolean tuningMode = false;
-  // TODO fill in these
-  public static final Distance botLength = Inches.of(40);
-  public static final Distance botWidth = Inches.of(40);
+  public static final Distance botLength = Meters.of(0.87);
+  public static final Distance botWidth = Meters.of(0.87);
 
   public static enum Mode {
     /** Running on a real robot. */

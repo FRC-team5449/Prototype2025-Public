@@ -37,7 +37,6 @@ public class Module {
 
   private final ModuleIO io;
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
-  private final int index;
 
   private final Alert driveDisconnectedAlert;
   private final Alert turnDisconnectedAlert;
@@ -46,7 +45,6 @@ public class Module {
 
   public Module(ModuleIO io, int index) {
     this.io = io;
-    this.index = index;
     driveDisconnectedAlert =
         new Alert(
             "Disconnected drive motor on module " + Integer.toString(index) + ".",

@@ -29,7 +29,7 @@ public class AutoFactory {
   private final ElevatorSubsystem elevator;
   private final ArmSubsystem arm;
   private final EndEffectorSubsystem endEffector;
-  private final AutoCommand autoCommand;
+  private final AlignCommands autoCommand;
 
   public Command dummyFourLV3() {
     var startToReef1 = getAutoPath("upperStartToReefI");
@@ -40,7 +40,7 @@ public class AutoFactory {
     return Commands.sequence(
         startAt(startToReef1),
         AutoBuilder.followPath(startToReef1),
-        autoCommand.driveToBranchTarget("limelight", false, () -> true),
+        autoCommand.driveToBranchTarget(false, () -> true),
         extendArmAndElevate(ElevatorState.L4),
         arm.setStateOk(ArmState.SCORE),
         endEffector.outtakeAuto(),
@@ -48,7 +48,7 @@ public class AutoFactory {
         AutoBuilder.followPath(reef1ToSource),
         endEffector.intake().alongWith(Commands.runOnce(drive::stop)),
         AutoBuilder.followPath(sourceToReef2),
-        autoCommand.driveToBranchTarget("limelight", true, () -> true),
+        autoCommand.driveToBranchTarget(true, () -> true),
         extendArmAndElevate(ElevatorState.L4),
         arm.setStateOk(ArmState.SCORE),
         endEffector.outtakeAuto(),
@@ -56,7 +56,7 @@ public class AutoFactory {
         AutoBuilder.followPath(reef2ToSource),
         endEffector.intake().alongWith(Commands.runOnce(drive::stop)),
         AutoBuilder.followPath(sourceToReef3),
-        autoCommand.driveToBranchTarget("limelight", false, () -> true),
+        autoCommand.driveToBranchTarget(false, () -> true),
         extendArmAndElevate(ElevatorState.L4),
         arm.setStateOk(ArmState.SCORE),
         endEffector.outtakeAuto(),
@@ -75,7 +75,7 @@ public class AutoFactory {
         startAt(startToReef1),
         AutoBuilder.followPath(startToReef1).alongWith(arm.setState(ArmState.IDLE)),
         autoCommand
-            .driveToBranchTarget("limelight", false, () -> true)
+            .driveToBranchTarget(false, () -> true)
             .alongWith(extendArmAndElevate(ElevatorState.L4)),
         arm.setStateOk(ArmState.SCORE),
         endEffector.outtakeAuto(),
@@ -85,7 +85,7 @@ public class AutoFactory {
         run(drive::stop).withDeadline(endEffector.intake()),
         AutoBuilder.followPath(sourceToReef2).alongWith(arm.setState(ArmState.IDLE)),
         autoCommand
-            .driveToBranchTarget("limelight", true, () -> true)
+            .driveToBranchTarget(true, () -> true)
             .alongWith(extendArmAndElevate(ElevatorState.L4)),
         arm.setStateOk(ArmState.SCORE),
         endEffector.outtakeAuto(),
@@ -95,7 +95,7 @@ public class AutoFactory {
         run(drive::stop).withDeadline(endEffector.intake()),
         AutoBuilder.followPath(sourceToReef3).alongWith(arm.setState(ArmState.IDLE)),
         autoCommand
-            .driveToBranchTarget("limelight", false, () -> true)
+            .driveToBranchTarget(false, () -> true)
             .alongWith(extendArmAndElevate(ElevatorState.L4)),
         arm.setStateOk(ArmState.SCORE),
         endEffector.outtakeAuto(),
@@ -115,7 +115,7 @@ public class AutoFactory {
         startAt(startToReef1),
         AutoBuilder.followPath(startToReef1).alongWith(arm.setState(ArmState.IDLE)),
         autoCommand
-            .driveToBranchTarget("limelight", true, () -> true)
+            .driveToBranchTarget(true, () -> true)
             .alongWith(extendArmAndElevate(ElevatorState.L4)),
         arm.setStateOk(ArmState.SCORE),
         endEffector.outtakeAuto(),
@@ -125,7 +125,7 @@ public class AutoFactory {
         run(drive::stop).withDeadline(endEffector.intake()),
         AutoBuilder.followPath(sourceToReef2).alongWith(arm.setState(ArmState.IDLE)),
         autoCommand
-            .driveToBranchTarget("limelight", false, () -> true)
+            .driveToBranchTarget(false, () -> true)
             .alongWith(extendArmAndElevate(ElevatorState.L4)),
         arm.setStateOk(ArmState.SCORE),
         endEffector.outtakeAuto(),
@@ -135,7 +135,7 @@ public class AutoFactory {
         run(drive::stop).withDeadline(endEffector.intake()),
         AutoBuilder.followPath(sourceToReef3).alongWith(arm.setState(ArmState.IDLE)),
         autoCommand
-            .driveToBranchTarget("limelight", true, () -> true)
+            .driveToBranchTarget(true, () -> true)
             .alongWith(extendArmAndElevate(ElevatorState.L4)),
         arm.setStateOk(ArmState.SCORE),
         endEffector.outtakeAuto(),

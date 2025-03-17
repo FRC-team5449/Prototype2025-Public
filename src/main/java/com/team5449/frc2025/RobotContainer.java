@@ -7,7 +7,7 @@
 
 package com.team5449.frc2025;
 
-import com.team5449.frc2025.auto.AutoCommand;
+import com.team5449.frc2025.auto.AlignCommands;
 import com.team5449.frc2025.auto.AutoFactory;
 import com.team5449.frc2025.commands.DriveCommands;
 import com.team5449.frc2025.subsystems.apriltagvision.AprilTagVision;
@@ -62,9 +62,8 @@ public class RobotContainer {
 
   private final ClimberSubsystem climber;
 
+@SuppressWarnings("unused")
   private final AprilTagVision vision;
-
-  private final RobotState robotState = RobotState.getInstance();
 
   private final AutoFactory autoFactory;
 
@@ -74,7 +73,7 @@ public class RobotContainer {
 
   private final LoggedDashboardChooser<Command> autoChooser;
 
-  private final AutoCommand autoCommand;
+  private final AlignCommands alignCommands;
 
   private DriveMode currentMode = DriveMode.TELEOP;
 
@@ -158,9 +157,9 @@ public class RobotContainer {
         break;
     }
 
-    autoCommand = new AutoCommand(drive, elevator, arm, endEffector, vision);
+    alignCommands = new AlignCommands(drive);
 
-    autoFactory = new AutoFactory(drive, elevator, arm, endEffector, autoCommand);
+    autoFactory = new AutoFactory(drive, elevator, arm, endEffector, alignCommands);
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", new SendableChooser<Command>());
     autoChooser.addDefaultOption("None", Commands.none());
@@ -251,16 +250,16 @@ public class RobotContainer {
         .L2()
         .and(() -> elevator.isStowed() && currentMode == DriveMode.TELEOP)
         .onTrue(
-            autoCommand
-                .driveToBranchTarget("limelight", true, () -> useLevel4)
+            alignCommands
+                .driveToBranchTarget(true, () -> useLevel4)
                 .until(driverGamepad.cross()));
 
     driverGamepad
         .R2()
         .and(() -> elevator.isStowed() && currentMode == DriveMode.TELEOP)
         .onTrue(
-            autoCommand
-                .driveToBranchTarget("limelight", false, () -> useLevel4)
+            alignCommands
+                .driveToBranchTarget(false, () -> useLevel4)
                 .until(driverGamepad.cross()));
 
     driverGamepad.options().onTrue(Commands.runOnce(() -> useLevel4 = !useLevel4));

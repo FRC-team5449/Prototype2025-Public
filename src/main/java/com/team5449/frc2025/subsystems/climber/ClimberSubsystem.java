@@ -44,7 +44,12 @@ public class ClimberSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged,
   }
 
   public Command decline() {
-    return Commands.runEnd(() -> climbOffset += 1, () -> {});
+    return Commands.runEnd(
+        () -> {
+          climbOffset =
+              Math.min(climbOffset + 1, ClimberConstants.kClimberConfig.kMaxPositionUnits);
+        },
+        () -> {});
   }
 
   public Command zeroOffset() {
@@ -52,7 +57,12 @@ public class ClimberSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged,
   }
 
   public Command elevate() {
-    return Commands.runEnd(() -> climbOffset -= 1, () -> {});
+    return Commands.runEnd(
+        () -> {
+          climbOffset =
+              Math.max(climbOffset - 1, ClimberConstants.kClimberConfig.kMinPositionUnits);
+        },
+        () -> {});
   }
 
   public boolean atGoal() {

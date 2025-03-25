@@ -69,10 +69,10 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
   @RequiredArgsConstructor
   public enum ElevatorState {
     IDLE(() -> 0),
-    L1(() -> 0.8),
-    L2(() -> 4.3 * (5.0 / 4.0)),
-    L3(() -> 10 * (5.0 / 4.0)),
-    L4(() -> 20 * (5.0 / 4.0));
+    L1(() -> 0.8 * (3.0 / 5.0)),
+    L2(() -> 4.3 * (3.0 / 4.0)),
+    L3(() -> 10 * (3.0 / 4.0)),
+    L4(() -> 20 * (3.0 / 4.0));
 
     public final DoubleSupplier goalSetpoint;
   }

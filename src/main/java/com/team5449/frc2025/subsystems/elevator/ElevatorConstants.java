@@ -31,7 +31,7 @@ public class ElevatorConstants {
     kElevatorConfig.canSlaveId = 2;
     kElevatorConfig.isSlaveOpposite = true;
 
-    kElevatorConfig.kMaxPositionUnits = 21 * (5.0 / 4.0);
+    kElevatorConfig.kMaxPositionUnits = 21 * (3.0 / 4.0);
     kElevatorConfig.kMinPositionUnits = -0.05;
 
     TalonFXConfiguration talonConfiguration = new TalonFXConfiguration();
@@ -45,20 +45,20 @@ public class ElevatorConstants {
             .withForwardSoftLimitThreshold(kElevatorConfig.kMaxPositionUnits)
             .withReverseSoftLimitEnable(true)
             .withReverseSoftLimitThreshold(kElevatorConfig.kMinPositionUnits);
-    talonConfiguration.CurrentLimits.StatorCurrentLimit = 70;
+    talonConfiguration.CurrentLimits.StatorCurrentLimit = 120;
     talonConfiguration.Slot0 =
         new Slot0Configs()
-            .withKP(1.7)
+            .withKP(1.85)
             .withKI(0)
-            .withKD(0.04)
-            .withKS(0.12)
-            .withKG(0.33)
+            .withKD(0.1)
+            .withKS(0)
+            .withKG(0.35)
             .withGravityType(GravityTypeValue.Elevator_Static)
             .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     talonConfiguration.MotionMagic =
         new MotionMagicConfigs()
-            .withMotionMagicCruiseVelocity(50)
-            .withMotionMagicAcceleration(500)
+            .withMotionMagicCruiseVelocity(200)
+            .withMotionMagicAcceleration(1000)
             .withMotionMagicExpo_kV(0.19)
             .withMotionMagicExpo_kA(0.3);
 

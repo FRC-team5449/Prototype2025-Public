@@ -65,7 +65,6 @@ public class Robot extends LoggedRobot {
     LimelightHelpers.SetIMUMode("limelight", 1);
     LimelightHelpers.SetRobotOrientation("limelight", FieldConstants.initialHeading, 0, 0, 0, 0, 0);
 
-    // TODO You must change this
     RobotState.getInstance()
         .setPose(
             DriverStation.getAlliance().get() == Alliance.Red

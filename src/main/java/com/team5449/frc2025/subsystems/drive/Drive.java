@@ -235,7 +235,6 @@ public class Drive extends SubsystemBase {
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
 
-    // TODO Rotation always wrong
     RobotState.getInstance()
         .consumeVisionObservation()
         .ifPresent(

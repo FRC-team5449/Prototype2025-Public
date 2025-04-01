@@ -62,7 +62,7 @@ public class RobotContainer {
 
   private final ClimberSubsystem climber;
 
-@SuppressWarnings("unused")
+  @SuppressWarnings("unused")
   private final AprilTagVision vision;
 
   private final AutoFactory autoFactory;
@@ -166,6 +166,7 @@ public class RobotContainer {
     autoChooser.addOption("Dummy 4 Level3", autoFactory.dummyFourLV3());
     autoChooser.addOption("Fast Ass 3 Level4 Upper", autoFactory.fastAss3Level4Upper());
     autoChooser.addOption("Fast Ass 3 Level4 Lower", autoFactory.fastAss3Level4Lower());
+    autoChooser.addOption("Feedforward Test", DriveCommands.feedforwardCharacterization(drive));
     configureBindings();
   }
 
@@ -250,17 +251,13 @@ public class RobotContainer {
         .L2()
         .and(() -> elevator.isStowed() && currentMode == DriveMode.TELEOP)
         .onTrue(
-            alignCommands
-                .driveToBranchTarget(true, () -> useLevel4)
-                .until(driverGamepad.cross()));
+            alignCommands.driveToBranchTarget(true, () -> useLevel4).until(driverGamepad.cross()));
 
     driverGamepad
         .R2()
         .and(() -> elevator.isStowed() && currentMode == DriveMode.TELEOP)
         .onTrue(
-            alignCommands
-                .driveToBranchTarget(false, () -> useLevel4)
-                .until(driverGamepad.cross()));
+            alignCommands.driveToBranchTarget(false, () -> useLevel4).until(driverGamepad.cross()));
 
     driverGamepad.options().onTrue(Commands.runOnce(() -> useLevel4 = !useLevel4));
 

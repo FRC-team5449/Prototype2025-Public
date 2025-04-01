@@ -35,11 +35,13 @@ import org.littletonrobotics.junction.Logger;
 public class AprilTagVision extends SubsystemBase {
   private static final double FIELD_LENGTH_METERS = FieldConstants.fieldLength;
   private static final double FIELD_WIDTH_METERS = FieldConstants.fieldWidth;
+  public static boolean isAligning = false;
   // Tuning constants
   private static final double MIN_TAG_AREA = 0.1;
   private static final double MAX_TAG_DISTANCE = 1.0;
   private static final double XY_STD_DEV_COEFFICIENT = 5;
   private static final double THETA_STD_DEV_COEFFICIENT = 100;
+  private static final double ALIGN_THETA_STD_DEV_COEFFICIENT = 100;
   private static final double MIN_TAG_SPACING = 1.0;
   private static final double MAX_TAG_TO_CAM_DISTANCE = 2;
 
@@ -135,7 +137,13 @@ public class AprilTagVision extends SubsystemBase {
       LimelightHelpers.PoseEstimate estimate, double stdDevCoefficient) {
     // Base standard deviations
     double xyStdDev = XY_STD_DEV_COEFFICIENT * stdDevCoefficient;
-    double thetaStdDev = THETA_STD_DEV_COEFFICIENT * stdDevCoefficient;
+    double thetaStdDev = Double.POSITIVE_INFINITY;
+
+    if (isAligning) {
+      thetaStdDev = ALIGN_THETA_STD_DEV_COEFFICIENT * stdDevCoefficient;
+    } else {
+      thetaStdDev = THETA_STD_DEV_COEFFICIENT * stdDevCoefficient;
+    }
 
     if (estimate.tagCount > 1) {
       // Multi-tag case

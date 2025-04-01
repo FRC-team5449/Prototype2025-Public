@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 public class HopperSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, MotorIO> {
-  @Setter @Getter private HopperState desiredState = HopperState.INTAKE;
+  @Setter @Getter private HopperState desiredState = HopperState.IDLE;
 
   public HopperSubsystem(final MotorIO io) {
     super(HopperConstants.kHopperConfig, new MotorInputsAutoLogged(), io);
@@ -48,7 +48,7 @@ public class HopperSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, 
   }
 
   public Command setState(HopperState state) {
-    return Commands.runOnce(() -> setDesiredState(state));
+    return Commands.runOnce(() -> setDesiredState(state), this);
   }
 
   public boolean atGoal() {
@@ -69,8 +69,9 @@ public class HopperSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, 
 
   @RequiredArgsConstructor
   public enum HopperState {
-    IDLE(() -> 0),
-    INTAKE(() -> 2),
+    ZERO(() -> 0),
+    IDLE(() -> 2),
+    INTAKE(() -> 5),
     FOLD(() -> 39);
 
     public final DoubleSupplier goalSetpoint;

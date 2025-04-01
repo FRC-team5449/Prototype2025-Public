@@ -176,7 +176,7 @@ public class RobotContainer {
             drive,
             () -> driverGamepad.getLeftY() * flip,
             () -> driverGamepad.getLeftX() * flip,
-            () -> -driverGamepad.getRightX()));
+            () -> -0.8 * driverGamepad.getRightX()));
 
     driverGamepad
         .circle()
@@ -271,6 +271,15 @@ public class RobotContainer {
                 .andThen(hopper.setState(HopperState.FOLD)));
 
     driverGamepad
+        .square()
+        .onTrue(hopper.setState(HopperState.INTAKE))
+        .onFalse(
+            hopper
+                .setState(HopperState.ZERO)
+                .andThen(Commands.waitSeconds(0.2))
+                .andThen(hopper.setState(HopperState.IDLE)));
+
+    driverGamepad
         .triangle()
         .and(
             () ->
@@ -299,8 +308,7 @@ public class RobotContainer {
                         () -> !climber.atGoal(ClimberState.ALIGN))
                     .alongWith(Commands.runOnce(() -> currentMode = DriveMode.TELEOP))
                     .andThen(
-                        hopper.setStateOk(HopperState.INTAKE),
-                        climber.setState(ClimberState.IDLE))));
+                        hopper.setStateOk(HopperState.IDLE), climber.setState(ClimberState.IDLE))));
   }
 
   public Command setElevatorState(ElevatorState state) {

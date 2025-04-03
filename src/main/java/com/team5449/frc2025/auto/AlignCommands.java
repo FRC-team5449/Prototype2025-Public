@@ -28,42 +28,45 @@ public class AlignCommands {
   private final Drive drive;
 
   private Command findAndDriveToTarget(Consumer<AtomicBoolean> targetFinder) {
-    IDrive iDrive=new IDrive(drive);
+    IDrive iDrive = new IDrive(drive);
     AtomicBoolean targetPoseExist = new AtomicBoolean(false);
-    return Commands.runOnce(()->targetFinder.accept(targetPoseExist)).andThen(Commands.either(iDrive, Commands.none(), () -> targetPoseExist.get())).until(() -> !targetPoseExist.get() || iDrive.atGoal());
+    return Commands.runOnce(() -> targetFinder.accept(targetPoseExist))
+        .andThen(Commands.either(iDrive, Commands.none(), () -> targetPoseExist.get()))
+        .until(() -> !targetPoseExist.get() || iDrive.atGoal());
   }
 
-  /**If it doesn't work as before, roll back to the previous version*/
+  /** If it doesn't work as before, roll back to the previous version */
   public Command driveToBranchTarget(boolean useLeftBranch, BooleanSupplier useLevel4) {
-    return findAndDriveToTarget((targetPoseExist) -> {
-                  Optional<Pose2d> tagPose =
-                      FieldConstants.getReefTagPose(drive.getPose().getTranslation());
+    return findAndDriveToTarget(
+        (targetPoseExist) -> {
+          Optional<Pose2d> tagPose =
+              FieldConstants.getReefTagPose(drive.getPose().getTranslation());
 
-                  if (tagPose.isEmpty()) {
-                    drive.setTargetPose(null);
-                    targetPoseExist.set(false);
-                    return;
-                  }
+          if (tagPose.isEmpty()) {
+            drive.setTargetPose(null);
+            targetPoseExist.set(false);
+            return;
+          }
 
-                  targetPoseExist.set(true);
+          targetPoseExist.set(true);
 
-                  Transform2d transformer =
-                      useLeftBranch
-                          ? useLevel4.getAsBoolean()
-                              ? FieldConstants.leftBranchTargetPoseRelativeToTagL4
-                              : FieldConstants.leftBranchTargetPoseRelativeToTag
-                          : useLevel4.getAsBoolean()
-                              ? FieldConstants.rightBranchTargetPoseRelativeToTagL4
-                              : FieldConstants.rightBranchTargetPoseRelativeToTag;
+          Transform2d transformer =
+              useLeftBranch
+                  ? useLevel4.getAsBoolean()
+                      ? FieldConstants.leftBranchTargetPoseRelativeToTagL4
+                      : FieldConstants.leftBranchTargetPoseRelativeToTag
+                  : useLevel4.getAsBoolean()
+                      ? FieldConstants.rightBranchTargetPoseRelativeToTagL4
+                      : FieldConstants.rightBranchTargetPoseRelativeToTag;
 
-                  Pose2d branchPose =
-                      tagPose
-                          .get()
-                          .transformBy(transformer)
-                          .transformBy(new Transform2d(0, 0, Rotation2d.k180deg));
+          Pose2d branchPose =
+              tagPose
+                  .get()
+                  .transformBy(transformer)
+                  .transformBy(new Transform2d(0, 0, Rotation2d.k180deg));
 
-                  Logger.recordOutput("Odometry/BLUE TARGET", AllianceFlipUtil.apply(branchPose));
-                  drive.setTargetPose(branchPose);
-                });
+          Logger.recordOutput("Odometry/BLUE TARGET", AllianceFlipUtil.apply(branchPose));
+          drive.setTargetPose(branchPose);
+        });
   }
 }

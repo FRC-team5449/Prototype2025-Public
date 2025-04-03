@@ -38,7 +38,6 @@ import com.team5449.frc2025.subsystems.hopper.HopperSubsystem.HopperState;
 import com.team5449.lib.subsystems.MotorIO;
 import com.team5449.lib.subsystems.SimTalonFXIO;
 import com.team5449.lib.subsystems.TalonFXIO;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -178,14 +177,15 @@ public class RobotContainer {
             () -> driverGamepad.getLeftX() * flip,
             () -> -0.8 * driverGamepad.getRightX()));
 
-    driverGamepad
-        .circle()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -driverGamepad.getLeftY() * flip,
-                () -> -driverGamepad.getLeftX() * flip,
-                Rotation2d::new));
+    // driverGamepad
+    //     .circle()
+    //     .whileTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> -driverGamepad.getLeftY() * flip,
+    //             () -> -driverGamepad.getLeftX() * flip,
+    //             Rotation2d::new));
+    driverGamepad.circle().onTrue(Commands.runOnce(() -> RobotState.getInstance().resetHeading()));
 
     driverGamepad
         .pov(0)

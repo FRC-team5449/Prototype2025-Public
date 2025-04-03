@@ -7,6 +7,7 @@
 
 package com.team5449.frc2025;
 
+import com.team5449.lib.util.AllianceFlipUtil;
 import com.team5449.lib.util.GeomUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -59,6 +60,13 @@ public class RobotState {
 
   public synchronized void updatePose(Pose2d pose) {
     estimatedPose = pose;
+  }
+
+  public synchronized void resetHeading() {
+    setPose(
+        new Pose2d(
+            estimatedPose.getTranslation(),
+            AllianceFlipUtil.shouldFlip() ? Rotation2d.kZero : Rotation2d.k180deg));
   }
 
   public synchronized Rotation2d getRotation() {

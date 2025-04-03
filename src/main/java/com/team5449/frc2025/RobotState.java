@@ -7,6 +7,7 @@
 
 package com.team5449.frc2025;
 
+import com.team5449.lib.thirdpartylibs.LimelightHelpers;
 import com.team5449.lib.util.AllianceFlipUtil;
 import com.team5449.lib.util.GeomUtil;
 import edu.wpi.first.math.Matrix;
@@ -67,6 +68,8 @@ public class RobotState {
         new Pose2d(
             estimatedPose.getTranslation(),
             AllianceFlipUtil.shouldFlip() ? Rotation2d.kZero : Rotation2d.k180deg));
+    LimelightHelpers.SetRobotOrientation(
+        "limelight", AllianceFlipUtil.shouldFlip() ? 180 : 0, 0, 0, 0, 0, 0);
   }
 
   public synchronized Rotation2d getRotation() {

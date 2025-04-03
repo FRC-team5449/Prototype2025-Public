@@ -9,6 +9,7 @@ package com.team5449.frc2025.auto;
 
 import com.team5449.frc2025.FieldConstants;
 import com.team5449.frc2025.commands.IDrive;
+import com.team5449.frc2025.subsystems.apriltagvision.AprilTagVision;
 import com.team5449.frc2025.subsystems.drive.Drive;
 import com.team5449.lib.util.AllianceFlipUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -30,9 +31,14 @@ public class AlignCommands {
   private Command findAndDriveToTarget(Consumer<AtomicBoolean> targetFinder) {
     IDrive iDrive = new IDrive(drive);
     AtomicBoolean targetPoseExist = new AtomicBoolean(false);
-    return Commands.runOnce(() -> targetFinder.accept(targetPoseExist))
+    return Commands.runOnce(
+            () -> {
+              targetFinder.accept(targetPoseExist);
+              AprilTagVision.isAligning = true;
+            })
         .andThen(Commands.either(iDrive, Commands.none(), () -> targetPoseExist.get()))
-        .until(() -> !targetPoseExist.get() || iDrive.atGoal());
+        .until(() -> !targetPoseExist.get() || iDrive.atGoal())
+        .finallyDo(() -> AprilTagVision.isAligning = false);
   }
 
   /** If it doesn't work as before, roll back to the previous version */

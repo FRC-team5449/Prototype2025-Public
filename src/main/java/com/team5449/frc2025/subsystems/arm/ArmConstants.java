@@ -27,7 +27,7 @@ public class ArmConstants {
   public static final ServoMotorSubsystemConfig kArmConfig = new ServoMotorSubsystemConfig();
   public static final double positionTolerance = 0.02;
 
-  public static final double kArmGearRatio = 62.5;
+  public static final double kArmGearRatio = 41.66667;
 
   public static final CANcoderConfiguration armCanCoderConfig = new CANcoderConfiguration();
   public static final int armCanCoderId = 8;
@@ -41,12 +41,12 @@ public class ArmConstants {
     kArmConfig.enableSlave = false;
 
     kArmConfig.kMaxPositionUnits = 0.295;
-    kArmConfig.kMinPositionUnits = -0.05;
+    kArmConfig.kMinPositionUnits = 0.05;
 
     TalonFXConfiguration talonConfiguration = new TalonFXConfiguration();
     talonConfiguration.MotorOutput =
         new MotorOutputConfigs()
-            .withInverted(InvertedValue.CounterClockwise_Positive)
+            .withInverted(InvertedValue.Clockwise_Positive)
             .withNeutralMode(NeutralModeValue.Brake);
     talonConfiguration.SoftwareLimitSwitch =
         new SoftwareLimitSwitchConfigs()
@@ -62,10 +62,10 @@ public class ArmConstants {
             .withSupplyCurrentLimit(70);
     talonConfiguration.Slot0 =
         new Slot0Configs()
-            .withKP(45)
+            .withKP(40)
             .withKI(0)
             .withKD(1)
-            .withKS(0.23) // TODO: Should be 0.23 when mech is fixed.
+            .withKS(0.01) // TODO: Should be 0.23 when mech is fixed.
             .withKG(0.44)
             .withGravityType(GravityTypeValue.Arm_Cosine)
             .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
@@ -83,8 +83,8 @@ public class ArmConstants {
   }
 
   static {
-    armCanCoderConfig.MagnetSensor.MagnetOffset = -0.413086;
+    armCanCoderConfig.MagnetSensor.MagnetOffset = 0.174560921875;
     armCanCoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
-    armCanCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+    armCanCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
   }
 }

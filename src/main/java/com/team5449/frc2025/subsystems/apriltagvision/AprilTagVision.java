@@ -35,7 +35,6 @@ import org.littletonrobotics.junction.Logger;
 public class AprilTagVision extends SubsystemBase {
   private static final double FIELD_LENGTH_METERS = FieldConstants.fieldLength;
   private static final double FIELD_WIDTH_METERS = FieldConstants.fieldWidth;
-  public static boolean isAligning = false;
   // Tuning constants
   private static final double MIN_TAG_AREA = 0.1;
   private static final double MAX_TAG_DISTANCE = 1.0;

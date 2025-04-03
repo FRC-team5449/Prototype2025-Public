@@ -64,13 +64,11 @@ public class ArmSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, Mot
         ArmConstants.positionTolerance);
   }
 
-  // 0.4257815 - x =  0.174560921875 +
-
   @RequiredArgsConstructor
   public enum ArmState {
-    IDLE(() -> 0.055634078),
-    INTAKE(() -> 0),
-    SCORE(() -> 0.145634078);
+    IDLE(() -> 0.182891),
+    INTAKE(() -> 0.24),
+    SCORE(() -> 0.092891);
 
     public final DoubleSupplier goalSetpoint;
   }

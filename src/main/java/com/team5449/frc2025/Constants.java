@@ -8,7 +8,6 @@
 package com.team5449.frc2025;
 
 import static edu.wpi.first.units.Units.Meters;
-
 import edu.wpi.first.units.measure.Distance;
 
 public final class Constants {

@@ -65,7 +65,7 @@ public class ArmConstants {
             .withKP(45)
             .withKI(0)
             .withKD(1)
-            .withKS(0.23) // TODO: Should be 0.23 when mech is fixed.
+            .withKS(0.23)
             .withKG(0.44)
             .withGravityType(GravityTypeValue.Arm_Cosine)
             .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);

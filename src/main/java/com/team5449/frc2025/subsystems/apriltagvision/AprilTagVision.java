@@ -7,7 +7,6 @@
 
 package com.team5449.frc2025.subsystems.apriltagvision;
 
-import com.team5449.frc2025.FieldConstants;
 import com.team5449.frc2025.RobotState;
 import com.team5449.frc2025.RobotState.VisionObservation;
 import com.team5449.frc2025.subsystems.drive.Drive;
@@ -30,8 +29,6 @@ import java.util.Set;
 import org.littletonrobotics.junction.Logger;
 
 public class AprilTagVision extends SubsystemBase {
-  private static final double FIELD_LENGTH_METERS = FieldConstants.fieldLength;
-  private static final double FIELD_WIDTH_METERS = FieldConstants.fieldWidth;
   public static boolean isAligning = false;
   // Tuning constants
   private static final double MIN_TAG_AREA = 0.1;

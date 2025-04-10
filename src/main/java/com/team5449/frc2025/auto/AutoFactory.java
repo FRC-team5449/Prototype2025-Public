@@ -17,6 +17,7 @@ import com.team5449.frc2025.subsystems.drive.Drive;
 import com.team5449.frc2025.subsystems.elevator.ElevatorSubsystem;
 import com.team5449.frc2025.subsystems.elevator.ElevatorSubsystem.ElevatorState;
 import com.team5449.frc2025.subsystems.endeffector.EndEffectorSubsystem;
+import com.team5449.frc2025.subsystems.hopper.HopperSubsystem;
 import com.team5449.lib.util.AllianceFlipUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,6 +30,7 @@ public class AutoFactory {
   private final ElevatorSubsystem elevator;
   private final ArmSubsystem arm;
   private final EndEffectorSubsystem endEffector;
+  private final HopperSubsystem hopper;
   private final AlignCommands autoCommand;
 
   public Command dummyFourLV3() {

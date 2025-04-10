@@ -10,6 +10,7 @@ package com.team5449.frc2025.auto;
 import static com.pathplanner.lib.auto.AutoBuilder.followPath;
 import static edu.wpi.first.wpilibj2.command.Commands.run;
 
+import com.pathplanner.lib.events.EventTrigger;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.team5449.frc2025.subsystems.arm.ArmSubsystem;
 import com.team5449.frc2025.subsystems.arm.ArmSubsystem.ArmState;
@@ -102,6 +103,45 @@ public class AutoFactory {
   }
   // spotless:on
 
+  // spotless:on
+  public Command fastestAss3Level4Upper() {
+    var startToReef1 = getAutoPath("upperStartToReefICon");
+    var reef1ToSource = getAutoPath("reefIToSourceCon");
+    var sourceToReef2 = getAutoPath("sourceToReefKCon");
+    var reef2ToSource = getAutoPath("reefKToSourceCon");
+    var sourceToReef3 = getAutoPath("sourceToReefLCon");
+
+    return Commands.sequence(
+        startAt(startToReef1),
+        followPath(startToReef1)
+            .alongWith(
+                arm.setState(ArmState.IDLE),
+                Commands.waitUntil(new EventTrigger("Elevate"))
+                    .andThen(extendElevator(ElevatorState.L4))),
+        score(),
+        Commands.parallel(
+            followPathStop(reef1ToSource), stowElevator().andThen(arm.setState(ArmState.INTAKE))),
+        run(drive::stop).withDeadline(endEffector.intake()),
+        followPath(sourceToReef2)
+            .alongWith(
+                arm.setState(ArmState.IDLE),
+                Commands.waitUntil(new EventTrigger("Elevate"))
+                    .andThen(extendElevator(ElevatorState.L4))),
+        score(),
+        Commands.parallel(
+            followPathStop(reef2ToSource), stowElevator().andThen(arm.setState(ArmState.INTAKE))),
+        run(drive::stop).withDeadline(endEffector.intake()),
+        followPath(sourceToReef3)
+            .alongWith(
+                arm.setState(ArmState.IDLE),
+                Commands.waitUntil(new EventTrigger("Elevate"))
+                    .andThen(extendElevator(ElevatorState.L4))),
+        score(),
+        stowElevator());
+  }
+
+  // spotless:on
+
   // spotless:off
   public Command fastAss3Level4Lower() {
     var startToReef1 = getAutoPath("lowerStartToReefE");
@@ -119,8 +159,7 @@ public class AutoFactory {
         arm.setStateOk(ArmState.SCORE),
         endEffector.outtakeAuto(),
         Commands.parallel(
-            followPathStop(reef1ToSource),
-            stowElevator().andThen(arm.setState(ArmState.INTAKE))),
+            followPathStop(reef1ToSource), stowElevator().andThen(arm.setState(ArmState.INTAKE))),
         run(drive::stop).withDeadline(endEffector.intake()),
         followPath(sourceToReef2).alongWith(arm.setState(ArmState.IDLE)),
         autoCommand
@@ -129,8 +168,7 @@ public class AutoFactory {
         arm.setStateOk(ArmState.SCORE),
         endEffector.outtakeAuto(),
         Commands.parallel(
-            followPathStop(reef2ToSource),
-            stowElevator().andThen(arm.setState(ArmState.INTAKE))),
+            followPathStop(reef2ToSource), stowElevator().andThen(arm.setState(ArmState.INTAKE))),
         run(drive::stop).withDeadline(endEffector.intake()),
         followPath(sourceToReef3).alongWith(arm.setState(ArmState.IDLE)),
         autoCommand
@@ -162,9 +200,10 @@ public class AutoFactory {
   private Command stowElevator() {
     return arm.setStateOk(ArmState.IDLE).andThen(elevator.setStateOk(ElevatorState.IDLE));
   }
-  
-  private Command score(){
-    return arm.setStateOk(ArmState.SCORE).alongWith(Commands.waitSeconds(0.3).andThen(endEffector.outtakeAuto()));
+
+  private Command score() {
+    return arm.setStateOk(ArmState.SCORE)
+        .alongWith(Commands.waitSeconds(0.3).andThen(endEffector.outtakeAuto()));
   }
 
   private Command startAt(PathPlannerPath firstPath) {

@@ -83,8 +83,8 @@ public class ArmConstants {
   }
 
   static {
-    armCanCoderConfig.MagnetSensor.MagnetOffset = -0.413086;
+    armCanCoderConfig.MagnetSensor.MagnetOffset = 0.105225;
     armCanCoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
-    armCanCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+    armCanCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
   }
 }

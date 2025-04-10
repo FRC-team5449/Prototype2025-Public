@@ -120,8 +120,8 @@ public class AutoFactory {
                     .andThen(extendElevator(ElevatorState.L4))),
         score(),
         Commands.parallel(
-            followPathStop(reef1ToSource), stowElevator().andThen(arm.setState(ArmState.INTAKE))),
-        run(drive::stop).withDeadline(endEffector.intake()),
+            followPathStop(reef1ToSource),
+            stowElevator().andThen(arm.setState(ArmState.INTAKE), endEffector.intake())),
         followPath(sourceToReef2)
             .alongWith(
                 arm.setState(ArmState.IDLE),
@@ -129,8 +129,8 @@ public class AutoFactory {
                     .andThen(extendElevator(ElevatorState.L4))),
         score(),
         Commands.parallel(
-            followPathStop(reef2ToSource), stowElevator().andThen(arm.setState(ArmState.INTAKE))),
-        run(drive::stop).withDeadline(endEffector.intake()),
+            followPathStop(reef2ToSource),
+            stowElevator().andThen(arm.setState(ArmState.INTAKE), endEffector.intake())),
         followPath(sourceToReef3)
             .alongWith(
                 arm.setState(ArmState.IDLE),

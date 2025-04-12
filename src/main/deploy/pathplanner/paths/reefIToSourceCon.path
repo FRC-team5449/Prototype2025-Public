@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.307447307673402,
-        "y": 5.7726881304443785
+        "x": 4.379976326365879,
+        "y": 5.720274301081842
       },
       "isLocked": false,
       "linkedName": "reefICon"
@@ -20,8 +20,8 @@
         "y": 7.307250072337963
       },
       "prevControl": {
-        "x": 2.710282482635061,
-        "y": 6.713873645163688
+        "x": 2.365683313121329,
+        "y": 6.79760538009086
       },
       "nextControl": null,
       "isLocked": false,
@@ -50,5 +50,5 @@
     "velocity": 0,
     "rotation": -119.99999999999999
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

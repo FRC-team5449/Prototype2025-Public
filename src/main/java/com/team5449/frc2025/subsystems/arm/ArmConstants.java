@@ -62,11 +62,12 @@ public class ArmConstants {
             .withSupplyCurrentLimit(70);
     talonConfiguration.Slot0 =
         new Slot0Configs()
-            .withKP(45)
+            .withKP(100)
             .withKI(0)
             .withKD(1)
             .withKS(0.23)
             .withKG(0.44)
+            .withKV(0.06)
             .withGravityType(GravityTypeValue.Arm_Cosine)
             .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     talonConfiguration.Feedback =
@@ -77,13 +78,13 @@ public class ArmConstants {
             .withRotorToSensorRatio(kArmGearRatio)
             .withSensorToMechanismRatio(1);
     talonConfiguration.MotionMagic =
-        new MotionMagicConfigs().withMotionMagicCruiseVelocity(0.8).withMotionMagicAcceleration(5);
+        new MotionMagicConfigs().withMotionMagicCruiseVelocity(30).withMotionMagicAcceleration(30);
 
     kArmConfig.fxConfig = talonConfiguration;
   }
 
   static {
-    armCanCoderConfig.MagnetSensor.MagnetOffset = 0.105225;
+    armCanCoderConfig.MagnetSensor.MagnetOffset = 0.11;
     armCanCoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
     armCanCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
   }

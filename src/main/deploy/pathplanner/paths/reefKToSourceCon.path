@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.063619624912528,
-        "y": 6.029566294928695
+        "x": 3.051377942730031,
+        "y": 6.00840236566209
       },
       "isLocked": false,
       "linkedName": "reefKCon"
@@ -20,8 +20,8 @@
         "y": 7.307250072337963
       },
       "prevControl": {
-        "x": 1.2372416102597859,
-        "y": 7.466712901592159
+        "x": 1.2296194100153628,
+        "y": 7.479979052671598
       },
       "nextControl": null,
       "isLocked": false,
@@ -50,5 +50,5 @@
     "velocity": 0,
     "rotation": -59.99999999999999
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

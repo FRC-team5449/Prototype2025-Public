@@ -20,6 +20,7 @@ import com.team5449.frc2025.subsystems.elevator.ElevatorSubsystem.ElevatorState;
 import com.team5449.frc2025.subsystems.endeffector.EndEffectorSubsystem;
 import com.team5449.frc2025.subsystems.hopper.HopperSubsystem;
 import com.team5449.lib.util.AllianceFlipUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -179,6 +180,19 @@ public class AutoFactory {
         stowElevator());
   }
 
+  public Command scorePreload() {
+    return Commands.sequence(
+        startAt(new Pose2d()),
+        arm.setStateOk(ArmState.IDLE),
+        autoCommand
+            .driveToBranchTarget(true, () -> true)
+            .alongWith(extendElevator(ElevatorState.L4)),
+        arm.setStateOk(ArmState.SCORE),
+        endEffector.outtakeAuto(),
+        stowElevator(),
+        arm.setState(ArmState.INTAKE));
+  }
+
   private PathPlannerPath getAutoPath(String fileName) {
     PathPlannerPath path = null;
     try {
@@ -207,7 +221,10 @@ public class AutoFactory {
   }
 
   private Command startAt(PathPlannerPath firstPath) {
-    return Commands.runOnce(
-        () -> drive.setPose(AllianceFlipUtil.apply(firstPath.getStartingHolonomicPose().get())));
+    return startAt(firstPath.getStartingHolonomicPose().get());
+  }
+
+  private Command startAt(Pose2d pose) {
+    return Commands.runOnce(() -> drive.setPose(AllianceFlipUtil.apply(pose)));
   }
 }

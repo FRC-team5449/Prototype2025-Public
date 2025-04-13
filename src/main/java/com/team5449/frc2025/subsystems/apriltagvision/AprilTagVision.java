@@ -14,6 +14,7 @@ import com.team5449.lib.thirdpartylibs.LimelightHelpers;
 import com.team5449.lib.thirdpartylibs.LimelightHelpers.PoseEstimate;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -59,8 +60,8 @@ public class AprilTagVision extends SubsystemBase {
     for (String limelightName : limelightNames) {
       LimelightHelpers.SetRobotOrientation(
           limelightName,
-          Drive.gyroRotation.getDegrees(),
-          Units.radiansToDegrees(RobotState.getInstance().getRobotSpeeds().omegaRadiansPerSecond),
+          LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName).pose.getRotation().getDegrees(),
+          0,
           0,
           0,
           0,
@@ -167,7 +168,7 @@ public class AprilTagVision extends SubsystemBase {
     List<VisionObservation> observations = new ArrayList<>();
 
     // Update orientation for all cameras
-    // updateRobotOrientation();
+    updateRobotOrientation();
 
     // Get estimates from each camera
     for (CameraConfig camera : cameras.values()) {

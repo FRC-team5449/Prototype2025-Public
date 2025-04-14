@@ -14,6 +14,7 @@ import com.team5449.lib.thirdpartylibs.LimelightHelpers.PoseEstimate;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -96,12 +97,15 @@ public class AprilTagVision extends SubsystemBase {
       return;
     }
 
+    ChassisSpeeds robotSpeeds = RobotState.getInstance().getRobotSpeeds();
+
     // Reject single-tag measurements with high ambiguity
     if ((poseEstimate.tagCount == 1
             && poseEstimate.rawFiducials.length == 1
             && (poseEstimate.rawFiducials[0].ambiguity > 0.5
                 || poseEstimate.rawFiducials[0].distToCamera > 0.5))
-        || Math.abs(RobotState.getInstance().getRobotSpeeds().omegaRadiansPerSecond) > 4) {
+        || Math.abs(robotSpeeds.omegaRadiansPerSecond) > 4
+        || Math.hypot(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond) > 3) {
       return;
     }
 

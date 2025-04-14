@@ -72,7 +72,6 @@ public class Robot extends LoggedRobot {
                 : new Pose2d(0, 0, Rotation2d.k180deg));
 
     canBus = new CANBus("*");
-    LimelightHelpers.SetIMUMode("limelight", 0);
     // CameraServer.startAutomaticCapture();
   }
 
@@ -115,7 +114,7 @@ public class Robot extends LoggedRobot {
       autonomousCommand.schedule();
     }
 
-    LimelightHelpers.SetIMUMode("limelight", 0);
+    // LimelightHelpers.SetIMUMode("limelight", 2);
   }
 
   @Override
@@ -130,7 +129,7 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-    LimelightHelpers.SetIMUMode("limelight", 0);
+    // LimelightHelpers.SetIMUMode("limelight", 2);
   }
 
   @Override

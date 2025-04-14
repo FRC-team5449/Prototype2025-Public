@@ -9,16 +9,13 @@ package com.team5449.frc2025.subsystems.apriltagvision;
 
 import com.team5449.frc2025.RobotState;
 import com.team5449.frc2025.RobotState.VisionObservation;
-import com.team5449.frc2025.subsystems.drive.Drive;
 import com.team5449.lib.thirdpartylibs.LimelightHelpers;
 import com.team5449.lib.thirdpartylibs.LimelightHelpers.PoseEstimate;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -60,7 +57,10 @@ public class AprilTagVision extends SubsystemBase {
     for (String limelightName : limelightNames) {
       LimelightHelpers.SetRobotOrientation(
           limelightName,
-          LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName).pose.getRotation().getDegrees(),
+          LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName)
+              .pose
+              .getRotation()
+              .getDegrees(),
           0,
           0,
           0,
@@ -89,26 +89,26 @@ public class AprilTagVision extends SubsystemBase {
     return processEstimate(poseEstimate, stdDevCoefficient);
   }
 
-  @SuppressWarnings("unused")
-  private Optional<VisionObservation> getMegaTagEstimate(
-      String cameraName, double stdDevCoefficient) {
+  private void correctCameraIMUByMegatag1(
+      String cameraName) {
     PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraName);
 
-    if (poseEstimate == null || poseEstimate.tagCount == 0) {
-      return Optional.empty();
+    if (poseEstimate == null || poseEstimate.tagCount == 0 || !isAligning) {
+      return;
     }
 
     // Reject single-tag measurements with high ambiguity
     if ((poseEstimate.tagCount == 1
             && poseEstimate.rawFiducials.length == 1
-            && (poseEstimate.rawFiducials[0].ambiguity > 0.7
-                || poseEstimate.rawFiducials[0].distToCamera > MAX_TAG_TO_CAM_DISTANCE))
-        || Units.radiansToDegrees(RobotState.getInstance().getRobotSpeeds().omegaRadiansPerSecond)
-            > 240) {
-      return Optional.empty();
+            && (poseEstimate.rawFiducials[0].ambiguity > 0.5
+                || poseEstimate.rawFiducials[0].distToCamera > 0.5))
+        || Math.abs(RobotState.getInstance().getRobotSpeeds().omegaRadiansPerSecond) > 4) {
+      return;
     }
 
-    return processEstimate(poseEstimate, stdDevCoefficient);
+    System.out.println("Updating LLM Fused Angle");
+    LimelightHelpers.SetRobotOrientation(
+      cameraName, poseEstimate.pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
   }
 
   private Optional<VisionObservation> processEstimate(
@@ -168,7 +168,6 @@ public class AprilTagVision extends SubsystemBase {
     List<VisionObservation> observations = new ArrayList<>();
 
     // Update orientation for all cameras
-    updateRobotOrientation();
 
     // Get estimates from each camera
     for (CameraConfig camera : cameras.values()) {
@@ -181,10 +180,16 @@ public class AprilTagVision extends SubsystemBase {
       //   continue;
       // }
 
+      correctCameraIMUByMegatag1(camera.limelightName());
+
       // Fallback to original MegaTag
       Optional<VisionObservation> megaTag2Estimate =
           getMegaTag2Estimate(camera.limelightName(), camera.stdDevCoefficient());
       megaTag2Estimate.ifPresent(observations::add);
+
+      Logger.recordOutput(
+          "Vision/PoseAngle",
+          LimelightHelpers.getBotPose2d_wpiBlue(camera.limelightName()).getRotation().getDegrees());
     }
 
     observations.stream()

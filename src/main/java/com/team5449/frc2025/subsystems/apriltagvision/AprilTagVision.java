@@ -89,8 +89,7 @@ public class AprilTagVision extends SubsystemBase {
     return processEstimate(poseEstimate, stdDevCoefficient);
   }
 
-  private void correctCameraIMUByMegatag1(
-      String cameraName) {
+  private void correctCameraIMUByMegatag1(String cameraName) {
     PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraName);
 
     if (poseEstimate == null || poseEstimate.tagCount == 0 || !isAligning) {
@@ -108,7 +107,7 @@ public class AprilTagVision extends SubsystemBase {
 
     System.out.println("Updating LLM Fused Angle");
     LimelightHelpers.SetRobotOrientation(
-      cameraName, poseEstimate.pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
+        cameraName, poseEstimate.pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
   }
 
   private Optional<VisionObservation> processEstimate(

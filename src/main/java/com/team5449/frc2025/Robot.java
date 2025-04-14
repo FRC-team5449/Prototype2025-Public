@@ -62,6 +62,7 @@ public class Robot extends LoggedRobot {
     FieldConstants.initializeField();
     robotContainer = new RobotContainer();
 
+    //TODO Ensure the mode you are using is correct
     LimelightHelpers.SetIMUMode("limelight", 1);
     LimelightHelpers.SetRobotOrientation("limelight", FieldConstants.initialHeading, 0, 0, 0, 0, 0);
 

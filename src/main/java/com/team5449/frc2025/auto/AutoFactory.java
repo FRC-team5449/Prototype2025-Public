@@ -32,7 +32,10 @@ public class AutoFactory {
   private final ElevatorSubsystem elevator;
   private final ArmSubsystem arm;
   private final EndEffectorSubsystem endEffector;
+
+  @SuppressWarnings("unused")
   private final HopperSubsystem hopper;
+
   private final AlignCommands autoCommand;
 
   public Command dummyFourLV3() {
@@ -102,9 +105,7 @@ public class AutoFactory {
         score(),
         stowElevator());
   }
-  // spotless:on
 
-  // spotless:on
   public Command fastestAss3Level4Upper() {
     var startToReef1 = getAutoPath("upperStartToReefICon");
     var reef1ToSource = getAutoPath("reefIToSourceCon");
@@ -156,37 +157,44 @@ public class AutoFactory {
             .alongWith(
                 arm.setState(ArmState.IDLE),
                 Commands.waitUntil(new EventTrigger("Elevate"))
-                    .andThen(extendElevator(ElevatorState.L4))),
+                    .andThen(extendElevator(ElevatorState.L4))
+        ),
         score(),
         Commands.parallel(
             followPathStop(reef1ToSource),
-            stowElevator().andThen(arm.setState(ArmState.INTAKE), endEffector.intake())),
+            stowElevator().andThen(arm.setState(ArmState.INTAKE), endEffector.intake())
+        ),
         followPath(sourceToReef2)
             .alongWith(
                 arm.setState(ArmState.IDLE),
                 Commands.waitUntil(new EventTrigger("Elevate"))
                     .andThen(
                         extendElevator(ElevatorState.L4),
-                        Commands.waitUntil(new EventTrigger("Score")).andThen(score()))),
+                        Commands.waitUntil(new EventTrigger("Score")).andThen(score()))
+        ),
         Commands.parallel(
             followPathStop(reef2ToSource),
-            stowElevator().andThen(arm.setState(ArmState.INTAKE), endEffector.intake())),
+            stowElevator().andThen(arm.setState(ArmState.INTAKE), endEffector.intake())
+        ),
         followPath(sourceToReef3)
             .alongWith(
                 arm.setState(ArmState.IDLE),
                 Commands.waitUntil(new EventTrigger("Elevate"))
                     .andThen(
                         extendElevator(ElevatorState.L4),
-                        Commands.waitUntil(new EventTrigger("Score")).andThen(score()))),
+                        Commands.waitUntil(new EventTrigger("Score")).andThen(score()))
+        ),
         score(),
         Commands.parallel(
             followPathStop(reef3ToSource),
-            stowElevator().andThen(arm.setState(ArmState.INTAKE), endEffector.intake())),
+            stowElevator().andThen(arm.setState(ArmState.INTAKE), endEffector.intake())
+        ),
         followPath(sourceToReef4)
             .alongWith(
                 arm.setState(ArmState.IDLE),
                 Commands.waitUntil(new EventTrigger("Elevate"))
-                    .andThen(extendElevator(ElevatorState.L4))),
+                    .andThen(extendElevator(ElevatorState.L4))
+        ),
         score(),
         stowElevator());
   }
@@ -240,9 +248,6 @@ public class AutoFactory {
         stowElevator());
   }
 
-  // spotless:on
-
-  // spotless:off
   public Command fastAss3Level4Lower() {
     var startToReef1 = getAutoPath("lowerStartToReefE");
     var reef1ToSource = getAutoPath("reefEToSource");
@@ -278,6 +283,7 @@ public class AutoFactory {
         endEffector.outtakeAuto(),
         stowElevator());
   }
+  //spotless:on
 
   public Command scorePreload() {
     return Commands.sequence(

@@ -48,7 +48,7 @@
   "eventMarkers": [
     {
       "name": "Elevate",
-      "waypointRelativePos": 0.6,
+      "waypointRelativePos": 0.3,
       "endWaypointRelativePos": null,
       "command": null
     }

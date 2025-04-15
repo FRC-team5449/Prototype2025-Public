@@ -35,7 +35,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
   }
 
   public Command intake() {
-    return runEnd(() -> io.setOpenLoop(0.7), () -> io.setOpenLoop(0))
+    return runEnd(() -> io.setOpenLoop(0.6), () -> io.setOpenLoop(0))
         .until(
             /*new Trigger(() -> inputs.accelerationRPM < -500)*/ new Trigger(this::hasCoral)
                 .debounce(intakeLatency));

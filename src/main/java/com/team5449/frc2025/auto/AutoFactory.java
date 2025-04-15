@@ -188,6 +188,53 @@ public class AutoFactory {
         stowElevator());
   }
 
+  public Command fastestAss4Level4Lower() {
+    var startToReef1 = getAutoPath("upperStartToReefJCon").mirrorPath();
+    var reef1ToSource = getAutoPath("reefJToSourceCon").mirrorPath();
+    var sourceToReef2 = getAutoPath("sourceToReefKCon").mirrorPath();
+    var reef2ToSource = getAutoPath("reefKToSourceCon").mirrorPath();
+    var sourceToReef3 = getAutoPath("sourceToReefLCon").mirrorPath();
+    var reef3ToSource = getAutoPath("reefLToSourceCon").mirrorPath();
+    var sourceToReef4 = getAutoPath("sourceToReefICon").mirrorPath();
+
+    return Commands.sequence(
+        startAt(startToReef1),
+        followPath(startToReef1)
+            .alongWith(
+                arm.setState(ArmState.IDLE),
+                Commands.waitUntil(new EventTrigger("Elevate"))
+                    .andThen(extendElevator(ElevatorState.L4))),
+        score(),
+        Commands.parallel(
+            followPathStop(reef1ToSource),
+            stowElevator().andThen(arm.setState(ArmState.INTAKE), endEffector.intake())),
+        followPath(sourceToReef2)
+            .alongWith(
+                arm.setState(ArmState.IDLE),
+                Commands.waitUntil(new EventTrigger("Elevate"))
+                    .andThen(extendElevator(ElevatorState.L4))),
+        score(),
+        Commands.parallel(
+            followPathStop(reef2ToSource),
+            stowElevator().andThen(arm.setState(ArmState.INTAKE), endEffector.intake())),
+        followPath(sourceToReef3)
+            .alongWith(
+                arm.setState(ArmState.IDLE),
+                Commands.waitUntil(new EventTrigger("Elevate"))
+                    .andThen(extendElevator(ElevatorState.L4))),
+        score(),
+        Commands.parallel(
+            followPathStop(reef3ToSource),
+            stowElevator().andThen(arm.setState(ArmState.INTAKE), endEffector.intake())),
+        followPath(sourceToReef4)
+            .alongWith(
+                arm.setState(ArmState.IDLE),
+                Commands.waitUntil(new EventTrigger("Elevate"))
+                    .andThen(extendElevator(ElevatorState.L4))),
+        score(),
+        stowElevator());
+  }
+
   // spotless:on
 
   // spotless:off

@@ -73,7 +73,7 @@ public class HopperSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, 
     IDLE(() -> 2),
     INTAKE(() -> 5),
     LOW(() -> 14),
-    FOLD(() -> 39);
+    FOLD(() -> 37.2);
 
     public final DoubleSupplier goalSetpoint;
   }

@@ -141,6 +141,53 @@ public class AutoFactory {
         stowElevator());
   }
 
+  public Command fastestAss4Level4Upper() {
+    var startToReef1 = getAutoPath("upperStartToReefJCon");
+    var reef1ToSource = getAutoPath("reefJToSourceCon");
+    var sourceToReef2 = getAutoPath("sourceToReefKCon");
+    var reef2ToSource = getAutoPath("reefKToSourceCon");
+    var sourceToReef3 = getAutoPath("sourceToReefLCon");
+    var reef3ToSource = getAutoPath("reefLToSourceCon");
+    var sourceToReef4 = getAutoPath("sourceToReefICon");
+
+    return Commands.sequence(
+        startAt(startToReef1),
+        followPath(startToReef1)
+            .alongWith(
+                arm.setState(ArmState.IDLE),
+                Commands.waitUntil(new EventTrigger("Elevate"))
+                    .andThen(extendElevator(ElevatorState.L4))),
+        score(),
+        Commands.parallel(
+            followPathStop(reef1ToSource),
+            stowElevator().andThen(arm.setState(ArmState.INTAKE), endEffector.intake())),
+        followPath(sourceToReef2)
+            .alongWith(
+                arm.setState(ArmState.IDLE),
+                Commands.waitUntil(new EventTrigger("Elevate"))
+                    .andThen(extendElevator(ElevatorState.L4))),
+        score(),
+        Commands.parallel(
+            followPathStop(reef2ToSource),
+            stowElevator().andThen(arm.setState(ArmState.INTAKE), endEffector.intake())),
+        followPath(sourceToReef3)
+            .alongWith(
+                arm.setState(ArmState.IDLE),
+                Commands.waitUntil(new EventTrigger("Elevate"))
+                    .andThen(extendElevator(ElevatorState.L4))),
+        score(),
+        Commands.parallel(
+            followPathStop(reef3ToSource),
+            stowElevator().andThen(arm.setState(ArmState.INTAKE), endEffector.intake())),
+        followPath(sourceToReef4)
+            .alongWith(
+                arm.setState(ArmState.IDLE),
+                Commands.waitUntil(new EventTrigger("Elevate"))
+                    .andThen(extendElevator(ElevatorState.L4))),
+        score(),
+        stowElevator());
+  }
+
   // spotless:on
 
   // spotless:off
@@ -217,7 +264,7 @@ public class AutoFactory {
 
   private Command score() {
     return arm.setStateOk(ArmState.SCORE)
-        .alongWith(Commands.waitSeconds(0.3).andThen(endEffector.outtakeAuto()));
+        .alongWith(Commands.waitSeconds(0.1).andThen(endEffector.outtakeAuto()));
   }
 
   private Command startAt(PathPlannerPath firstPath) {

@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.309407919340864,
-        "y": 5.582231721470184
+        "x": 5.767579282794351,
+        "y": 5.5901841400075165
       },
       "isLocked": false,
       "linkedName": "start"
     },
     {
       "anchor": {
-        "x": 5.04,
-        "y": 5.31
+        "x": 5.33,
+        "y": 5.14
       },
       "prevControl": {
-        "x": 5.530229912577309,
-        "y": 5.487673821353611
+        "x": 5.504606125458927,
+        "y": 5.318920934918811
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "reefICon"
+      "linkedName": "reefJCon"
     }
   ],
   "rotationTargets": [],

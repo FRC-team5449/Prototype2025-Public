@@ -183,7 +183,7 @@ public class AprilTagVision extends SubsystemBase {
       //   continue;
       // }
 
-      correctCameraIMUByMegatag1(camera.limelightName());
+      //correctCameraIMUByMegatag1(camera.limelightName());
 
       // Fallback to original MegaTag
       Optional<VisionObservation> megaTag2Estimate =

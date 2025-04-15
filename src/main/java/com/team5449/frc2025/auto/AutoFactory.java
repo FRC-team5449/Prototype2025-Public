@@ -165,8 +165,9 @@ public class AutoFactory {
             .alongWith(
                 arm.setState(ArmState.IDLE),
                 Commands.waitUntil(new EventTrigger("Elevate"))
-                    .andThen(extendElevator(ElevatorState.L4))),
-        score(),
+                    .andThen(
+                        extendElevator(ElevatorState.L4),
+                        Commands.waitUntil(new EventTrigger("Score")).andThen(score()))),
         Commands.parallel(
             followPathStop(reef2ToSource),
             stowElevator().andThen(arm.setState(ArmState.INTAKE), endEffector.intake())),
@@ -174,7 +175,9 @@ public class AutoFactory {
             .alongWith(
                 arm.setState(ArmState.IDLE),
                 Commands.waitUntil(new EventTrigger("Elevate"))
-                    .andThen(extendElevator(ElevatorState.L4))),
+                    .andThen(
+                        extendElevator(ElevatorState.L4),
+                        Commands.waitUntil(new EventTrigger("Score")).andThen(score()))),
         score(),
         Commands.parallel(
             followPathStop(reef3ToSource),
@@ -212,8 +215,9 @@ public class AutoFactory {
             .alongWith(
                 arm.setState(ArmState.IDLE),
                 Commands.waitUntil(new EventTrigger("Elevate"))
-                    .andThen(extendElevator(ElevatorState.L4))),
-        score(),
+                    .andThen(
+                        extendElevator(ElevatorState.L4),
+                        Commands.waitUntil(new EventTrigger("Score")).andThen(score()))),
         Commands.parallel(
             followPathStop(reef2ToSource),
             stowElevator().andThen(arm.setState(ArmState.INTAKE), endEffector.intake())),
@@ -221,8 +225,9 @@ public class AutoFactory {
             .alongWith(
                 arm.setState(ArmState.IDLE),
                 Commands.waitUntil(new EventTrigger("Elevate"))
-                    .andThen(extendElevator(ElevatorState.L4))),
-        score(),
+                    .andThen(
+                        extendElevator(ElevatorState.L4),
+                        Commands.waitUntil(new EventTrigger("Score")).andThen(score()))),
         Commands.parallel(
             followPathStop(reef3ToSource),
             stowElevator().andThen(arm.setState(ArmState.INTAKE), endEffector.intake())),

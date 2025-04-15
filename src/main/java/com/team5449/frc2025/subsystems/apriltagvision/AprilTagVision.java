@@ -9,6 +9,7 @@ package com.team5449.frc2025.subsystems.apriltagvision;
 
 import com.team5449.frc2025.RobotState;
 import com.team5449.frc2025.RobotState.VisionObservation;
+import com.team5449.frc2025.subsystems.drive.Drive;
 import com.team5449.lib.thirdpartylibs.LimelightHelpers;
 import com.team5449.lib.thirdpartylibs.LimelightHelpers.PoseEstimate;
 import edu.wpi.first.math.Matrix;
@@ -33,7 +34,7 @@ public class AprilTagVision extends SubsystemBase {
   private static final double MIN_TAG_AREA = 0.1;
   private static final double MAX_TAG_DISTANCE = 1.0;
   private static final double XY_STD_DEV_COEFFICIENT = 5;
-  private static final double THETA_STD_DEV_COEFFICIENT = 200;
+  private static final double THETA_STD_DEV_COEFFICIENT = 9999999;
   private static final double ALIGN_THETA_STD_DEV_COEFFICIENT = 5;
   private static final double MIN_TAG_SPACING = 1.0;
   private static final double MAX_TAG_TO_CAM_DISTANCE = 2;
@@ -57,16 +58,7 @@ public class AprilTagVision extends SubsystemBase {
   public void updateRobotOrientation() {
     for (String limelightName : limelightNames) {
       LimelightHelpers.SetRobotOrientation(
-          limelightName,
-          LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName)
-              .pose
-              .getRotation()
-              .getDegrees(),
-          0,
-          0,
-          0,
-          0,
-          0);
+          limelightName, Drive.gyroRotation.getDegrees(), 0, 0, 0, 0, 0);
     }
   }
 
@@ -171,6 +163,7 @@ public class AprilTagVision extends SubsystemBase {
     List<VisionObservation> observations = new ArrayList<>();
 
     // Update orientation for all cameras
+    updateRobotOrientation();
 
     // Get estimates from each camera
     for (CameraConfig camera : cameras.values()) {
@@ -183,7 +176,7 @@ public class AprilTagVision extends SubsystemBase {
       //   continue;
       // }
 
-      //correctCameraIMUByMegatag1(camera.limelightName());
+      // correctCameraIMUByMegatag1(camera.limelightName());
 
       // Fallback to original MegaTag
       Optional<VisionObservation> megaTag2Estimate =

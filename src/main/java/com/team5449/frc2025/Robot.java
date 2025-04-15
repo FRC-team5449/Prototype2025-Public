@@ -115,7 +115,7 @@ public class Robot extends LoggedRobot {
       autonomousCommand.schedule();
     }
 
-    LimelightHelpers.SetIMUMode("limelight", 2);
+    LimelightHelpers.SetIMUMode("limelight", 0);
   }
 
   @Override
@@ -130,7 +130,7 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-    LimelightHelpers.SetIMUMode("limelight", 2);
+    LimelightHelpers.SetIMUMode("limelight", 0);
   }
 
   @Override

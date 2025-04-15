@@ -98,7 +98,7 @@ public class TunerConstants {
   public static final Distance kWheelRadius = Millimeter.of(50);
   public static final double kWheelRadiusMeter = kWheelRadius.in(Meter);
 
-  public static final int kPigeonId = 0;
+  public static final int kPigeonId = 50;
 
   // These are only used for simulation
   private static final MomentOfInertia kSteerInertia = KilogramSquareMeters.of(0.01);

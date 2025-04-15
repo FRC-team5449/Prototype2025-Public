@@ -46,6 +46,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -87,7 +88,7 @@ public class Drive extends SubsystemBase {
   private final SwerveDriveKinematics kinematics =
       new SwerveDriveKinematics(TunerConstants.moduleTranslations);
 
-  private Rotation2d rawGyroRotation = new Rotation2d();
+  public static Rotation2d rawGyroRotation = new Rotation2d();
   public static Rotation2d gyroRotation = new Rotation2d();
   private static Rotation2d gyroOffset =
       DriverStation.getAlliance().get() == Alliance.Red
@@ -173,6 +174,8 @@ public class Drive extends SubsystemBase {
     RobotState.getInstance().consumeTargetResetRequest().ifPresent(this::setTargetPose);
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
+    Logger.recordOutput("Drive/RotationPose", new Pose2d(0, 0, gyroInputs.yawPosition));
+    SmartDashboard.putNumber("PigeonDegrees", rawGyroRotation.getDegrees());
     Logger.processInputs("Drive/Gyro", gyroInputs);
     for (var module : modules) {
       module.periodic();

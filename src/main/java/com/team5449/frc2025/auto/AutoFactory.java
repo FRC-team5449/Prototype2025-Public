@@ -259,7 +259,8 @@ public class AutoFactory {
   }
 
   private Command stowElevator() {
-    return arm.setStateOk(ArmState.IDLE).andThen(elevator.setStateOk(ElevatorState.IDLE));
+    return arm.setStateOk(ArmState.IDLE)
+        .alongWith(Commands.waitSeconds(0.3).andThen(elevator.setStateOk(ElevatorState.IDLE)));
   }
 
   private Command score() {

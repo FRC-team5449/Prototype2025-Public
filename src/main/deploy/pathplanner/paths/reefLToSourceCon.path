@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.7424132371121637,
-        "y": 6.033204336541688
+        "x": 2.623355556194678,
+        "y": 6.158916123104766
       },
       "isLocked": false,
       "linkedName": "reefLCon"
@@ -20,8 +20,8 @@
         "y": 7.307250072337963
       },
       "prevControl": {
-        "x": 1.2190898376946784,
-        "y": 7.532531428019206
+        "x": 1.1853088526220765,
+        "y": 7.564199372523877
       },
       "nextControl": null,
       "isLocked": false,
@@ -29,7 +29,21 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.5,
+      "constraints": {
+        "maxVelocity": 4.0,
+        "maxAcceleration": 5.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {

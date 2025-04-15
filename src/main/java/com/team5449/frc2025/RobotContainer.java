@@ -165,6 +165,7 @@ public class RobotContainer {
     autoChooser.addOption("Dummy 4 Level3", autoFactory.dummyFourLV3());
     autoChooser.addOption("Fast Ass 3 Level4 Upper", autoFactory.fastAss3Level4Upper());
     autoChooser.addOption("Fast Upper *****", autoFactory.fastestAss3Level4Upper());
+    autoChooser.addOption("Fast 4444 Upper *****", autoFactory.fastestAss4Level4Upper());
     autoChooser.addOption("Fast Ass 3 Level4 Lower", autoFactory.fastAss3Level4Lower());
     configureBindings();
   }

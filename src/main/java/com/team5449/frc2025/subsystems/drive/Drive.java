@@ -64,7 +64,7 @@ public class Drive extends SubsystemBase {
   // PathPlanner config constants
   private static final double ROBOT_MASS_KG = 55;
   private static final double ROBOT_MOI = 6;
-  private static final double WHEEL_COF = 1;
+  private static final double WHEEL_COF = 1.18;
   private static final RobotConfig PP_CONFIG =
       new RobotConfig(
           ROBOT_MASS_KG,

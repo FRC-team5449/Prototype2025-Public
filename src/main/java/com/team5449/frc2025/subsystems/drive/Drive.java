@@ -64,7 +64,7 @@ public class Drive extends SubsystemBase {
   // PathPlanner config constants
   private static final double ROBOT_MASS_KG = 55;
   private static final double ROBOT_MOI = 6;
-  private static final double WHEEL_COF = 1.18;
+  private static final double WHEEL_COF = 1;
   private static final RobotConfig PP_CONFIG =
       new RobotConfig(
           ROBOT_MASS_KG,
@@ -366,6 +366,17 @@ public class Drive extends SubsystemBase {
   @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
     return poseEstimator.getEstimatedPosition();
+  }
+
+  public Pose2d getPoseWithLookahead() {
+    ChassisSpeeds speeds = getChassisSpeeds();
+    double lookAheadSeconds = 0.040;
+    Twist2d twsist =
+        new Twist2d(
+            speeds.vxMetersPerSecond * lookAheadSeconds,
+            speeds.vyMetersPerSecond * lookAheadSeconds,
+            speeds.omegaRadiansPerSecond * lookAheadSeconds);
+    return getPose().exp(twsist);
   }
 
   /** Returns the current odometry rotation. */

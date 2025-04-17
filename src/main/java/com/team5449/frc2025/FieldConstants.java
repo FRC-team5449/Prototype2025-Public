@@ -27,7 +27,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class FieldConstants {
   public static final AprilTagFieldLayout tagLayout =
-      AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+      AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
   public static final double fieldWidth = tagLayout.getFieldWidth();
   public static final double fieldLength = tagLayout.getFieldLength();

@@ -95,7 +95,7 @@ public class TunerConstants {
 
   public static final double kDriveGearRatio = 6.122448979591837;
   private static final double kSteerGearRatio = 21.428571428571427;
-  public static final Distance kWheelRadius = Millimeter.of(50);
+  public static final Distance kWheelRadius = Millimeter.of(50.5);
   public static final double kWheelRadiusMeter = kWheelRadius.in(Meter);
 
   public static final int kPigeonId = 50;

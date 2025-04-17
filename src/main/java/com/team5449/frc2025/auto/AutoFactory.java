@@ -72,11 +72,11 @@ public class AutoFactory {
 
   // spotless:off
   public Command fastAss3Level4Upper() {
-    var startToReef1 = getAutoPath("upperStartToReefI");
-    var reef1ToSource = getAutoPath("reefIToSource");
-    var sourceToReef2 = getAutoPath("sourceToReefK");
-    var reef2ToSource = getAutoPath("reefKToSource");
-    var sourceToReef3 = getAutoPath("sourceToReefL");
+    var reef1ToSource = getAutoPath("reefEToSource").mirrorPath();
+    var startToReef1 = getAutoPath("lowerStartToReefE").mirrorPath();
+    var sourceToReef2 = getAutoPath("sourceToReefD").mirrorPath();
+    var reef2ToSource = getAutoPath("reefDToSource").mirrorPath();
+    var sourceToReef3 = getAutoPath("sourceToReefC").mirrorPath();
 
     return Commands.sequence(
         startAt(startToReef1),
@@ -106,6 +106,7 @@ public class AutoFactory {
         stowElevator());
   }
 
+  @Deprecated
   public Command fastestAss3Level4Upper() {
     var startToReef1 = getAutoPath("upperStartToReefICon");
     var reef1ToSource = getAutoPath("reefIToSourceCon");

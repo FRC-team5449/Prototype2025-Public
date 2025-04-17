@@ -95,14 +95,14 @@ public class FieldConstants {
       DriverStation.getAlliance().get() == Alliance.Red ? 0 : 180;
 
   public static final Transform2d leftBranchTargetPoseRelativeToTagL4 =
-      new Transform2d(0.56, -0.165, Rotation2d.kZero);
+      new Transform2d(0.56, -0.167, Rotation2d.kZero);
   public static final Transform2d rightBranchTargetPoseRelativeToTagL4 =
-      new Transform2d(0.56, 0.165, Rotation2d.kZero);
+      new Transform2d(0.56, 0.167, Rotation2d.kZero);
 
   public static final Transform2d leftBranchTargetPoseRelativeToTag =
-      new Transform2d(0.5, -0.165, Rotation2d.kZero);
+      new Transform2d(0.5, -0.167, Rotation2d.kZero);
   public static final Transform2d rightBranchTargetPoseRelativeToTag =
-      new Transform2d(0.5, 0.165, Rotation2d.kZero);
+      new Transform2d(0.5, 0.167, Rotation2d.kZero);
 
   public static Optional<Pose2d> getReefTagPose(Translation2d botPosition) {
     Translation2d dist =

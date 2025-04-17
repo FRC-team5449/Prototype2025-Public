@@ -290,6 +290,9 @@ public class RobotContainer {
                     && currentMode == DriveMode.CLIMB)
         .onTrue(climber.setState(ClimberState.IDLE));
 
+    // new Trigger(()->false).onTrue(Commands.runOnce(()->drive.setPose(new
+    // Pose2d(drive.getPose().getTranslation(),Rotation2d.kZero))));
+
     driverGamepad.R2().and(() -> currentMode == DriveMode.CLIMB).whileTrue(climber.elevate());
 
     driverGamepad.L2().and(() -> currentMode == DriveMode.CLIMB).whileTrue(climber.decline());

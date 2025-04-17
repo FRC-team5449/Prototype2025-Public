@@ -59,7 +59,7 @@ public class IDrive extends Command {
     thetakP.initDefault(5.5);
     thetakD.initDefault(0.1);
     driveMaxVelocity.initDefault(TunerConstants.kLinearSpeedAt12Volts.in(MetersPerSecond));
-    driveMaxAcceleration.initDefault(10);
+    driveMaxAcceleration.initDefault(15);
     thetaMaxVelocity.initDefault(8);
     thetaMaxAcceleration.initDefault(20.0);
     driveTolerance.initDefault(0.05);

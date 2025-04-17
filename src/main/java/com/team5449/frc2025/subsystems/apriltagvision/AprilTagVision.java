@@ -58,7 +58,13 @@ public class AprilTagVision extends SubsystemBase {
   public void updateRobotOrientation() {
     for (String limelightName : limelightNames) {
       LimelightHelpers.SetRobotOrientation(
-          limelightName, Drive.gyroRotation.getDegrees(), 0, 0, 0, 0, 0);
+          limelightName,
+          Drive.gyroRotation.minus(RobotState.getInstance().getOffsetAngle()).getDegrees(),
+          0,
+          0,
+          0,
+          0,
+          0);
     }
   }
 

@@ -24,4 +24,6 @@ public interface EndEffectorIO {
   public default void setOpenLoop(double outputVolts) {}
 
   public default void differentialOpenLoop(double leftOutput, double rightOutput) {}
+
+  public default void setPosition(double position) {}
 }

@@ -70,6 +70,8 @@ public class ArmSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, Mot
   public enum ArmState {
     IDLE(() -> 0.055634078),
     INTAKE(() -> 0),
+    NET(() -> -0.06),
+    LOW_SCORE(() -> 0.2),
     SCORE(() -> 0.145634078);
 
     public final DoubleSupplier goalSetpoint;

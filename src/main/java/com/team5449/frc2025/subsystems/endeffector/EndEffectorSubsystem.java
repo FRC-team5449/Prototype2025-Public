@@ -59,6 +59,10 @@ public class EndEffectorSubsystem extends SubsystemBase {
     return runEnd(() -> io.differentialOpenLoop(0.4, 0.18), () -> io.differentialOpenLoop(0, 0));
   }
 
+  public void setOpenloop(double output) {
+    io.setOpenLoop(output);
+  }
+
   @Override
   public void periodic() {
     io.updateInputs(inputs);

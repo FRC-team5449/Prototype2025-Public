@@ -72,7 +72,8 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
     L1(() -> 0.8 * (3.0 / 5.0)),
     L2(() -> 4.5 * (3.0 / 4.0)),
     L3(() -> 10.2 * (3.0 / 4.0)),
-    L4(() -> 20 * (3.0 / 4.0));
+    L4(() -> 20 * (3.0 / 4.0)),
+    L5(() -> 15.4);
 
     public final DoubleSupplier goalSetpoint;
   }

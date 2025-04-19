@@ -168,6 +168,8 @@ public class RobotContainer {
     autoChooser.addOption("Fast 4444 Upper *****", autoFactory.fastestAss4Level4Upper());
     autoChooser.addOption("Fast 4444 Lower *****", autoFactory.fastestAss4Level4Lower());
     autoChooser.addOption("Fast Ass 3 Level4 Lower", autoFactory.fastAss3Level4Lower());
+    autoChooser.addOption("poor", autoFactory.scorePreload());
+
     configureBindings();
   }
 
@@ -208,10 +210,21 @@ public class RobotContainer {
         .pov(270)
         .and(() -> currentMode == DriveMode.TELEOP)
         .onTrue(setElevatorState(ElevatorState.L2));
+
+    driverGamepad
+        .touchpad()
+        .and(() -> currentMode == DriveMode.TELEOP)
+        .onTrue(
+            setElevatorState(ElevatorState.L5)
+                .andThen(
+                    Commands.waitUntil(() -> elevator.atGoal(ElevatorState.L5)),
+                    arm.setState(ArmState.NET)));
+
     driverGamepad
         .create()
         .and(() -> currentMode == DriveMode.TELEOP)
         .onTrue(setElevatorState(ElevatorState.IDLE));
+
     driverGamepad
         .R1()
         .onTrue(
@@ -231,10 +244,22 @@ public class RobotContainer {
 
     driverGamepad
         .R2()
-        .and(() -> !elevator.atGoal(ElevatorState.IDLE) && currentMode == DriveMode.TELEOP)
+        .and(
+            () ->
+                !elevator.atGoal(ElevatorState.IDLE)
+                    && !elevator.atGoal(ElevatorState.L1)
+                    && currentMode == DriveMode.TELEOP)
         .whileTrue(
             new StartEndCommand(
                 () -> arm.setDesiredState(ArmState.SCORE),
+                () -> arm.setDesiredState(ArmState.IDLE)));
+
+    driverGamepad
+        .R2()
+        .and(() -> elevator.atGoal(ElevatorState.L1) && currentMode == DriveMode.TELEOP)
+        .whileTrue(
+            new StartEndCommand(
+                () -> arm.setDesiredState(ArmState.LOW_SCORE),
                 () -> arm.setDesiredState(ArmState.IDLE)));
 
     driverGamepad
@@ -254,6 +279,13 @@ public class RobotContainer {
         .and(() -> elevator.isStowed() && currentMode == DriveMode.TELEOP)
         .onTrue(
             alignCommands.driveToBranchTarget(true, () -> useLevel4).until(driverGamepad.cross()));
+
+    driverGamepad
+        .L2()
+        .and(() -> !elevator.isStowed() && currentMode == DriveMode.TELEOP)
+        .whileTrue(
+            Commands.runEnd(
+                () -> endEffector.setOpenloop(-0.5), () -> endEffector.setOpenloop(-0.05)));
 
     driverGamepad
         .R2()

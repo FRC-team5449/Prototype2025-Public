@@ -164,7 +164,6 @@ public class RobotContainer {
     autoChooser.addDefaultOption("None", Commands.none());
     autoChooser.addOption("Dummy 4 Level3", autoFactory.dummyFourLV3());
     autoChooser.addOption("Fast Ass 3 Level4 Upper", autoFactory.fastAss3Level4Upper());
-    autoChooser.addOption("Fast Upper *****", autoFactory.fastestAss3Level4Upper());
     autoChooser.addOption("Fast 4444 Upper *****", autoFactory.fastestAss4Level4Upper());
     autoChooser.addOption("Fast 4444 Lower *****", autoFactory.fastestAss4Level4Lower());
     autoChooser.addOption("Fast Ass 3 Level4 Lower", autoFactory.fastAss3Level4Lower());
@@ -227,12 +226,18 @@ public class RobotContainer {
 
     driverGamepad
         .R1()
+        .and(() -> elevator.getDesiredState() != ElevatorState.L5)
         .onTrue(
             elevator
                 .setState(ElevatorState.IDLE)
                 .andThen(Commands.print("Done state setting"))
                 .alongWith(
                     Commands.waitUntil(elevator::isStowed).andThen(arm.setState(ArmState.INTAKE))));
+
+    driverGamepad
+        .R1()
+        .and(() -> elevator.getDesiredState() == ElevatorState.L5)
+        .onTrue(setElevatorState(ElevatorState.IDLE));
 
     driverGamepad
         .R1()
@@ -264,10 +269,23 @@ public class RobotContainer {
 
     driverGamepad
         .L1()
-        .and(() -> !elevator.atGoal(ElevatorState.L1) && elevator.atGoal() && !elevator.isStowed())
+        .and(
+            () ->
+                !elevator.atGoal(ElevatorState.L1)
+                    && !elevator.atGoal(ElevatorState.L5)
+                    && elevator.atGoal()
+                    && !elevator.isStowed())
         .whileTrue(endEffector.outtake());
 
     driverGamepad.L1().and(elevator::isStowed).whileTrue(endEffector.outtake());
+
+    driverGamepad
+        .L1()
+        .and(() -> elevator.atGoal(ElevatorState.L5) && arm.atGoal(ArmState.NET))
+        .onTrue(
+            Commands.sequence(
+                arm.setStateOk(ArmState.SCORE).alongWith(endEffector.outtake().withTimeout(0.5)),
+                arm.setState(ArmState.IDLE)));
 
     driverGamepad
         .L1()
@@ -285,7 +303,8 @@ public class RobotContainer {
         .and(() -> !elevator.isStowed() && currentMode == DriveMode.TELEOP)
         .whileTrue(
             Commands.runEnd(
-                () -> endEffector.setOpenloop(-0.5), () -> endEffector.setOpenloop(-0.05)));
+                    () -> endEffector.setOpenloop(-0.5), () -> endEffector.setOpenloop(-0.05))
+                .until(endEffector::hasCoral));
 
     driverGamepad
         .R2()

@@ -57,7 +57,7 @@ public class ElevatorConstants {
             .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     talonConfiguration.MotionMagic =
         new MotionMagicConfigs()
-            .withMotionMagicCruiseVelocity(50)
+            .withMotionMagicCruiseVelocity(200)
             .withMotionMagicAcceleration(1000)
             .withMotionMagicExpo_kV(0.19)
             .withMotionMagicExpo_kA(0.3);
